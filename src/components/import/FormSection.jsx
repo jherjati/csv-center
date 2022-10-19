@@ -1,3 +1,5 @@
+import { types } from "../../constants";
+
 function FormSection({ tabName, fields, columns }) {
   return (
     <section className='grid grid-cols-2 gap-4'>
@@ -15,9 +17,9 @@ function FormSection({ tabName, fields, columns }) {
                 id={col + "_mapping"}
                 className='mt-2 w-full shadow-sm focus:ring-teal-500 focus:border-teal-500 block sm:text-sm border-gray-300 rounded-md'
               >
-                {["text", "integer", "real"].map((el, idx) => (
-                  <option key={idx} value={el}>
-                    {el}
+                {types.map(({ label }) => (
+                  <option key={label} value={label}>
+                    {label}
                   </option>
                 ))}
               </select>

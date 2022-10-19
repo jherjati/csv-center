@@ -3,6 +3,7 @@ import { Fragment } from "preact";
 import { useEffect, useState } from "preact/hooks";
 import { PlusIcon, TrashIcon } from "@heroicons/react/20/solid";
 import { formats } from "../../contexts";
+import { types } from "../../constants";
 
 export default function FormatModal({ open, setOpen, focusFormat }) {
   const [tableName, setTableName] = useState("");
@@ -122,9 +123,9 @@ export default function FormatModal({ open, setOpen, focusFormat }) {
                           className='col-span-3 shadow-sm focus:ring-teal-500 focus:border-teal-500 block sm:text-sm border-gray-300'
                           defaultValue={el[1]}
                         >
-                          {["text", "integer", "real"].map((el, idx) => (
-                            <option key={idx} value={el}>
-                              {el}
+                          {types.map(({ label }) => (
+                            <option key={label} value={label}>
+                              {label}
                             </option>
                           ))}
                         </select>
@@ -183,9 +184,9 @@ export default function FormatModal({ open, setOpen, focusFormat }) {
                       id={"type-add"}
                       className='cursor-pointer col-span-3 shadow-sm focus:ring-teal-500 focus:border-teal-500 block sm:text-sm border-gray-300'
                     >
-                      {["text", "integer", "real"].map((el, idx) => (
-                        <option key={idx} value={el}>
-                          {el}
+                      {types.map(({ label }) => (
+                        <option key={label} value={label}>
+                          {label}
                         </option>
                       ))}
                     </select>

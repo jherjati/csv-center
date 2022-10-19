@@ -1,12 +1,14 @@
 import { db, formats, withHeader } from "../../contexts";
 import { useLocation } from "wouter-preact";
 import { parse } from "papaparse";
+import { parse as dateParse } from "date-fns";
 import { useState, useMemo } from "preact/hooks";
 import { ArrowPathIcon, PlusIcon } from "@heroicons/react/20/solid";
 import { useSnack } from "../../hooks";
 import Tabs from "./Tabs";
 import FormatModal from "./FormatModal";
 import FormSection from "./FormSection";
+import { types } from "../../constants";
 
 const formatColumns = (columns) =>
   columns
@@ -14,7 +16,7 @@ const formatColumns = (columns) =>
       return (
         el.name.replaceAll(/[^a-zA-Z0-9]/g, "_").replaceAll("__", "_") +
         " " +
-        el.type
+        types.find((type) => type.label === el.type).db
       );
     })
     .join(", ");
@@ -26,7 +28,9 @@ const formatDynamic = (data, withHeader) =>
         const temp = key.replaceAll(/[^a-zA-Z0-9]/g, "_").replaceAll("__", "_");
         columnName = temp.slice(-1) === "_" ? temp.slice(0, -1) : temp;
       }
-      return columnName + " " + data[key];
+      return (
+        columnName + " " + types.find((type) => type.label === data[key]).db
+      );
     })
     .join(", ");
 
@@ -50,13 +54,29 @@ function Mapping({ fields, file }) {
       if (tabName === "Dynamic") {
         const tableName = file.name.split(".")[0];
         const formData = Object.fromEntries(form.entries());
-        const realKeys = [];
+        const newFormat = [],
+          realKeys = [],
+          dayKeys = [],
+          monthKeys = [];
+
         Object.keys(formData).forEach((key) => {
-          if (formData[key] === "real") {
-            realKeys.push(key);
+          newFormat.push({ name: key, type: formData[key], aliases: [] });
+          switch (formData[key]) {
+            case "real":
+              realKeys.push(key);
+              break;
+            case "date [dd-MM-yyyy]":
+              dayKeys.push(key);
+              break;
+            case "date [MM-dd-yyyy]":
+              monthKeys.push(key);
+              break;
+            default:
+              break;
           }
         });
 
+        formats.value = { ...formats.value, [tableName]: newFormat };
         db.value.run(
           `CREATE TABLE IF NOT EXISTS '${tableName}'( ${formatDynamic(
             formData,
@@ -70,10 +90,22 @@ function Mapping({ fields, file }) {
               row.data[key] = row.data[key]
                 .replaceAll(".", "")
                 .replace(",", ".");
+            } else if (dayKeys.includes(key)) {
+              row.data[key] =
+                dateParse(
+                  row.data[key].trim().replaceAll(/[^a-zA-Z0-9]/g, "_"),
+                  "dd_MM_yyyy"
+                ) / 1000;
+            } else if (monthKeys.includes(key)) {
+              row.data[key] =
+                dateParse(
+                  row.data[key].trim().replaceAll(/[^a-zA-Z0-9]/g, "_"),
+                  "MM_dd_yyyy"
+                ) / 1000;
             }
           });
           const statement = `
-        INSERT INTO '${tableName}' VALUES ( ${Object.keys(formData)
+            INSERT INTO '${tableName}' VALUES ( ${Object.keys(formData)
             .map(() => "?")
             .join(", ")} );
           `;
@@ -84,10 +116,22 @@ function Mapping({ fields, file }) {
         };
       } else {
         const mapping = Object.fromEntries(form.entries());
-        const realKeys = [];
+        const realKeys = [],
+          dayKeys = [],
+          monthKeys = [];
         columns.forEach((col) => {
-          if (col.type === "real") {
-            realKeys.push(mapping[col.name]);
+          switch (col.type) {
+            case "real":
+              realKeys.push(mapping[col.name]);
+              break;
+            case "date [dd-MM-yyyy]":
+              dayKeys.push(mapping[col.name]);
+              break;
+            case "date [MM-dd-yyyy]":
+              monthKeys.push(mapping[col.name]);
+              break;
+            default:
+              break;
           }
         });
 
@@ -103,6 +147,18 @@ function Mapping({ fields, file }) {
               row.data[key] = row.data[key]
                 .replaceAll(".", "")
                 .replace(",", ".");
+            } else if (dayKeys.includes(key)) {
+              row.data[key] =
+                dateParse(
+                  row.data[key].trim().replaceAll(/[^a-zA-Z0-9]/g, "_"),
+                  "dd_MM_yyyy"
+                ) / 1000;
+            } else if (monthKeys.includes(key)) {
+              row.data[key] =
+                dateParse(
+                  row.data[key].trim().replaceAll(/[^a-zA-Z0-9]/g, "_"),
+                  "MM_dd_yyyy"
+                ) / 1000;
             }
           });
           const statement = `

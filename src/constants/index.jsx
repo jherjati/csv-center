@@ -60,3 +60,11 @@ export const operators = {
   integer: [],
   real: [],
 };
+
+export const types = [
+  { label: "text", db: "text", input: "text" },
+  { label: "integer", db: "integer", input: "number" },
+  { label: "real", db: "real", input: "number" },
+  { label: "date [MM-dd-yyyy]", db: "integer", input: "date" },
+  { label: "date [dd-MM-yyyy]", db: "integer", input: "date" },
+];
