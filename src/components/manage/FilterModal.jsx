@@ -13,7 +13,23 @@ export default function FilterModal({
   columns,
 }) {
   const [isText, setIsText] = useState(columns[0].type === "text");
-  
+
+  const handleSubmit = (event) => {
+    event.preventDefault();
+    const form = new FormData(event.target);
+    const data = Object.fromEntries(form.entries());
+    setFilter((prev) => [
+      ...prev,
+      [
+        data["col-add"],
+        data["opr-add"],
+        ["IS NULL", "IS NOT NULL"].includes(data["opr-add"])
+          ? ""
+          : data["val-add"],
+      ],
+    ]);
+  };
+
   return (
     <Transition.Root show={open} as={Fragment}>
       <Dialog as='div' className='relative z-10' onClose={setOpen}>
@@ -87,11 +103,14 @@ export default function FilterModal({
                         className='col-span-3 shadow-sm focus:ring-teal-500 focus:border-teal-500 block sm:text-sm border-gray-300'
                         defaultValue={el[1]}
                       >
-                        {operators["base"].map((el) => (
-                          <option key={el.sign} value={el.sign}>
-                            {el.text}
-                          </option>
-                        ))}
+                        {Object.keys(operators)
+                          .map((key) => operators[key])
+                          .flat()
+                          .map((el) => (
+                            <option key={el.sign} value={el.sign}>
+                              {el.text}
+                            </option>
+                          ))}
                       </select>
 
                       {/* Value */}
@@ -107,7 +126,7 @@ export default function FilterModal({
                         onClick={(event) => {
                           event.preventDefault();
                           setFilter((prev) =>
-                            prev.filter((el, idx) => idx !== id)
+                            prev.filter((_, idx) => idx !== id)
                           );
                         }}
                         className='h-10 w-10 self-end flex items-center justify-center rounded-r-md border border-gray-300 text-sm font-medium text-gray-600 shadow-sm hover:bg-gray-50 hover:text-gray-900 focus:z-10 focus:border-teal-500 focus:outline-none focus:ring-1 focus:ring-teal-500'
@@ -118,24 +137,7 @@ export default function FilterModal({
                   ))}
                 </div>
                 <hr className='my-3' />
-                <form
-                  onSubmit={(event) => {
-                    event.preventDefault();
-                    const form = new FormData(event.target);
-                    const data = Object.fromEntries(form.entries());
-                    setFilter((prev) => [
-                      ...prev,
-                      [
-                        data["col-add"],
-                        data["opr-add"],
-                        ["IS NULL", "IS NOT NULL"].includes(data["opr-add"])
-                          ? ""
-                          : data["val-add"],
-                      ],
-                    ]);
-                  }}
-                  className='grid grid-cols-10'
-                >
+                <form onSubmit={handleSubmit} className='grid grid-cols-10'>
                   {/* Column */}
                   <select
                     name={"col-add"}

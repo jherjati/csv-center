@@ -16,8 +16,23 @@ import {
 
 const filterToString = (filter) =>
   filter.length
-    ? "WHERE " + filter.map((el) => [el[0], el[1], "?"].join(" ")).join(" AND ")
+    ? "WHERE " +
+      filter
+        .map((el) =>
+          [
+            el[0],
+            el[1],
+            ["IS NULL", "IS NOT NULL"].includes(el[1]) ? "" : "?",
+          ].join(" ")
+        )
+        .join(" AND ")
     : "";
+const filterToValues = (filter) =>
+  filter
+    .filter((el) => !["IS NULL", "IS NOT NULL"].includes(el[1]))
+    .map((el) =>
+      ["LIKE", "NOT LIKE"].includes(el[1]) ? "%" + el[2] + "%" : el[2]
+    );
 
 function DbTable({ name }) {
   const [detailOpen, setDetailOpen] = useState(false);
@@ -44,9 +59,7 @@ function DbTable({ name }) {
           .join(", ")} FROM '${name}' ${filterToString(
           filter
         )} ${sortString} LIMIT 10 OFFSET ${(page - 1) * 10}`,
-        filter.map((el) =>
-          ["LIKE", "NOT LIKE"].includes(el[1]) ? "%" + el[2] + "%" : el[2]
-        )
+        filterToValues(filter)
       )[0],
     [sortString, page, detailOpen, filter]
   );
@@ -60,9 +73,7 @@ function DbTable({ name }) {
       db.value
         ? db.value.exec(
             `SELECT COUNT(*) FROM '${name}' ${filterToString(filter)}`,
-            filter.map((el) =>
-              ["LIKE", "NOT LIKE"].includes(el[1]) ? "%" + el[2] + "%" : el[2]
-            )
+            filterToValues(filter)
           )
         : [{ values: [[0]] }],
     [db.value, filter, detailOpen]
@@ -78,9 +89,7 @@ function DbTable({ name }) {
 
     db.value.each(
       `SELECT * FROM '${name}' ${filterToString(filter)}`,
-      filter.map((el) =>
-        ["LIKE", "NOT LIKE"].includes(el[1]) ? "%" + el[2] + "%" : el[2]
-      ),
+      filterToValues(filter),
       function (row) {
         writer.write(
           encoder.encode(
@@ -94,7 +103,6 @@ function DbTable({ name }) {
 
     writer.close();
   }, [filter]);
-
   return (
     <section className='my-6 w-full rounded-lg overflow-hidden shadow'>
       <div className='py-3 px-6 bg-white flex justify-between items-center'>
