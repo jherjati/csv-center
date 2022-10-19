@@ -1,0 +1,44 @@
+{
+  "name": "client",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "deploy": "aws s3 sync dist s3://csv.braga.co.id"
+  },
+  "dependencies": {
+    "@headlessui/react": "^1.7.2",
+    "@heroicons/react": "^2.0.11",
+    "@preact/signals": "^1.1.1",
+    "chart.js": "^3.9.1",
+    "chartjs-adapter-date-fns": "^2.0.0",
+    "date-fns": "^2.29.3",
+    "papaparse": "^5.3.2",
+    "preact": "^10.10.6",
+    "preact-compat": "^3.19.0",
+    "react": "npm:@preact/compat",
+    "react-dom": "npm:@preact/compat",
+    "sql.js": "^1.8.0",
+    "streamsaver": "^2.0.6",
+    "wouter-preact": "^2.8.0-alpha.2"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.19.3",
+    "@preact/preset-vite": "^2.3.0",
+    "@rollup/plugin-alias": "^4.0.0",
+    "@tailwindcss/forms": "^0.5.3",
+    "autoprefixer": "^10.4.8",
+    "postcss": "^8.4.16",
+    "tailwindcss": "^3.1.8",
+    "vite": "^3.1.0",
+    "vite-plugin-pwa": "^0.13.1",
+    "workbox-window": "^6.5.4"
+  },
+  "alias": {
+    "react": "preact/compat",
+    "react-dom": "preact/compat"
+  }
+}
