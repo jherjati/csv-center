@@ -31,6 +31,44 @@ export default function FormatModal({
     }
   }, [focusFormat]);
 
+  const deleteFormat = (event) => {
+    event.preventDefault();
+    if (focusFormat === tabName) setTabName("Dynamic");
+    setOpen(false);
+    const newFormats = {};
+    Object.keys(formats.value).forEach((key) =>
+      key !== focusFormat ? (newFormats[key] = formats.value[key]) : null
+    );
+    formats.value = newFormats;
+    localStorage.setItem("predefined_tables", JSON.stringify(newFormats));
+  };
+
+  const addColumn = (event) => {
+    event.preventDefault();
+    const form = new FormData(event.target);
+    const data = Object.fromEntries(form.entries());
+    setColumns((prev) => [
+      ...prev,
+      [data["name-add"], data["type-add"], data["aliases-add"]],
+    ]);
+  };
+
+  const submitFormat = (event) => {
+    event.preventDefault();
+    const newFormats = {};
+    Object.keys(formats.value).forEach(
+      (key) => key !== focusFormat && (newFormats[key] = formats.value[key])
+    );
+    newFormats[tableName] = columns.map((el) => ({
+      name: el[0],
+      type: el[1],
+      aliases: el[2].split(","),
+    }));
+    localStorage.setItem("predefined_tables", JSON.stringify(newFormats));
+    formats.value = newFormats;
+    setOpen(false);
+  };
+
   return (
     <Transition.Root show={open} as={Fragment}>
       <Dialog as='div' className='relative z-10' onClose={setOpen}>
@@ -77,22 +115,7 @@ export default function FormatModal({
                     </div>
                     {focusFormat && (
                       <button
-                        onClick={(event) => {
-                          event.preventDefault();
-                          if (focusFormat === tabName) setTabName("Dynamic");
-                          setOpen(false);
-                          const newFormats = {};
-                          Object.keys(formats.value).forEach((key) =>
-                            key !== focusFormat
-                              ? (newFormats[key] = formats.value[key])
-                              : null
-                          );
-                          formats.value = newFormats;
-                          localStorage.setItem(
-                            "predefined_tables",
-                            JSON.stringify(newFormats)
-                          );
-                        }}
+                        onClick={deleteFormat}
                         className='inline-flex items-center rounded-md border border-gray-300 px-3 py-2 text-sm font-medium leading-4 text-gray-600 shadow-sm hover:bg-gray-50 hover:text-gray-900 focus:z-10 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500'
                       >
                         <TrashIcon
@@ -118,17 +141,29 @@ export default function FormatModal({
                       <>
                         {/* Name */}
                         <input
-                          disabled
                           type={"text"}
                           className='col-span-3 shadow-sm focus:ring-teal-500 focus:border-teal-500 block sm:text-sm border-gray-300 rounded-l-md'
                           defaultValue={el[0]}
+                          onChange={(event) => {
+                            setColumns((prev) => {
+                              let newColumns = [...prev];
+                              newColumns[id][0] = event.target.value;
+                              return newColumns;
+                            });
+                          }}
                         />
 
                         {/* Type */}
                         <select
-                          disabled
                           className='col-span-3 shadow-sm focus:ring-teal-500 focus:border-teal-500 block sm:text-sm border-gray-300'
                           defaultValue={el[1]}
+                          onChange={(event) => {
+                            setColumns((prev) => {
+                              let newColumns = [...prev];
+                              newColumns[id][1] = event.target.value;
+                              return newColumns;
+                            });
+                          }}
                         >
                           {types.map(({ label }) => (
                             <option key={label} value={label}>
@@ -139,10 +174,16 @@ export default function FormatModal({
 
                         {/* Aliases */}
                         <input
-                          disabled
                           type={"text"}
-                          className={`col-span-3 text-gray-500 shadow-sm focus:ring-teal-500 focus:border-teal-500 block w-full sm:text-sm border-gray-300 h-10`}
+                          className={`col-span-3 shadow-sm focus:ring-teal-500 focus:border-teal-500 block w-full sm:text-sm border-gray-300 h-10`}
                           defaultValue={el[2]}
+                          onChange={(event) => {
+                            setColumns((prev) => {
+                              let newColumns = [...prev];
+                              newColumns[id][2] = event.target.value;
+                              return newColumns;
+                            });
+                          }}
                         />
 
                         {/* Action */}
@@ -161,22 +202,7 @@ export default function FormatModal({
                     ))}
                   </div>
                   <hr className='my-3' />
-                  <form
-                    onSubmit={(event) => {
-                      event.preventDefault();
-                      const form = new FormData(event.target);
-                      const data = Object.fromEntries(form.entries());
-                      setColumns((prev) => [
-                        ...prev,
-                        [
-                          data["name-add"],
-                          data["type-add"],
-                          data["aliases-add"],
-                        ],
-                      ]);
-                    }}
-                    className='grid grid-cols-10'
-                  >
+                  <form onSubmit={addColumn} className='grid grid-cols-10'>
                     {/* Name */}
                     <input
                       type={"text"}
@@ -226,26 +252,7 @@ export default function FormatModal({
                       Cancel
                     </button>
                     <button
-                      onClick={(event) => {
-                        event.preventDefault();
-                        const newFormats = {};
-                        Object.keys(formats.value).forEach(
-                          (key) =>
-                            key !== focusFormat &&
-                            (newFormats[key] = formats.value[key])
-                        );
-                        newFormats[tableName] = columns.map((el) => ({
-                          name: el[0],
-                          type: el[1],
-                          aliases: el[2].split(","),
-                        }));
-                        localStorage.setItem(
-                          "predefined_tables",
-                          JSON.stringify(newFormats)
-                        );
-                        formats.value = newFormats;
-                        setOpen(false);
-                      }}
+                      onClick={submitFormat}
                       className='ml-3 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-teal-600 hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500'
                     >
                       Submit
