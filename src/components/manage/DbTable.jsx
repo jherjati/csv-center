@@ -4,7 +4,7 @@ import { unparse } from "papaparse";
 import { format as dateFormat } from "date-fns";
 
 import { db, formats } from "../../contexts";
-import { useSort } from "../../hooks";
+import { useSnack, useSort } from "../../hooks";
 import Actions from "./Actions";
 import Pagination from "./Pagination";
 import DetailModal from "./DetailModal";
@@ -43,6 +43,7 @@ function DbTable({ name, isInFormats }) {
   const [page, setPage] = useState(1);
 
   const { sortAsc, handleSortClick, sortString } = useSort();
+  const { setSnackContent } = useSnack();
 
   const columns = useMemo(
     () =>
@@ -97,28 +98,37 @@ function DbTable({ name, isInFormats }) {
   );
 
   const handleExport = useCallback(() => {
-    const fileStream = streamSaver.createWriteStream(name + ".csv");
-    const writer = fileStream.getWriter();
-    const encoder = new TextEncoder();
-    writer.write(
-      encoder.encode(columns.map((col) => col.name).join(";") + "\r\n")
-    );
+    try {
+      const fileStream = streamSaver.createWriteStream(name + ".csv");
+      const writer = fileStream.getWriter();
+      const encoder = new TextEncoder();
+      writer.write(
+        encoder.encode(columns.map((col) => col.name).join(";") + "\r\n")
+      );
 
-    db.value.each(
-      `SELECT * FROM '${name}' ${filterToString(filter)}`,
-      filterToValues(filter),
-      function (row) {
-        writer.write(
-          encoder.encode(
-            unparse([columns.map((col) => row[col.name])], {
-              delimiter: ";",
-            }) + "\r\n"
-          )
-        );
-      }
-    );
+      db.value.each(
+        `SELECT * FROM '${name}' ${filterToString(filter)}`,
+        filterToValues(filter),
+        function (row) {
+          writer.write(
+            encoder.encode(
+              unparse([columns.map((col) => row[col.name])], {
+                delimiter: ";",
+              }) + "\r\n"
+            )
+          );
+        }
+      );
 
-    writer.close();
+      writer.close();
+    } catch (error) {
+      console.error(error);
+      setSnackContent([
+        "error",
+        "An Error Occured",
+        "Download process stuck due to some table configuration",
+      ]);
+    }
   }, [filter]);
 
   return (

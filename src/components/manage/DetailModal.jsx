@@ -6,6 +6,7 @@ import { TrashIcon } from "@heroicons/react/20/solid";
 import { types } from "../../constants";
 import { format } from "date-fns";
 import { parse } from "date-fns";
+import { useSnack } from "../../hooks";
 
 export default function DetailModal({
   open,
@@ -14,6 +15,8 @@ export default function DetailModal({
   focusId,
   columns,
 }) {
+  const { setSnackContent } = useSnack();
+
   useEffect(() => {
     if (open && focusId) {
       const res = db.value.exec(
@@ -44,28 +47,39 @@ export default function DetailModal({
 
   const handleSubmit = useCallback(
     (event) => {
-      event.preventDefault();
-      const form = new FormData(event.target);
-      const data = Object.fromEntries(form.entries());
-      const statement = focusId
-        ? `UPDATE '${tableName}' SET ${columns
-            .map((col) => `${col.name} = ?`)
-            .join(", ")} WHERE rowid = ${focusId};`
-        : `
+      try {
+        event.preventDefault();
+        const form = new FormData(event.target);
+        const data = Object.fromEntries(form.entries());
+        const statement = focusId
+          ? `UPDATE '${tableName}' SET ${columns
+              .map((col) => `${col.name} = ?`)
+              .join(", ")} WHERE rowid = ${focusId};`
+          : `
         INSERT INTO '${tableName}' VALUES ( ${columns
-            .map(() => "?")
-            .join(", ")} );
+              .map(() => "?")
+              .join(", ")} );
         `;
-      db.value.run(
-        statement,
-        columns.map((col) => {
-          if (types.find((type) => type.label === col.type).input === "date") {
-            return parse(data[col.name], "yyyy-MM-dd", new Date()) / 1000;
-          }
-          return data[col.name];
-        })
-      );
-      setOpen(false);
+        db.value.run(
+          statement,
+          columns.map((col) => {
+            if (
+              types.find((type) => type.label === col.type).input === "date"
+            ) {
+              return parse(data[col.name], "yyyy-MM-dd", new Date()) / 1000;
+            }
+            return data[col.name];
+          })
+        );
+        setOpen(false);
+      } catch (error) {
+        console.error(error);
+        setSnackContent([
+          "error",
+          "An Error Occured",
+          "You might miss something on your data form, please check",
+        ]);
+      }
     },
     [db.value, focusId]
   );

@@ -4,6 +4,7 @@ import { useState } from "preact/hooks";
 import { operators, types } from "../../constants";
 import { PlusIcon, TrashIcon, XMarkIcon } from "@heroicons/react/20/solid";
 import { parse, format } from "date-fns";
+import { useSnack } from "../../hooks";
 
 export default function FilterModal({
   open,
@@ -14,25 +15,35 @@ export default function FilterModal({
   columns,
 }) {
   const [activeType, setActiveType] = useState(columns[0].type);
+  const { setSnackContent } = useSnack();
 
   const handleSubmit = (event) => {
-    event.preventDefault();
-    const form = new FormData(event.target);
-    const data = Object.fromEntries(form.entries());
-    const newFilterItem = [
-      data["col-add"],
-      data["opr-add"],
-      ["IS NULL", "IS NOT NULL"].includes(data["opr-add"])
-        ? ""
-        : types.find(
-            (ty) =>
-              ty.label ===
-              columns.find((col) => col.name === data["col-add"]).type
-          ).input === "date"
-        ? parse(data["val-add"], "yyyy-MM-dd", new Date()) / 1000
-        : data["val-add"],
-    ];
-    setFilter((prev) => [...prev, newFilterItem]);
+    try {
+      event.preventDefault();
+      const form = new FormData(event.target);
+      const data = Object.fromEntries(form.entries());
+      const newFilterItem = [
+        data["col-add"],
+        data["opr-add"],
+        ["IS NULL", "IS NOT NULL"].includes(data["opr-add"])
+          ? ""
+          : types.find(
+              (ty) =>
+                ty.label ===
+                columns.find((col) => col.name === data["col-add"]).type
+            ).input === "date"
+          ? parse(data["val-add"], "yyyy-MM-dd", new Date()) / 1000
+          : data["val-add"],
+      ];
+      setFilter((prev) => [...prev, newFilterItem]);
+    } catch (error) {
+      console.error(error);
+      setSnackContent([
+        "error",
+        "An Error Occured",
+        "Download process stuck due to some table configuration",
+      ]);
+    }
   };
 
   return (
