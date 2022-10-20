@@ -219,6 +219,12 @@ function Mapping({ fields, file }) {
 
   const [focusFormat, setFocusFormat] = useState();
 
+  const openNewFormat = (event) => {
+    event.preventDefault();
+    setFocusFormat(null);
+    setAddOpen(true);
+  };
+
   return (
     <>
       <form
@@ -230,11 +236,7 @@ function Mapping({ fields, file }) {
             Table Format
           </h4>
           <button
-            onClick={(event) => {
-              event.preventDefault();
-              setFocusFormat(null);
-              setAddOpen(true);
-            }}
+            onClick={openNewFormat}
             className='inline-flex items-center py-2 px-4 space-x-2 rounded-md border border-gray-300 bg-white text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2'
           >
             <PlusIcon className='h-5 w-5' aria-hidden='true' />
