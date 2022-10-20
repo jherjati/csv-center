@@ -56,7 +56,7 @@ function DbTable({ name, isInFormats }) {
 
   const data = useMemo(() => {
     const dateIndeks = [];
-    const toReturn = db.value.exec(
+    let toReturn = db.value.exec(
       `SELECT rowid, ${columns
         .map((el, idx) => {
           if (["date [MM-dd-yyyy]", "date [dd-MM-yyyy]"].includes(el.type)) {
@@ -68,8 +68,9 @@ function DbTable({ name, isInFormats }) {
         filter
       )} ${sortString} LIMIT 10 OFFSET ${(page - 1) * 10}`,
       filterToValues(filter)
-    )[0];
-    if (dateIndeks.length) {
+    );
+    toReturn = toReturn[0];
+    if (toReturn && dateIndeks.length) {
       toReturn.values.map((row) => {
         dateIndeks.forEach((indeks) => {
           row[indeks] = dateFormat(new Date(row[indeks] * 1000), "dd-MM-yyyy");
