@@ -1,8 +1,9 @@
 import { useMemo, useState, useCallback } from "preact/hooks";
 import streamSaver from "streamsaver";
 import { unparse } from "papaparse";
+import { format as dateFormat } from "date-fns";
 
-import { db } from "../../contexts";
+import { db, formats } from "../../contexts";
 import { useSort } from "../../hooks";
 import Actions from "./Actions";
 import Pagination from "./Pagination";
@@ -34,7 +35,7 @@ const filterToValues = (filter) =>
       ["LIKE", "NOT LIKE"].includes(el[1]) ? "%" + el[2] + "%" : el[2]
     );
 
-function DbTable({ name }) {
+function DbTable({ name, isInFormats }) {
   const [detailOpen, setDetailOpen] = useState(false);
   const [filterOpen, setFilterOpen] = useState(false);
   const [filter, setFilter] = useState([]);
@@ -45,24 +46,39 @@ function DbTable({ name }) {
 
   const columns = useMemo(
     () =>
-      db.value
-        .exec(`PRAGMA table_info('${name}')`)[0]
-        .values.map((el) => ({ name: el[1], type: el[2].toLowerCase() })),
-    [name]
+      isInFormats
+        ? formats.value[name]
+        : db.value
+            .exec(`PRAGMA table_info('${name}')`)[0]
+            .values.map((el) => ({ name: el[1], type: el[2].toLowerCase() })),
+    [name, isInFormats]
   );
 
-  const data = useMemo(
-    () =>
-      db.value.exec(
-        `SELECT rowid, ${columns
-          .map((el) => el.name)
-          .join(", ")} FROM '${name}' ${filterToString(
-          filter
-        )} ${sortString} LIMIT 10 OFFSET ${(page - 1) * 10}`,
-        filterToValues(filter)
-      )[0],
-    [sortString, page, detailOpen, filter]
-  );
+  const data = useMemo(() => {
+    const dateIndeks = [];
+    const toReturn = db.value.exec(
+      `SELECT rowid, ${columns
+        .map((el, idx) => {
+          if (["date [MM-dd-yyyy]", "date [dd-MM-yyyy]"].includes(el.type)) {
+            dateIndeks.push(idx + 1);
+          }
+          return el.name;
+        })
+        .join(", ")} FROM '${name}' ${filterToString(
+        filter
+      )} ${sortString} LIMIT 10 OFFSET ${(page - 1) * 10}`,
+      filterToValues(filter)
+    )[0];
+    if (dateIndeks.length) {
+      toReturn.values.map((row) => {
+        dateIndeks.forEach((indeks) => {
+          row[indeks] = dateFormat(new Date(row[indeks] * 1000), "dd-MM-yyyy");
+        });
+        return row;
+      });
+    }
+    return toReturn;
+  }, [sortString, page, detailOpen, filter]);
 
   const [
     {
@@ -103,6 +119,7 @@ function DbTable({ name }) {
 
     writer.close();
   }, [filter]);
+
   return (
     <section className='my-6 w-full rounded-lg overflow-hidden shadow'>
       <div className='py-3 px-6 bg-white flex justify-between items-center'>
@@ -110,13 +127,11 @@ function DbTable({ name }) {
           {name}
         </h5>
         <Actions
-          tableName={name}
           setDetailOpen={setDetailOpen}
           setFilterOpen={setFilterOpen}
           setFocusId={setFocusId}
           handleExport={handleExport}
           filterCount={filter.length}
-          columns={columns}
         />
       </div>
       <div className='overflow-scroll w-full'>

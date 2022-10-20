@@ -60,7 +60,11 @@ function Mapping({ fields, file }) {
           monthKeys = [];
 
         Object.keys(formData).forEach((key) => {
-          newFormat.push({ name: key, type: formData[key], aliases: [] });
+          newFormat.push({
+            name: withHeader.value ? key : "column_" + key,
+            type: formData[key],
+            aliases: [],
+          });
           switch (formData[key]) {
             case "real":
               realKeys.push(key);
@@ -76,7 +80,9 @@ function Mapping({ fields, file }) {
           }
         });
 
-        formats.value = { ...formats.value, [tableName]: newFormat };
+        const newFormats = { ...formats.value, [tableName]: newFormat };
+        localStorage.setItem("predefined_tables", JSON.stringify(newFormats));
+        formats.value = newFormats;
         db.value.run(
           `CREATE TABLE IF NOT EXISTS '${tableName}'( ${formatDynamic(
             formData,
@@ -94,13 +100,15 @@ function Mapping({ fields, file }) {
               row.data[key] =
                 dateParse(
                   row.data[key].trim().replaceAll(/[^a-zA-Z0-9]/g, "_"),
-                  "dd_MM_yyyy"
+                  "dd_MM_yyyy",
+                  new Date()
                 ) / 1000;
             } else if (monthKeys.includes(key)) {
               row.data[key] =
                 dateParse(
                   row.data[key].trim().replaceAll(/[^a-zA-Z0-9]/g, "_"),
-                  "MM_dd_yyyy"
+                  "MM_dd_yyyy",
+                  new Date()
                 ) / 1000;
             }
           });
@@ -151,13 +159,15 @@ function Mapping({ fields, file }) {
               row.data[key] =
                 dateParse(
                   row.data[key].trim().replaceAll(/[^a-zA-Z0-9]/g, "_"),
-                  "dd_MM_yyyy"
+                  "dd_MM_yyyy",
+                  new Date()
                 ) / 1000;
             } else if (monthKeys.includes(key)) {
               row.data[key] =
                 dateParse(
                   row.data[key].trim().replaceAll(/[^a-zA-Z0-9]/g, "_"),
-                  "MM_dd_yyyy"
+                  "MM_dd_yyyy",
+                  new Date()
                 ) / 1000;
             }
           });
@@ -252,6 +262,8 @@ function Mapping({ fields, file }) {
         open={addOpen}
         setOpen={setAddOpen}
         focusFormat={focusFormat}
+        tabName={tabName}
+        setTabName={setTabName}
       />
     </>
   );

@@ -3,6 +3,9 @@ import { Fragment } from "preact";
 import { useCallback, useEffect } from "preact/hooks";
 import { db } from "../../contexts";
 import { TrashIcon } from "@heroicons/react/20/solid";
+import { types } from "../../constants";
+import { format } from "date-fns";
+import { parse } from "date-fns";
 
 export default function DetailModal({
   open,
@@ -21,7 +24,19 @@ export default function DetailModal({
       setTimeout(() => {
         const form = document.getElementById("detail-form");
         res.columns.forEach((name, idx) => {
-          form[name].value = res.values[0][idx];
+          if (
+            types.find(
+              (type) =>
+                type.label === columns.find((col) => col.name === name).type
+            ).input === "date"
+          ) {
+            form[name].value = format(
+              new Date(res.values[0][idx] * 1000),
+              "yyyy-MM-dd"
+            );
+          } else {
+            form[name].value = res.values[0][idx];
+          }
         });
       }, 50);
     }
@@ -43,7 +58,12 @@ export default function DetailModal({
         `;
       db.value.run(
         statement,
-        columns.map((col) => data[col.name])
+        columns.map((col) => {
+          if (types.find((type) => type.label === col.type).input === "date") {
+            return parse(data[col.name], "yyyy-MM-dd", new Date()) / 1000;
+          }
+          return data[col.name];
+        })
       );
       setOpen(false);
     },
@@ -119,11 +139,7 @@ export default function DetailModal({
                         </label>
                         <div className='mt-1'>
                           <input
-                            type={
-                              ["real", "integer"].includes(type)
-                                ? "number"
-                                : "text"
-                            }
+                            type={types.find((ty) => ty.label === type).input}
                             step='any'
                             name={name}
                             id={name}

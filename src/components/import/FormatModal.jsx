@@ -5,7 +5,13 @@ import { PlusIcon, TrashIcon } from "@heroicons/react/20/solid";
 import { formats } from "../../contexts";
 import { types } from "../../constants";
 
-export default function FormatModal({ open, setOpen, focusFormat }) {
+export default function FormatModal({
+  open,
+  setOpen,
+  focusFormat,
+  tabName,
+  setTabName,
+}) {
   const [tableName, setTableName] = useState("");
   const [columns, setColumns] = useState([]);
 
@@ -73,6 +79,7 @@ export default function FormatModal({ open, setOpen, focusFormat }) {
                       <button
                         onClick={(event) => {
                           event.preventDefault();
+                          if (focusFormat === tabName) setTabName("Dynamic");
                           setOpen(false);
                           const newFormats = {};
                           Object.keys(formats.value).forEach((key) =>
