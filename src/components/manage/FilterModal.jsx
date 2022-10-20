@@ -1,8 +1,9 @@
 import { Dialog, Transition } from "@headlessui/react";
 import { Fragment } from "preact";
 import { useState } from "preact/hooks";
-import { operators } from "../../constants";
+import { operators, types } from "../../constants";
 import { PlusIcon, TrashIcon, XMarkIcon } from "@heroicons/react/20/solid";
+import { parse, format } from "date-fns";
 
 export default function FilterModal({
   open,
@@ -12,22 +13,26 @@ export default function FilterModal({
   setFilter,
   columns,
 }) {
-  const [isText, setIsText] = useState(columns[0].type === "text");
+  const [activeType, setActiveType] = useState(columns[0].type);
 
   const handleSubmit = (event) => {
     event.preventDefault();
     const form = new FormData(event.target);
     const data = Object.fromEntries(form.entries());
-    setFilter((prev) => [
-      ...prev,
-      [
-        data["col-add"],
-        data["opr-add"],
-        ["IS NULL", "IS NOT NULL"].includes(data["opr-add"])
-          ? ""
-          : data["val-add"],
-      ],
-    ]);
+    const newFilterItem = [
+      data["col-add"],
+      data["opr-add"],
+      ["IS NULL", "IS NOT NULL"].includes(data["opr-add"])
+        ? ""
+        : types.find(
+            (ty) =>
+              ty.label ===
+              columns.find((col) => col.name === data["col-add"]).type
+          ).input === "date"
+        ? parse(data["val-add"], "yyyy-MM-dd", new Date()) / 1000
+        : data["val-add"],
+    ];
+    setFilter((prev) => [...prev, newFilterItem]);
   };
 
   return (
@@ -82,59 +87,70 @@ export default function FilterModal({
                     Value
                   </label>
                   <span className='hidden col-span-1'></span>
-                  {filter.map((el, id) => (
-                    <>
-                      {/* Column */}
-                      <select
-                        disabled
-                        className='col-span-3 shadow-sm focus:ring-teal-500 focus:border-teal-500 block sm:text-sm border-gray-300 rounded-l-md'
-                        defaultValue={el[0]}
-                      >
-                        {columns.map((el) => (
-                          <option key={el.name} value={el.name}>
-                            {el.name}
-                          </option>
-                        ))}
-                      </select>
-
-                      {/* Operator */}
-                      <select
-                        disabled
-                        className='col-span-3 shadow-sm focus:ring-teal-500 focus:border-teal-500 block sm:text-sm border-gray-300'
-                        defaultValue={el[1]}
-                      >
-                        {Object.keys(operators)
-                          .map((key) => operators[key])
-                          .flat()
-                          .map((el) => (
-                            <option key={el.sign} value={el.sign}>
-                              {el.text}
+                  {filter.map((el, id) => {
+                    const thisType = types.find(
+                      (ty) =>
+                        ty.label ===
+                        columns.find((col) => col.name === el[0]).type
+                    );
+                    return (
+                      <>
+                        {/* Column */}
+                        <select
+                          disabled
+                          className='col-span-3 shadow-sm focus:ring-teal-500 focus:border-teal-500 block sm:text-sm border-gray-300 rounded-l-md'
+                          defaultValue={el[0]}
+                        >
+                          {columns.map((el) => (
+                            <option key={el.name} value={el.name}>
+                              {el.name}
                             </option>
                           ))}
-                      </select>
+                        </select>
 
-                      {/* Value */}
-                      <input
-                        disabled
-                        type={"text"}
-                        className={`col-span-3 text-gray-500 shadow-sm focus:ring-teal-500 focus:border-teal-500 block w-full sm:text-sm border-gray-300 h-10`}
-                        defaultValue={el[2]}
-                      />
+                        {/* Operator */}
+                        <select
+                          disabled
+                          className='col-span-3 shadow-sm focus:ring-teal-500 focus:border-teal-500 block sm:text-sm border-gray-300'
+                          defaultValue={el[1]}
+                        >
+                          {Object.keys(operators)
+                            .map((key) => operators[key])
+                            .flat()
+                            .map((el) => (
+                              <option key={el.sign} value={el.sign}>
+                                {el.text}
+                              </option>
+                            ))}
+                        </select>
 
-                      {/* Action */}
-                      <button
-                        onClick={(event) => {
-                          event.preventDefault();
-                          setFilter((prev) =>
-                            prev.filter((_, idx) => idx !== id)
-                          );
-                        }}
-                        className='h-10 w-10 self-end flex items-center justify-center rounded-r-md border border-gray-300 text-sm font-medium text-gray-600 shadow-sm hover:bg-gray-50 hover:text-gray-900 focus:z-10 focus:border-teal-500 focus:outline-none focus:ring-1 focus:ring-teal-500'
-                      >
-                        <TrashIcon className='h-4 w-4' aria-hidden='true' />
-                      </button>
-                    </>
-                  ))}
+                        {/* Value */}
+                        <input
+                          disabled
+                          type={thisType.input}
+                          className={`col-span-3 text-gray-500 shadow-sm focus:ring-teal-500 focus:border-teal-500 block w-full sm:text-sm border-gray-300 h-10`}
+                          defaultValue={
+                            thisType.input === "date"
+                              ? format(new Date(el[2] * 1000), "yyyy-MM-dd")
+                              : el[2]
+                          }
+                        />
+
+                        {/* Action */}
+                        <button
+                          onClick={(event) => {
+                            event.preventDefault();
+                            setFilter((prev) =>
+                              prev.filter((_, idx) => idx !== id)
+                            );
+                          }}
+                          className='h-10 w-10 self-end flex items-center justify-center rounded-r-md border border-gray-300 text-sm font-medium text-gray-600 shadow-sm hover:bg-gray-50 hover:text-gray-900 focus:z-10 focus:border-teal-500 focus:outline-none focus:ring-1 focus:ring-teal-500'
+                        >
+                          <TrashIcon className='h-4 w-4' aria-hidden='true' />
+                        </button>
+                      </>
+                    );
+                  })}
                 </div>
                 <hr className='my-3' />
                 <form onSubmit={handleSubmit} className='grid grid-cols-10'>
@@ -143,16 +159,12 @@ export default function FilterModal({
                     name={"col-add"}
                     id={"col-add"}
                     className='cursor-pointer col-span-3 shadow-sm focus:ring-teal-500 focus:border-teal-500 block sm:text-sm border-gray-300 rounded-l-md'
-                    onChange={(event) => {
-                      if (
+                    onChange={(event) =>
+                      setActiveType(
                         columns.find((el) => el.name === event.target.value)
-                          .type === "text"
-                      ) {
-                        setIsText(true);
-                      } else {
-                        setIsText(false);
-                      }
-                    }}
+                          .type
+                      )
+                    }
                   >
                     {columns.map((el) => (
                       <option key={el.name} value={el.name}>
@@ -172,7 +184,7 @@ export default function FilterModal({
                         {el.text}
                       </option>
                     ))}
-                    {isText &&
+                    {activeType === "text" &&
                       operators["text"].map((el) => (
                         <option key={el.sign} value={el.sign}>
                           {el.text}
@@ -182,8 +194,13 @@ export default function FilterModal({
 
                   {/* Value */}
                   <input
-                    type={isText ? "text" : "number"}
-                    step='any'
+                    type={types.find((ty) => ty.label === activeType).input}
+                    step={
+                      types.find((ty) => ty.label === activeType).db ===
+                      "integer"
+                        ? 1
+                        : "any"
+                    }
                     name={"val-add"}
                     id={"val-add"}
                     className={`col-span-3 shadow-sm focus:ring-teal-500 focus:border-teal-500 block w-full sm:text-sm border-gray-300 h-10`}

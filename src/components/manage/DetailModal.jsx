@@ -140,7 +140,12 @@ export default function DetailModal({
                         <div className='mt-1'>
                           <input
                             type={types.find((ty) => ty.label === type).input}
-                            step='any'
+                            step={
+                              types.find((ty) => ty.label === type).db ===
+                              "integer"
+                                ? 1
+                                : "any"
+                            }
                             name={name}
                             id={name}
                             autoComplete={name}
