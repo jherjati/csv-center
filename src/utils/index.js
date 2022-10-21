@@ -12,7 +12,7 @@ export function classNames(...classes) {
 }
 
 export const doesContainSymbol = (inputString) =>
-  /[^a-zA-Z0-9]/.test(inputString);
+  /[^a-zA-Z0-9_]/.test(inputString);
 
 export const realTransformer = (inputString) =>
   inputString.replaceAll(".", "").replace(",", ".");
