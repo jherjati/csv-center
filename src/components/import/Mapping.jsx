@@ -56,8 +56,7 @@ function Mapping({ fields, file }) {
         const formData = Object.fromEntries(form.entries());
         const newFormat = [],
           realKeys = [],
-          dayKeys = [],
-          monthKeys = [];
+          dateKeys = [];
 
         Object.keys(formData).forEach((key) => {
           newFormat.push({
@@ -65,18 +64,18 @@ function Mapping({ fields, file }) {
             type: formData[key],
             aliases: withHeader.value ? [] : [key],
           });
-          switch (formData[key]) {
-            case "real":
-              realKeys.push(key);
-              break;
-            case "date [dd-MM-yyyy]":
-              dayKeys.push(key);
-              break;
-            case "date [MM-dd-yyyy]":
-              monthKeys.push(key);
-              break;
-            default:
-              break;
+          if (formData[key] === "real") {
+            realKeys.push(key);
+          } else if (
+            types
+              .filter((ty) => ty.input === "date")
+              .map((ty) => ty.label)
+              .includes(formData[key])
+          ) {
+            dateKeys.push({
+              key: key,
+              format: symbolReplacer(/\[(.*?)\]/.exec(formData[key])[1]),
+            });
           }
         });
 
@@ -94,18 +93,11 @@ function Mapping({ fields, file }) {
           Object.keys(row.data).forEach((key) => {
             if (row.data[key].includes(",") && realKeys.includes(key)) {
               row.data[key] = realTransformer(row.data[key]);
-            } else if (dayKeys.includes(key)) {
+            } else if (dateKeys.map((k) => k.key).includes(key)) {
               row.data[key] =
                 dateParse(
                   symbolReplacer(row.data[key]),
-                  "dd_MM_yyyy",
-                  new Date()
-                ) / 1000;
-            } else if (monthKeys.includes(key)) {
-              row.data[key] =
-                dateParse(
-                  symbolReplacer(row.data[key]),
-                  "MM_dd_yyyy",
+                  dateKeys.find((k) => k.key === key).format,
                   new Date()
                 ) / 1000;
             }

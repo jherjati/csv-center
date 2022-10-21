@@ -14,6 +14,7 @@ import {
   BarsArrowUpIcon,
   Bars3Icon,
 } from "@heroicons/react/20/solid";
+import { types } from "../../constants";
 
 const filterToString = (filter) =>
   filter.length
@@ -60,7 +61,12 @@ function DbTable({ name, isInFormats }) {
     let toReturn = db.value.exec(
       `SELECT rowid, ${columns
         .map((el, idx) => {
-          if (["date [MM-dd-yyyy]", "date [dd-MM-yyyy]"].includes(el.type)) {
+          if (
+            types
+              .filter((ty) => ty.input === "date")
+              .map((ty) => ty.label)
+              .includes(el.type)
+          ) {
             dateIndeks.push(idx + 1);
           }
           return el.name;
@@ -74,7 +80,7 @@ function DbTable({ name, isInFormats }) {
     if (toReturn && dateIndeks.length) {
       toReturn.values.map((row) => {
         dateIndeks.forEach((indeks) => {
-          row[indeks] = dateFormat(new Date(row[indeks] * 1000), "dd-MM-yyyy");
+          row[indeks] = dateFormat(new Date(row[indeks] * 1000), "yyyy-MM-dd");
         });
         return row;
       });
