@@ -4,6 +4,8 @@ import { useEffect, useState } from "preact/hooks";
 import { PlusIcon, TrashIcon } from "@heroicons/react/20/solid";
 import { formats } from "../../contexts";
 import { types } from "../../constants";
+import { doesContainSymbol } from "../../utils";
+import { useSnack } from "../../hooks";
 
 export default function FormatModal({
   open,
@@ -14,6 +16,7 @@ export default function FormatModal({
 }) {
   const [tableName, setTableName] = useState("");
   const [columns, setColumns] = useState([]);
+  const { setSnackContent } = useSnack();
 
   useEffect(() => {
     if (focusFormat) {
@@ -56,17 +59,32 @@ export default function FormatModal({
   const submitFormat = (event) => {
     event.preventDefault();
     const newFormats = {};
-    Object.keys(formats.value).forEach(
-      (key) => key !== focusFormat && (newFormats[key] = formats.value[key])
+    Object.keys(formats.value).forEach((key) => {
+      if (key !== focusFormat) newFormats[key] = formats.value[key];
+    });
+    const newFormat = [];
+    let anyRestrictedKey = false;
+    columns.forEach((el) =>
+      doesContainSymbol(el[0])
+        ? (anyRestrictedKey = true)
+        : newFormat.push({
+            name: el[0],
+            type: el[1],
+            aliases: el[2].split(","),
+          })
     );
-    newFormats[tableName] = columns.map((el) => ({
-      name: el[0],
-      type: el[1],
-      aliases: el[2].split(","),
-    }));
-    localStorage.setItem("predefined_tables", JSON.stringify(newFormats));
-    formats.value = newFormats;
-    setOpen(false);
+    if (anyRestrictedKey) {
+      setSnackContent([
+        "error",
+        "An Error Occured",
+        "Column name can contain only alphanumeric and underscore character",
+      ]);
+    } else {
+      newFormats[tableName] = newFormat;
+      localStorage.setItem("predefined_tables", JSON.stringify(newFormats));
+      formats.value = newFormats;
+      setOpen(false);
+    }
   };
 
   return (

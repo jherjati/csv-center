@@ -10,3 +10,19 @@ export function paginate(page, maxPage) {
 export function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
 }
+
+export const doesContainSymbol = (inputString) =>
+  /[^a-zA-Z0-9]/.test(inputString);
+
+export const realTransformer = (inputString) =>
+  inputString.replaceAll(".", "").replace(",", ".");
+
+export const symbolReplacer = (inputString) =>
+  inputString.trim().replaceAll(/[^a-zA-Z0-9]/g, "_");
+
+export const dbNameEscaper = (inputString) => {
+  let toReturn = symbolReplacer(inputString)
+    .toLowerCase()
+    .replaceAll("__", "_");
+  return toReturn.slice(-1) === "_" ? toReturn.slice(0, -1) : toReturn;
+};

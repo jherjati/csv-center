@@ -1,4 +1,5 @@
 import { types } from "../../constants";
+import { dbNameEscaper } from "../../utils";
 
 function FormSection({ tabName, fields, columns }) {
   return (
@@ -26,13 +27,9 @@ function FormSection({ tabName, fields, columns }) {
             </div>
           ))
         : columns.map((col, id) => {
-            const candidates = col.aliases.concat([col.name]).map((el) =>
-              el
-                .trim()
-                .toLowerCase()
-                .replaceAll(/[^a-zA-Z0-9]/g, "_")
-                .replaceAll("__", "_")
-            );
+            const candidates = col.aliases
+              .concat([col.name])
+              .map((el) => dbNameEscaper(el));
             return (
               <div key={id}>
                 <label
@@ -46,13 +43,7 @@ function FormSection({ tabName, fields, columns }) {
                   id={col.name + "_mapping"}
                   className='mt-2 w-full shadow-sm focus:ring-teal-500 focus:border-teal-500 block sm:text-sm border-gray-300 rounded-md'
                   defaultValue={fields.find((el) =>
-                    candidates.includes(
-                      el
-                        .trim()
-                        .toLowerCase()
-                        .replaceAll(/[^a-zA-Z0-9]/g, "_")
-                        .replaceAll("__", "_")
-                    )
+                    candidates.includes(dbNameEscaper(el))
                   )}
                 >
                   {fields.map((el) => (

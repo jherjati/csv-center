@@ -9,12 +9,13 @@ import Tabs from "./Tabs";
 import FormatModal from "./FormatModal";
 import FormSection from "./FormSection";
 import { types } from "../../constants";
+import { dbNameEscaper, realTransformer, symbolReplacer } from "../../utils";
 
 const formatColumns = (columns) =>
   columns
     .map((el) => {
       return (
-        el.name.replaceAll(/[^a-zA-Z0-9]/g, "_").replaceAll("__", "_") +
+        dbNameEscaper(el.name) +
         " " +
         types.find((type) => type.label === el.type).db
       );
@@ -25,8 +26,7 @@ const formatDynamic = (data, withHeader) =>
     .map((key) => {
       let columnName = "column_" + key;
       if (withHeader) {
-        const temp = key.replaceAll(/[^a-zA-Z0-9]/g, "_").replaceAll("__", "_");
-        columnName = temp.slice(-1) === "_" ? temp.slice(0, -1) : temp;
+        columnName = dbNameEscaper(key);
       }
       return (
         columnName + " " + types.find((type) => type.label === data[key]).db
@@ -61,9 +61,9 @@ function Mapping({ fields, file }) {
 
         Object.keys(formData).forEach((key) => {
           newFormat.push({
-            name: withHeader.value ? key : "column_" + key,
+            name: withHeader.value ? dbNameEscaper(key) : "column_" + key,
             type: formData[key],
-            aliases: [],
+            aliases: withHeader.value ? [] : [key],
           });
           switch (formData[key]) {
             case "real":
@@ -93,20 +93,18 @@ function Mapping({ fields, file }) {
         stepFunction = (row) => {
           Object.keys(row.data).forEach((key) => {
             if (row.data[key].includes(",") && realKeys.includes(key)) {
-              row.data[key] = row.data[key]
-                .replaceAll(".", "")
-                .replace(",", ".");
+              row.data[key] = realTransformer(row.data[key]);
             } else if (dayKeys.includes(key)) {
               row.data[key] =
                 dateParse(
-                  row.data[key].trim().replaceAll(/[^a-zA-Z0-9]/g, "_"),
+                  symbolReplacer(row.data[key]),
                   "dd_MM_yyyy",
                   new Date()
                 ) / 1000;
             } else if (monthKeys.includes(key)) {
               row.data[key] =
                 dateParse(
-                  row.data[key].trim().replaceAll(/[^a-zA-Z0-9]/g, "_"),
+                  symbolReplacer(row.data[key]),
                   "MM_dd_yyyy",
                   new Date()
                 ) / 1000;
@@ -152,20 +150,18 @@ function Mapping({ fields, file }) {
         stepFunction = (row) => {
           Object.keys(row.data).forEach((key) => {
             if (row.data[key].includes(",") && realKeys.includes(key)) {
-              row.data[key] = row.data[key]
-                .replaceAll(".", "")
-                .replace(",", ".");
+              row.data[key] = realTransformer(row.data[key]);
             } else if (dayKeys.includes(key)) {
               row.data[key] =
                 dateParse(
-                  row.data[key].trim().replaceAll(/[^a-zA-Z0-9]/g, "_"),
+                  symbolReplacer(row.data[key]),
                   "dd_MM_yyyy",
                   new Date()
                 ) / 1000;
             } else if (monthKeys.includes(key)) {
               row.data[key] =
                 dateParse(
-                  row.data[key].trim().replaceAll(/[^a-zA-Z0-9]/g, "_"),
+                  symbolReplacer(row.data[key]),
                   "MM_dd_yyyy",
                   new Date()
                 ) / 1000;
