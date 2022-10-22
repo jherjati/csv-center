@@ -67,4 +67,5 @@ export const types = [
   { label: "real", db: "real", input: "number" },
   { label: "date [MM-dd-yyyy]", db: "integer", input: "date" },
   { label: "date [dd-MM-yyyy]", db: "integer", input: "date" },
+  { label: "date [yyyy-MM-dd]", db: "integer", input: "date" },
 ];

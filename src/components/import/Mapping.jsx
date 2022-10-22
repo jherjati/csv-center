@@ -115,21 +115,20 @@ function Mapping({ fields, file }) {
       } else {
         const mapping = Object.fromEntries(form.entries());
         const realKeys = [],
-          dayKeys = [],
-          monthKeys = [];
+          dateKeys = [];
         columns.forEach((col) => {
-          switch (col.type) {
-            case "real":
-              realKeys.push(mapping[col.name]);
-              break;
-            case "date [dd-MM-yyyy]":
-              dayKeys.push(mapping[col.name]);
-              break;
-            case "date [MM-dd-yyyy]":
-              monthKeys.push(mapping[col.name]);
-              break;
-            default:
-              break;
+          if (col.type === "real") {
+            realKeys.push(mapping[col.name]);
+          } else if (
+            types
+              .filter((ty) => ty.input === "date")
+              .map((ty) => ty.label)
+              .includes(col.type)
+          ) {
+            dateKeys.push({
+              key: mapping[col.name],
+              format: symbolReplacer(/\[(.*?)\]/.exec(col.type)[1]),
+            });
           }
         });
 
@@ -143,18 +142,11 @@ function Mapping({ fields, file }) {
           Object.keys(row.data).forEach((key) => {
             if (row.data[key].includes(",") && realKeys.includes(key)) {
               row.data[key] = realTransformer(row.data[key]);
-            } else if (dayKeys.includes(key)) {
+            } else if (dateKeys.map((k) => k.key).includes(key)) {
               row.data[key] =
                 dateParse(
                   symbolReplacer(row.data[key]),
-                  "dd_MM_yyyy",
-                  new Date()
-                ) / 1000;
-            } else if (monthKeys.includes(key)) {
-              row.data[key] =
-                dateParse(
-                  symbolReplacer(row.data[key]),
-                  "MM_dd_yyyy",
+                  dateKeys.find((k) => k.key === key).format,
                   new Date()
                 ) / 1000;
             }
