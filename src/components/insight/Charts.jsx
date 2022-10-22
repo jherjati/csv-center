@@ -1,146 +1,83 @@
-import ChartEl from "./ChartEl";
-import {
-  Chart,
-  DoughnutController,
-  LineController,
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  ArcElement,
-  LineElement,
-  Tooltip,
-  Legend,
-  PolarAreaController,
-  RadialLinearScale,
-  BarController,
-  BarElement,
-} from "chart.js";
-
-Chart.register(
-  LineController,
-  CategoryScale,
-  DoughnutController,
-  LinearScale,
-  PointElement,
-  ArcElement,
-  LineElement,
-  Tooltip,
-  Legend,
-  PolarAreaController,
-  RadialLinearScale,
-  BarController,
-  BarElement
-);
+import ChartItem from "./ChartItem";
 
 function Charts() {
   return (
-    <div className='w-full grid grid-cols-3 pb-6'>
-      <ChartEl
-        data={{
-          labels: ["January", "February", "March", "April", "May", "June"],
-          datasets: [
-            {
-              label: "My First dataset",
-              backgroundColor: "rgb(255, 99, 132)",
-              borderColor: "rgb(255, 99, 132)",
-              data: [0, 10, 5, 2, 20, 30, 45],
-            },
-          ],
-        }}
-        config={{
-          type: "line",
-          options: {},
-        }}
-      />
-      <ChartEl
-        data={{
-          labels: ["Red", "Blue", "Yellow"],
-          datasets: [
-            {
-              label: "My First Dataset",
-              data: [300, 50, 100],
-              backgroundColor: [
-                "rgb(255, 99, 132)",
-                "rgb(54, 162, 235)",
-                "rgb(255, 205, 86)",
-              ],
-              hoverOffset: 4,
-            },
-          ],
-        }}
-        config={{
-          type: "doughnut",
-        }}
-      />
-      <ChartEl
-        data={{
-          labels: [
-            "January",
-            "February",
-            "March",
-            "April",
-            "May",
-            "June",
-            "July",
-          ],
-          datasets: [
-            {
-              label: "My First Dataset",
-              data: [65, 59, 80, 81, 56, 55, 40],
-              backgroundColor: [
-                "rgba(255, 99, 132, 0.2)",
-                "rgba(255, 159, 64, 0.2)",
-                "rgba(255, 205, 86, 0.2)",
-                "rgba(75, 192, 192, 0.2)",
-                "rgba(54, 162, 235, 0.2)",
-                "rgba(153, 102, 255, 0.2)",
-                "rgba(201, 203, 207, 0.2)",
-              ],
-              borderColor: [
-                "rgb(255, 99, 132)",
-                "rgb(255, 159, 64)",
-                "rgb(255, 205, 86)",
-                "rgb(75, 192, 192)",
-                "rgb(54, 162, 235)",
-                "rgb(153, 102, 255)",
-                "rgb(201, 203, 207)",
-              ],
-              borderWidth: 1,
-            },
-          ],
-        }}
+    <div className='w-full grid grid-cols-6 pb-6'>
+      <ChartItem
         config={{
           type: "bar",
-          options: {
-            scales: {
-              y: {
-                beginAtZero: true,
-              },
-            },
+          colors: ["purple"],
+          axisOptions: {
+            xAxisMode: "tick",
+            xIsSeries: true,
           },
+          barOptions: {
+            stacked: true,
+            spaceRatio: 0.5,
+          },
+          valuesOverPoints: 1,
         }}
-      />
-      <ChartEl
         data={{
-          labels: ["Red", "Green", "Yellow", "Grey", "Blue"],
+          labels: [
+            "12am-3am",
+            "3am-6am",
+            "6am-9am",
+            "9am-12pm",
+            "12pm-3pm",
+            "3pm-6pm",
+            "6pm-9pm",
+            "9pm-12am",
+          ],
+
           datasets: [
             {
-              label: "My First Dataset",
-              data: [11, 16, 7, 3, 14],
-              backgroundColor: [
-                "rgb(255, 99, 132)",
-                "rgb(75, 192, 192)",
-                "rgb(255, 205, 86)",
-                "rgb(201, 203, 207)",
-                "rgb(54, 162, 235)",
-              ],
+              values: [25, 40, 30, 35, 8, 52, 17, -4],
             },
           ],
         }}
+        span={6}
+      />
+
+      <ChartItem
         config={{
-          type: "polarArea",
-          options: {},
+          type: "percentage",
+          valuesOverPoints: 1,
         }}
+        data={{
+          labels: [
+            "12am-3am",
+            "3am-6am",
+            "6am-9am",
+            "9am-12pm",
+            "12pm-3pm",
+            "3pm-6pm",
+            "6pm-9pm",
+            "9pm-12am",
+          ],
+          datasets: [
+            {
+              values: [25, 40, 30, 35, 8, 52, 17, -4],
+            },
+          ],
+        }}
+        span={6}
+      />
+
+      <ChartItem
+        config={{
+          type: "line",
+          colors: ["green"],
+          lineOptions: {
+            dotSize: 1.25,
+            regionFill: 1, // default: 1
+          },
+          valuesOverPoints: 1,
+        }}
+        data={{
+          labels: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
+          datasets: [{ values: [18, 40, 30, 35, 8, 52, 17, -4] }],
+        }}
+        span={6}
       />
     </div>
   );
