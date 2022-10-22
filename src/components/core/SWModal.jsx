@@ -56,13 +56,12 @@ export default function SWModal() {
                 as='h3'
                 className='text-lg font-medium leading-6 text-gray-900'
               >
-                Versi Terbaru Hadir
+                New Version Is Coming
               </Dialog.Title>
               <div className='mt-2'>
                 <p className='text-sm text-gray-500'>
-                  Versi terbaru dari aplikasi Kotaku telah hadir, tentu dengan
-                  fitur yg semakin memudahkan. Anda hanya perlu melakukan
-                  refresh.
+                  The latest version is here, with features that make your work
+                  even easier. You just need to refresh.
                 </p>
               </div>
 
@@ -77,7 +76,7 @@ export default function SWModal() {
                       // the page will reload and the up-to-date content will be served.
                     }}
                   >
-                    Refresh sekarang!
+                    Refresh now!
                   </button>
                 </div>
 
@@ -89,7 +88,7 @@ export default function SWModal() {
                       setmodalOpen(false);
                     }}
                   >
-                    Nanti dulu
+                    Next time
                   </button>
                 </div>
               </div>
