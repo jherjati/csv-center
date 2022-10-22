@@ -26,6 +26,11 @@ export default function App() {
     try {
       const SQL = await initSqlJs({ locateFile: (file) => "/sql/" + file });
       db.value = new SQL.Database();
+      window.addEventListener("beforeunload", (event) => {
+        event.preventDefault();
+        return (event.returnValue =
+          "Are you sure you saved your work before leaving?");
+      });
     } catch (err) {
       console.error(err);
     }
