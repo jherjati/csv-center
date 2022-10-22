@@ -9,8 +9,8 @@ export const navigation = [
   { name: "Import", href: "/", icon: ArrowDownOnSquareIcon },
   { name: "Manage", href: "/manage", icon: FolderIcon },
   {
-    name: "Dashboard",
-    href: "/dashboard",
+    name: "Insight",
+    href: "/insight",
     icon: ChartPieIcon,
   },
   {

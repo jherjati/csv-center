@@ -12,6 +12,7 @@ specifiers:
   chart.js: ^3.9.1
   chartjs-adapter-date-fns: ^2.0.0
   date-fns: ^2.29.3
+  frappe-charts: ^1.6.2
   papaparse: ^5.3.2
   postcss: ^8.4.16
   preact: ^10.10.6
@@ -33,6 +34,7 @@ dependencies:
   chart.js: 3.9.1
   chartjs-adapter-date-fns: 2.0.0_chart.js@3.9.1
   date-fns: 2.29.3
+  frappe-charts: 1.6.2
   papaparse: 5.3.2
   preact: 10.11.1
   preact-compat: 3.19.0_preact@10.11.1
@@ -2212,6 +2214,10 @@ packages:
   /fraction.js/4.2.0:
     resolution: {integrity: sha512-MhLuK+2gUcnZe8ZHlaaINnQLl0xRIGRfcGk2yl8xoQAfHrSsL3rYu6FCmBdkdbhc9EPlwyGHewaRsvwRMJtAlA==}
     dev: true
+
+  /frappe-charts/1.6.2:
+    resolution: {integrity: sha512-9TC3/+YVUi84yYoEbxFiSqu+1FQ5If/ydUNj6i8FRpwynd08t6a7RkS+IRJozAk6NfdL8/LVTTE1DUOjjKZZxg==}
+    dev: false
 
   /fs-extra/9.1.0:
     resolution: {integrity: sha512-hcg3ZmepS30/7BSFqRvoo3DOMQu7IjqxO5nCDt+zM9XWjb33Wg7ziNT+Qvqbuc3+gWpzO02JubVyk2G4Zvo1OQ==}

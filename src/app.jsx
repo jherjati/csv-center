@@ -10,7 +10,7 @@ import { classNames } from "./utils";
 import { QuestionMarkCircleIcon } from "@heroicons/react/24/solid";
 import { Fragment } from "preact";
 
-const Dashboard = lazy(() => import("./pages/Dashboard"));
+const Insight = lazy(() => import("./pages/Insight"));
 const Import = lazy(() => import("./pages/Import"));
 const Manage = lazy(() => import("./pages/Manage"));
 const Compare = lazy(() => import("./pages/Compare"));
@@ -246,9 +246,9 @@ export default function App() {
               <Compare />
             </Suspense>
           </Route>
-          <Route path='/dashboard'>
+          <Route path='/insight'>
             <Suspense fallback={<></>}>
-              <Dashboard />
+              <Insight />
             </Suspense>
           </Route>
         </Switch>
