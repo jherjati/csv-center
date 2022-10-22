@@ -5,8 +5,24 @@ function Charts() {
     <div className='w-full grid grid-cols-6 pb-6'>
       <ChartItem
         config={{
+          type: "line",
+          colors: ["green"],
+          lineOptions: {
+            dotSize: 1.25,
+            regionFill: 1, // default: 1
+          },
+          valuesOverPoints: 1,
+        }}
+        data={{
+          labels: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
+          datasets: [{ values: [18, 40, 30, 35, 8, 52, 17, -4] }],
+        }}
+        span={6}
+      />
+      <ChartItem
+        config={{
           type: "bar",
-          colors: ["purple"],
+          colors: ["orange"],
           axisOptions: {
             xAxisMode: "tick",
             xIsSeries: true,
@@ -37,7 +53,6 @@ function Charts() {
         }}
         span={6}
       />
-
       <ChartItem
         config={{
           type: "percentage",
@@ -59,23 +74,6 @@ function Charts() {
               values: [25, 40, 30, 35, 8, 52, 17, -4],
             },
           ],
-        }}
-        span={6}
-      />
-
-      <ChartItem
-        config={{
-          type: "line",
-          colors: ["green"],
-          lineOptions: {
-            dotSize: 1.25,
-            regionFill: 1, // default: 1
-          },
-          valuesOverPoints: 1,
-        }}
-        data={{
-          labels: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
-          datasets: [{ values: [18, 40, 30, 35, 8, 52, 17, -4] }],
         }}
         span={6}
       />
