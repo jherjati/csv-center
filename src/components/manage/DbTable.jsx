@@ -17,7 +17,7 @@ import {
 import { types } from "../../constants";
 import { filterToString, filterToValues } from "../../utils";
 
-function DbTable({ name, isInFormats, children }) {
+function DbTable({ name, isInFormats }) {
   const [detailOpen, setDetailOpen] = useState(false);
   const [filterOpen, setFilterOpen] = useState(false);
   const [filter, setFilter] = useState([]);
@@ -38,6 +38,8 @@ function DbTable({ name, isInFormats, children }) {
         action: "exec",
         sql: `PRAGMA table_info('${name}')`,
       });
+    } else {
+      setColumns(formats.value[name]);
     }
   }, [name, isInFormats]);
 
@@ -69,7 +71,7 @@ function DbTable({ name, isInFormats, children }) {
       });
       dateIndeks.current = newDateIndeks;
     }
-  }, [sortString, page, detailOpen, filter, columns]);
+  }, [name, sortString, page, detailOpen, filter, columns]);
 
   // Count
   const [count, setCount] = useState(0);
@@ -80,7 +82,7 @@ function DbTable({ name, isInFormats, children }) {
       sql: `SELECT COUNT(*) FROM '${name}' ${filterToString(filter)}`,
       params: filterToValues(filter),
     });
-  }, [filter, detailOpen]);
+  }, [name, filter, detailOpen]);
 
   // Export
   const handleExport = useCallback(() => {
@@ -113,65 +115,70 @@ function DbTable({ name, isInFormats, children }) {
       sql: `SELECT * FROM '${name}' ${filterToString(filter)}`,
       params: filterToValues(filter),
     });
-  }, [filter]);
+  }, [name, filter]);
 
   // Message receiver
   useEffect(() => {
     if (!isDownload) {
       dbWorker.value.onmessage = ({ data }) => {
-        if (data.id === "count row") {
-          setCount(data.results[0]?.values[0]);
-        } else if (data.id === "browse column") {
-          setColumns(
-            data.results[0]?.values.map((el) => ({
-              name: el[1],
-              type: el[2].toLowerCase(),
-            }))
-          );
-        } else if (data.id === "read row") {
-          const res = data.results[0];
-          setTimeout(() => {
-            const form = document.getElementById("detail-form");
-            res.columns.forEach((name, idx) => {
-              if (
-                types.find(
-                  (type) =>
-                    type.label === columns.find((col) => col.name === name).type
-                ).input === "date"
-              ) {
-                form[name].value = dateFormat(
-                  new Date(res.values[0][idx] * 1000),
-                  "yyyy-MM-dd"
-                );
-              } else {
-                form[name].value = res.values[0][idx];
-              }
-            });
-          }, 50);
-        } else if (data.id === "browse row") {
-          let toReturn = data.results[0];
-          if (toReturn && dateIndeks.current.length) {
-            toReturn.values = toReturn.values.map((row) => {
-              let newRow = [...row];
-              dateIndeks.current.forEach((indeks) => {
-                newRow[indeks] = dateFormat(
-                  new Date(newRow[indeks] * 1000),
-                  "yyyy-MM-dd"
-                );
+        try {
+          if (data.id === "count row") {
+            setCount(data.results[0]?.values[0]);
+          } else if (data.id === "browse column") {
+            setColumns(
+              data.results[0]?.values.map((el) => ({
+                name: el[1],
+                type: el[2].toLowerCase(),
+              }))
+            );
+          } else if (data.id === "read row") {
+            const res = data.results[0];
+            setTimeout(() => {
+              const form = document.getElementById("detail-form");
+              res.columns.forEach((name, idx) => {
+                if (
+                  types.find(
+                    (type) =>
+                      type.label ===
+                      columns.find((col) => col.name === name).type
+                  ).input === "date"
+                ) {
+                  form[name].value = dateFormat(
+                    new Date(res.values[0][idx] * 1000),
+                    "yyyy-MM-dd"
+                  );
+                } else {
+                  form[name].value = res.values[0][idx];
+                }
               });
-              return newRow;
-            });
+            }, 50);
+          } else if (data.id === "browse row") {
+            let toReturn = data.results[0];
+            if (toReturn && dateIndeks.current.length) {
+              toReturn.values = toReturn.values.map((row) => {
+                let newRow = [...row];
+                dateIndeks.current.forEach((indeks) => {
+                  newRow[indeks] = dateFormat(
+                    new Date(newRow[indeks] * 1000),
+                    "yyyy-MM-dd"
+                  );
+                });
+                return newRow;
+              });
+            }
+            setData(toReturn);
           }
-          setData(toReturn);
-        }
+        } catch (error) {}
       };
     }
-  }, [isDownload]);
+  }, [name, isDownload]);
 
   return (
-    <section className='my-6 w-full rounded-lg overflow-hidden shadow'>
+    <section className='mb-6 w-full rounded-b-lg overflow-hidden'>
       <div className='py-3 px-6 bg-white flex justify-between items-center'>
-        {children}
+        <h4 className='text-xl font-semibold text-gray-900 capitalize'>
+          {name}
+        </h4>
         <Actions
           setDetailOpen={setDetailOpen}
           setFilterOpen={setFilterOpen}

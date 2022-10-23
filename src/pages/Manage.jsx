@@ -29,19 +29,21 @@ function Manage() {
         </div>
         <div className='mx-auto max-w-7xl px-4 sm:px-6 md:px-8'>
           {(!dbTables || !dbTables.length) && <EmptyDb />}
-          {dbTables && activeTable !== null && (
-            <DbTable
-              name={dbTables[activeTable]}
-              isInFormats={Object.keys(formats.value).includes(
-                dbTables[activeTable]
-              )}
-            >
+          {dbTables && (
+            <>
               <TableTabs
                 dbTables={dbTables}
                 setActiveTable={setActiveTable}
                 activeTable={activeTable}
               />
-            </DbTable>
+              <DbTable
+                key={activeTable}
+                name={dbTables[activeTable]}
+                isInFormats={Object.keys(formats.value).includes(
+                  dbTables[activeTable]
+                )}
+              />
+            </>
           )}
         </div>
       </main>
