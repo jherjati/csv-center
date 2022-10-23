@@ -1,17 +1,16 @@
 import { Fragment } from "preact";
 import { Transition } from "@headlessui/react";
-import { useSnack } from "../../hooks";
 import {
   CheckCircleIcon,
   XMarkIcon,
   ExclamationCircleIcon,
 } from "@heroicons/react/20/solid";
 import { snackbar } from "../../contexts";
+import { closeSnack } from "../../utils";
 
 const SnackBar = () => {
   const content = snackbar.value["content"];
   const show = snackbar.value["visible"];
-  const { closeSnack } = useSnack();
 
   return (
     <div

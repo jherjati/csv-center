@@ -30,24 +30,26 @@ export const useSort = () => {
   return { sortAsc, handleSortClick, sortString };
 };
 
-export const useInitDB = useEffect(() => {
-  try {
-    window.addEventListener("beforeunload", (event) => {
-      event.preventDefault();
-      return (event.returnValue =
-        "Are you sure you saved your work before leaving?");
-    });
-    dbWorker.value.onerror = (error) => {
-      console.error(error);
+export const useInitDB = () => {
+  useEffect(() => {
+    try {
+      window.addEventListener("beforeunload", (event) => {
+        event.preventDefault();
+        return (event.returnValue =
+          "Are you sure you saved your work before leaving?");
+      });
+      dbWorker.value.onerror = (error) => {
+        console.error(error);
+      };
+      dbWorker.value.postMessage({ action: "open" });
+    } catch (err) {
+      console.error(err);
+    }
+    return () => {
+      dbWorker.value.postMessage({ action: "close" });
     };
-    dbWorker.value.postMessage({ action: "open" });
-  } catch (err) {
-    console.error(err);
-  }
-  return () => {
-    dbWorker.value.postMessage({ action: "close" });
-  };
-}, []);
+  }, []);
+};
 
 export const useTables = () => {
   const [dbTables, setDbTables] = useState();
