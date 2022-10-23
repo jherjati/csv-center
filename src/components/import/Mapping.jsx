@@ -1,4 +1,4 @@
-import { db, formats, withHeader } from "../../contexts";
+import { dbWorker, formats, withHeader } from "../../contexts";
 import { useLocation } from "wouter-preact";
 import { parse } from "papaparse";
 import { parse as dateParse } from "date-fns";
@@ -82,12 +82,15 @@ function Mapping({ fields, file }) {
         const newFormats = { ...formats.value, [tableName]: newFormat };
         localStorage.setItem("predefined_tables", JSON.stringify(newFormats));
         formats.value = newFormats;
-        db.value.run(
-          `CREATE TABLE IF NOT EXISTS '${tableName}'( ${formatDynamic(
+
+        dbWorker.value.postMessage({
+          id: "create table",
+          action: "exec",
+          sql: `CREATE TABLE IF NOT EXISTS '${tableName}'( ${formatDynamic(
             formData,
             withHeader.value
-          )} );`
-        );
+          )} );`,
+        });
 
         stepFunction = (row) => {
           Object.keys(row.data).forEach((key) => {
@@ -107,10 +110,13 @@ function Mapping({ fields, file }) {
             .map(() => "?")
             .join(", ")} );
           `;
-          db.value.run(
-            statement,
-            Object.keys(formData).map((key) => row.data[key])
-          );
+
+          dbWorker.value.postMessage({
+            id: "insert row",
+            action: "exec",
+            sql: statement,
+            params: Object.keys(formData).map((key) => row.data[key]),
+          });
         };
       } else {
         const mapping = Object.fromEntries(form.entries());
@@ -132,11 +138,13 @@ function Mapping({ fields, file }) {
           }
         });
 
-        db.value.run(
-          `CREATE TABLE IF NOT EXISTS '${tabName}'( ${formatColumns(
+        dbWorker.value.postMessage({
+          id: "create table",
+          action: "exec",
+          sql: `CREATE TABLE IF NOT EXISTS '${tabName}'( ${formatColumns(
             columns
-          )} );`
-        );
+          )} );`,
+        });
 
         stepFunction = (row) => {
           Object.keys(row.data).forEach((key) => {
@@ -156,10 +164,12 @@ function Mapping({ fields, file }) {
             .map(() => "?")
             .join(", ")} );
             `;
-          db.value.run(
-            statement,
-            columns.map((col) => row.data[mapping[col.name]])
-          );
+          dbWorker.value.postMessage({
+            id: "insert row",
+            action: "exec",
+            sql: statement,
+            params: columns.map((col) => row.data[mapping[col.name]]),
+          });
         };
       }
 

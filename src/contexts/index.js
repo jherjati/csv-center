@@ -1,6 +1,7 @@
 import { signal } from "@preact/signals";
 
 export const db = signal();
+export const dbWorker = signal(new Worker("/sql/worker.sql-wasm.js"));
 
 export const formats = signal(
   localStorage.getItem("predefined_tables")

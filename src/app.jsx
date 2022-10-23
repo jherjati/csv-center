@@ -1,10 +1,9 @@
 import { Dialog, Transition } from "@headlessui/react";
 import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
-import initSqlJs from "sql.js";
 import { Suspense, lazy } from "preact/compat";
 import { Link, Route, Switch, useLocation } from "wouter-preact";
 import { useEffect, useState } from "preact/hooks";
-import { db } from "./contexts";
+import { dbWorker } from "./contexts";
 import { navigation } from "./constants";
 import { classNames } from "./utils";
 import { QuestionMarkCircleIcon } from "@heroicons/react/24/solid";
@@ -24,18 +23,20 @@ export default function App() {
 
   useEffect(async () => {
     try {
-      const SQL = await initSqlJs({ locateFile: (file) => "/sql/" + file });
-      db.value = new SQL.Database();
       window.addEventListener("beforeunload", (event) => {
         event.preventDefault();
         return (event.returnValue =
           "Are you sure you saved your work before leaving?");
       });
+      dbWorker.value.onerror = (error) => {
+        console.error(error);
+      };
+      dbWorker.value.postMessage({ action: "open" });
     } catch (err) {
       console.error(err);
     }
     return () => {
-      db.value.close();
+      dbWorker.value.postMessage({ action: "close" });
     };
   }, []);
 

@@ -1,20 +1,22 @@
-import { useErrorBoundary, useMemo } from "preact/hooks";
+import { useEffect, useErrorBoundary, useState } from "preact/hooks";
 import PageError from "../components/core/PageError";
 import DbTable from "../components/manage/DbTable";
 import EmptyDb from "../components/manage/EmptyDb";
-import { db, formats } from "../contexts";
+import { dbWorker, formats } from "../contexts";
 import { useSnack } from "../hooks";
 
 function Manage() {
-  const dbTables = useMemo(
-    () =>
-      db.value
-        ? db.value.exec(
-            `SELECT name FROM sqlite_schema WHERE type ='table' AND name NOT LIKE 'sqlite_%';`
-          )[0]?.values
-        : undefined,
-    [db.value]
-  );
+  const [dbTables, setDbTables] = useState();
+  useEffect(() => {
+    dbWorker.value.onmessage = ({ data }) => {
+      setDbTables(data.results[0]?.values);
+    };
+    dbWorker.value.postMessage({
+      id: "browse table",
+      action: "exec",
+      sql: `SELECT name FROM sqlite_schema WHERE type ='table' AND name NOT LIKE 'sqlite_%';`,
+    });
+  }, []);
 
   const { setSnackContent } = useSnack();
   const [error, resetError] = useErrorBoundary((error) => {
