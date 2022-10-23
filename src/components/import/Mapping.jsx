@@ -53,9 +53,11 @@ function Mapping({ fields, file }) {
     try {
       setIsImporting(true);
       const form = new FormData(event.target);
-      let stepFunction;
+      let stepFunction,
+        tableName = tabName;
+
       if (tabName === "Dynamic") {
-        const tableName = file.name.split(".")[0];
+        tableName = file.name.split(".")[0];
         const formData = Object.fromEntries(form.entries());
         const newFormat = [],
           realKeys = [],
@@ -191,12 +193,23 @@ function Mapping({ fields, file }) {
           ]);
         },
         complete: function () {
-          setLocation("/manage");
-          setSnackContent([
-            "success",
-            "Table Data Imported",
-            "Happy exploration! Glad to help",
-          ]);
+          dbWorker.value.onmessage = ({ data }) => {
+            if (data.id === "check complete") {
+              setSnackContent([
+                "success",
+                tableName + " Table Checked",
+                data.error
+                  ? "Something missed, maybe not needed, keep going!"
+                  : "All is well, happy exploration!",
+              ]);
+              setLocation("/manage");
+            }
+          };
+          dbWorker.value.postMessage({
+            id: "check complete",
+            action: "exec",
+            sql: `PRAGMA main.quick_check('${tableName}')`,
+          });
         },
       });
     } catch (error) {
