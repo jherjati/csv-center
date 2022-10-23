@@ -46,20 +46,11 @@ function DbTable({ name, isInFormats }) {
   const { sortAsc, handleSortClick, sortString } = useSort();
 
   // Column
-  const [columns, setColumns] = useState([]);
+  const [columns, setColumns] = useState(
+    isInFormats ? formats.value[name] : []
+  );
   useEffect(() => {
-    if (isInFormats) {
-      setColumns(formats.value[name]);
-    } else {
-      dbWorker.value.onmessage = ({ data }) => {
-        setColumns(
-          data.results[0]?.values.map((el) => ({
-            name: el[1],
-            type: el[2].toLowerCase(),
-          }))
-        );
-      };
-
+    if (!isInFormats) {
       dbWorker.value.postMessage({
         id: "browse column",
         action: "exec",
@@ -71,30 +62,36 @@ function DbTable({ name, isInFormats }) {
   // Data
   const [data, setData] = useState([]);
   useEffect(() => {
-    if (columns.length) {
-      const dateIndeks = [];
+    const dateIndeks = [];
 
-      dbWorker.value.onmessage = ({ data }) => {
-        if (data.id === "browse row") {
-          let toReturn = data.results[0];
-
-          if (toReturn && dateIndeks.length) {
-            toReturn.values = toReturn.values.map((row) => {
-              let newRow = [...row];
-              dateIndeks.forEach((indeks) => {
-                newRow[indeks] = dateFormat(
-                  new Date(newRow[indeks] * 1000),
-                  "yyyy-MM-dd"
-                );
-              });
-              return newRow;
+    dbWorker.value.onmessage = ({ data }) => {
+      if (data.id === "count row") setCount(data.results[0]?.values[0]);
+      else if (data.id === "browse column")
+        setColumns(
+          data.results[0]?.values.map((el) => ({
+            name: el[1],
+            type: el[2].toLowerCase(),
+          }))
+        );
+      else if (data.id === "browse row") {
+        let toReturn = data.results[0];
+        if (toReturn && dateIndeks.length) {
+          toReturn.values = toReturn.values.map((row) => {
+            let newRow = [...row];
+            dateIndeks.forEach((indeks) => {
+              newRow[indeks] = dateFormat(
+                new Date(newRow[indeks] * 1000),
+                "yyyy-MM-dd"
+              );
             });
-          }
-
-          setData(toReturn);
+            return newRow;
+          });
         }
-      };
+        setData(toReturn);
+      }
+    };
 
+    if (columns.length) {
       dbWorker.value.postMessage({
         id: "browse row",
         action: "exec",
@@ -121,10 +118,6 @@ function DbTable({ name, isInFormats }) {
   // Count
   const [count, setCount] = useState(0);
   useEffect(() => {
-    dbWorker.value.onmessage = ({ data }) => {
-      if (data.id === "count row") setCount(data.results[0]?.values[0]);
-    };
-
     dbWorker.value.postMessage({
       id: "count row",
       action: "exec",
@@ -133,6 +126,7 @@ function DbTable({ name, isInFormats }) {
     });
   }, [filter, detailOpen]);
 
+  // Export
   const handleExport = useCallback(() => {
     const fileStream = streamSaver.createWriteStream(name + ".csv");
     const writer = fileStream.getWriter();
@@ -142,7 +136,6 @@ function DbTable({ name, isInFormats }) {
     );
 
     dbWorker.value.onmessage = ({ data }) => {
-      console.log(data);
       if (data.finished) {
         writer.close();
       } else {
@@ -157,7 +150,7 @@ function DbTable({ name, isInFormats }) {
     };
 
     dbWorker.value.postMessage({
-      id: "download table",
+      id: "export table",
       action: "each",
       sql: `SELECT * FROM '${name}' ${filterToString(filter)}`,
       params: filterToValues(filter),
@@ -257,15 +250,17 @@ function DbTable({ name, isInFormats }) {
         tableName={name}
         focusId={focusId}
         columns={columns}
-      />
-      <FilterModal
-        open={filterOpen}
-        setOpen={setFilterOpen}
-        tableName={name}
-        filter={filter}
-        setFilter={setFilter}
-        columns={columns}
       /> */}
+      {columns.length && (
+        <FilterModal
+          open={filterOpen}
+          setOpen={setFilterOpen}
+          tableName={name}
+          filter={filter}
+          setFilter={setFilter}
+          columns={columns}
+        />
+      )}
     </section>
   );
 }
