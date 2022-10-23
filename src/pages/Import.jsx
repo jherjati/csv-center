@@ -5,12 +5,11 @@ import Dropzone from "../components/import/Dropzone";
 import Mapping from "../components/import/Mapping";
 import PreviewTable from "../components/import/PreviewTable";
 import { withHeader } from "../contexts";
-import { useSnack } from "../hooks";
+import { setSnackContent } from "../utils";
 
 function Import() {
   const [fields, setFields] = useState([]);
   const [file, setFile] = useState();
-  const { setSnackContent } = useSnack();
   const [error, resetError] = useErrorBoundary((error) => {
     console.error(error);
     setSnackContent([

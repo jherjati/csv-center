@@ -4,12 +4,16 @@ import { parse } from "papaparse";
 import { parse as dateParse } from "date-fns";
 import { useState, useMemo } from "preact/hooks";
 import { ArrowPathIcon, PlusIcon } from "@heroicons/react/20/solid";
-import { useSnack } from "../../hooks";
 import Tabs from "./Tabs";
 import FormatModal from "./FormatModal";
 import FormSection from "./FormSection";
 import { types } from "../../constants";
-import { dbNameEscaper, realTransformer, symbolReplacer } from "../../utils";
+import {
+  dbNameEscaper,
+  realTransformer,
+  setSnackContent,
+  symbolReplacer,
+} from "../../utils";
 
 const formatColumns = (columns) =>
   columns
@@ -43,7 +47,6 @@ function Mapping({ fields, file }) {
   );
   const [addOpen, setAddOpen] = useState(false);
   const [isImporting, setIsImporting] = useState(false);
-  const { setSnackContent } = useSnack();
 
   const handleImport = async (event) => {
     event.preventDefault();

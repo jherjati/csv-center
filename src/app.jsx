@@ -2,8 +2,7 @@ import { Dialog, Transition } from "@headlessui/react";
 import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
 import { Suspense, lazy } from "preact/compat";
 import { Link, Route, Switch, useLocation } from "wouter-preact";
-import { useEffect, useState } from "preact/hooks";
-import { dbWorker } from "./contexts";
+import { useState } from "preact/hooks";
 import { navigation } from "./constants";
 import { classNames } from "./utils";
 import { QuestionMarkCircleIcon } from "@heroicons/react/24/solid";
@@ -16,29 +15,13 @@ const Compare = lazy(() => import("./pages/Compare"));
 
 import SWModal from "./components/core/SWModal";
 import SnackBar from "./components/core/Snackbar";
+import { useInitDB } from "./hooks";
 
 export default function App() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [location] = useLocation();
 
-  useEffect(async () => {
-    try {
-      window.addEventListener("beforeunload", (event) => {
-        event.preventDefault();
-        return (event.returnValue =
-          "Are you sure you saved your work before leaving?");
-      });
-      dbWorker.value.onerror = (error) => {
-        console.error(error);
-      };
-      dbWorker.value.postMessage({ action: "open" });
-    } catch (err) {
-      console.error(err);
-    }
-    return () => {
-      dbWorker.value.postMessage({ action: "close" });
-    };
-  }, []);
+  useInitDB();
 
   return (
     <div>

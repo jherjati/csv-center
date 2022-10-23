@@ -1,10 +1,9 @@
 import { useErrorBoundary } from "preact/hooks";
 import PageError from "../components/core/PageError";
 import TableMetric from "../components/insight/TableMetric";
-import { useSnack } from "../hooks";
+import { setSnackContent } from "../utils";
 
 function Insight() {
-  const { setSnackContent } = useSnack();
   const [error, resetError] = useErrorBoundary((error) => {
     console.error(error);
     setSnackContent([

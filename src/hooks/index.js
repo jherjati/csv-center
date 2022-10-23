@@ -1,5 +1,5 @@
-import { useCallback, useState, useMemo } from "preact/hooks";
-import { snackbar } from "../contexts";
+import { useCallback, useState, useMemo, useEffect } from "preact/hooks";
+import { dbWorker } from "../contexts";
 
 export const useSort = () => {
   const [sortAsc, setSortAsc] = useState({});
@@ -30,18 +30,37 @@ export const useSort = () => {
   return { sortAsc, handleSortClick, sortString };
 };
 
-export const useSnack = () => ({
-  openSnack: () => {
-    snackbar.value = { ...snackbar.value, visible: true };
-    setTimeout(() => {
-      snackbar.value = { ...snackbar.value, visible: false };
-    }, 3000);
-  },
-  closeSnack: () => (snackbar.value = { ...snackbar.value, visible: false }),
-  setSnackContent: (newContent) => {
-    snackbar.value = { content: newContent, visible: true };
-    setTimeout(() => {
-      snackbar.value = { ...snackbar.value, visible: false };
-    }, 3000);
-  },
-});
+export const useInitDB = useEffect(() => {
+  try {
+    window.addEventListener("beforeunload", (event) => {
+      event.preventDefault();
+      return (event.returnValue =
+        "Are you sure you saved your work before leaving?");
+    });
+    dbWorker.value.onerror = (error) => {
+      console.error(error);
+    };
+    dbWorker.value.postMessage({ action: "open" });
+  } catch (err) {
+    console.error(err);
+  }
+  return () => {
+    dbWorker.value.postMessage({ action: "close" });
+  };
+}, []);
+
+export const useTables = () => {
+  const [dbTables, setDbTables] = useState();
+  useEffect(() => {
+    dbWorker.value.onmessage = ({ data }) => {
+      setDbTables(data.results[0]?.values);
+    };
+    dbWorker.value.postMessage({
+      id: "browse table",
+      action: "exec",
+      sql: `SELECT name FROM sqlite_schema WHERE type ='table' AND name NOT LIKE 'sqlite_%';`,
+    });
+  }, []);
+
+  return { dbTables };
+};

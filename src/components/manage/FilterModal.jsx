@@ -4,7 +4,7 @@ import { useState } from "preact/hooks";
 import { operators, types } from "../../constants";
 import { PlusIcon, TrashIcon, XMarkIcon } from "@heroicons/react/20/solid";
 import { parse, format } from "date-fns";
-import { useSnack } from "../../hooks";
+import { setSnackContent } from "../../utils";
 
 export default function FilterModal({
   open,
@@ -15,7 +15,6 @@ export default function FilterModal({
   columns,
 }) {
   const [activeType, setActiveType] = useState(columns[0].type);
-  const { setSnackContent } = useSnack();
 
   const handleSubmit = (event) => {
     try {

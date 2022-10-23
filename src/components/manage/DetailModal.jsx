@@ -6,7 +6,7 @@ import { TrashIcon } from "@heroicons/react/20/solid";
 import { types } from "../../constants";
 import { format } from "date-fns";
 import { parse } from "date-fns";
-import { useSnack } from "../../hooks";
+import { setSnackContent } from "../../utils";
 
 export default function DetailModal({
   open,
@@ -15,7 +15,6 @@ export default function DetailModal({
   focusId,
   columns,
 }) {
-  const { setSnackContent } = useSnack();
 
   useEffect(() => {
     if (open && focusId) {

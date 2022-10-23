@@ -1,3 +1,5 @@
+import { snackbar } from "../contexts";
+
 export function paginate(page, maxPage) {
   if ([1, 2, maxPage - 1, maxPage].includes(page))
     return [1, 2, 3, 0, maxPage - 2, maxPage - 1, maxPage];
@@ -25,4 +27,21 @@ export const dbNameEscaper = (inputString) => {
     .toLowerCase()
     .replaceAll("__", "_");
   return toReturn.slice(-1) === "_" ? toReturn.slice(0, -1) : toReturn;
+};
+
+export const openSnack = () => {
+  snackbar.value = { ...snackbar.value, visible: true };
+  setTimeout(() => {
+    snackbar.value = { ...snackbar.value, visible: false };
+  }, 3000);
+};
+
+export const closeSnack = () =>
+  (snackbar.value = { ...snackbar.value, visible: false });
+
+export const setSnackContent = (newContent) => {
+  snackbar.value = { content: newContent, visible: true };
+  setTimeout(() => {
+    snackbar.value = { ...snackbar.value, visible: false };
+  }, 3000);
 };

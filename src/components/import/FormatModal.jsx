@@ -4,8 +4,7 @@ import { useEffect, useState } from "preact/hooks";
 import { PlusIcon, TrashIcon } from "@heroicons/react/20/solid";
 import { formats } from "../../contexts";
 import { types } from "../../constants";
-import { doesContainSymbol } from "../../utils";
-import { useSnack } from "../../hooks";
+import { doesContainSymbol, setSnackContent } from "../../utils";
 
 export default function FormatModal({
   open,
@@ -16,7 +15,6 @@ export default function FormatModal({
 }) {
   const [tableName, setTableName] = useState("");
   const [columns, setColumns] = useState([]);
-  const { setSnackContent } = useSnack();
 
   useEffect(() => {
     if (focusFormat) {

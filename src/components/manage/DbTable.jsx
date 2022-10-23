@@ -4,7 +4,7 @@ import { unparse } from "papaparse";
 import { format as dateFormat } from "date-fns";
 
 import { db, formats } from "../../contexts";
-import { useSnack, useSort } from "../../hooks";
+import { useSort } from "../../hooks";
 import Actions from "./Actions";
 import Pagination from "./Pagination";
 import DetailModal from "./DetailModal";
@@ -15,6 +15,7 @@ import {
   Bars3Icon,
 } from "@heroicons/react/20/solid";
 import { types } from "../../constants";
+import { setSnackContent } from "../../utils";
 
 const filterToString = (filter) =>
   filter.length
@@ -44,7 +45,6 @@ function DbTable({ name, isInFormats }) {
   const [page, setPage] = useState(1);
 
   const { sortAsc, handleSortClick, sortString } = useSort();
-  const { setSnackContent } = useSnack();
 
   const columns = useMemo(
     () =>
