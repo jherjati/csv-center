@@ -1,9 +1,9 @@
-import { useMemo, useState, useCallback } from "preact/hooks";
+import { useState, useCallback, useEffect } from "preact/hooks";
 import streamSaver from "streamsaver";
 import { unparse } from "papaparse";
 import { format as dateFormat } from "date-fns";
 
-import { db, formats } from "../../contexts";
+import { dbWorker, formats } from "../../contexts";
 import { useSort } from "../../hooks";
 import Actions from "./Actions";
 import Pagination from "./Pagination";
@@ -15,7 +15,6 @@ import {
   Bars3Icon,
 } from "@heroicons/react/20/solid";
 import { types } from "../../constants";
-import { setSnackContent } from "../../utils";
 
 const filterToString = (filter) =>
   filter.length
@@ -46,95 +45,123 @@ function DbTable({ name, isInFormats }) {
 
   const { sortAsc, handleSortClick, sortString } = useSort();
 
-  const columns = useMemo(
-    () =>
-      isInFormats
-        ? formats.value[name]
-        : db.value
-            .exec(`PRAGMA table_info('${name}')`)[0]
-            .values.map((el) => ({ name: el[1], type: el[2].toLowerCase() })),
-    [name, isInFormats]
-  );
+  // Column
+  const [columns, setColumns] = useState([]);
+  useEffect(() => {
+    if (isInFormats) {
+      setColumns(formats.value[name]);
+    } else {
+      dbWorker.value.onmessage = ({ data }) => {
+        setColumns(
+          data.results[0]?.values.map((el) => ({
+            name: el[1],
+            type: el[2].toLowerCase(),
+          }))
+        );
+      };
 
-  const data = useMemo(() => {
-    const dateIndeks = [];
-    let toReturn = db.value.exec(
-      `SELECT rowid, ${columns
-        .map((el, idx) => {
-          if (
-            types
-              .filter((ty) => ty.input === "date")
-              .map((ty) => ty.label)
-              .includes(el.type)
-          ) {
-            dateIndeks.push(idx + 1);
-          }
-          return el.name;
-        })
-        .join(", ")} FROM '${name}' ${filterToString(
-        filter
-      )} ${sortString} LIMIT 10 OFFSET ${(page - 1) * 10}`,
-      filterToValues(filter)
-    );
-    toReturn = toReturn[0];
-    if (toReturn && dateIndeks.length) {
-      toReturn.values.map((row) => {
-        dateIndeks.forEach((indeks) => {
-          row[indeks] = dateFormat(new Date(row[indeks] * 1000), "yyyy-MM-dd");
-        });
-        return row;
+      dbWorker.value.postMessage({
+        id: "browse column",
+        action: "exec",
+        sql: `PRAGMA table_info('${name}')`,
       });
     }
-    return toReturn;
-  }, [sortString, page, detailOpen, filter]);
+  }, [name, isInFormats]);
 
-  const [
-    {
-      values: [[count]],
-    },
-  ] = useMemo(
-    () =>
-      db.value
-        ? db.value.exec(
-            `SELECT COUNT(*) FROM '${name}' ${filterToString(filter)}`,
-            filterToValues(filter)
-          )
-        : [{ values: [[0]] }],
-    [db.value, filter, detailOpen]
-  );
+  // Data
+  const [data, setData] = useState([]);
+  useEffect(() => {
+    if (columns.length) {
+      const dateIndeks = [];
+
+      dbWorker.value.onmessage = ({ data }) => {
+        if (data.id === "browse row") {
+          let toReturn = data.results[0];
+
+          if (toReturn && dateIndeks.length) {
+            toReturn.values = toReturn.values.map((row) => {
+              let newRow = [...row];
+              dateIndeks.forEach((indeks) => {
+                newRow[indeks] = dateFormat(
+                  new Date(newRow[indeks] * 1000),
+                  "yyyy-MM-dd"
+                );
+              });
+              return newRow;
+            });
+          }
+
+          setData(toReturn);
+        }
+      };
+
+      dbWorker.value.postMessage({
+        id: "browse row",
+        action: "exec",
+        sql: `SELECT ${[{ name: "rowid" }, ...columns]
+          .map((el, idx) => {
+            if (
+              types
+                .filter((ty) => ty.input === "date")
+                .map((ty) => ty.label)
+                .includes(el.type)
+            ) {
+              dateIndeks.push(idx);
+            }
+            return el.name;
+          })
+          .join(", ")} FROM '${name}' ${filterToString(
+          filter
+        )} ${sortString} LIMIT 10 OFFSET ${(page - 1) * 10}`,
+        params: filterToValues(filter),
+      });
+    }
+  }, [sortString, page, detailOpen, filter, columns]);
+
+  // Count
+  const [count, setCount] = useState(0);
+  useEffect(() => {
+    dbWorker.value.onmessage = ({ data }) => {
+      if (data.id === "count row") setCount(data.results[0]?.values[0]);
+    };
+
+    dbWorker.value.postMessage({
+      id: "count row",
+      action: "exec",
+      sql: `SELECT COUNT(*) FROM '${name}' ${filterToString(filter)}`,
+      params: filterToValues(filter),
+    });
+  }, [filter, detailOpen]);
 
   const handleExport = useCallback(() => {
-    try {
-      const fileStream = streamSaver.createWriteStream(name + ".csv");
-      const writer = fileStream.getWriter();
-      const encoder = new TextEncoder();
-      writer.write(
-        encoder.encode(columns.map((col) => col.name).join(";") + "\r\n")
-      );
+    const fileStream = streamSaver.createWriteStream(name + ".csv");
+    const writer = fileStream.getWriter();
+    const encoder = new TextEncoder();
+    writer.write(
+      encoder.encode(columns.map((col) => col.name).join(";") + "\r\n")
+    );
 
-      db.value.each(
-        `SELECT * FROM '${name}' ${filterToString(filter)}`,
-        filterToValues(filter),
-        function (row) {
-          writer.write(
-            encoder.encode(
-              unparse([columns.map((col) => row[col.name])], {
-                delimiter: ";",
-              }) + "\r\n"
-            )
-          );
-        }
-      );
+    dbWorker.value.onmessage = ({ data }) => {
+      console.log(data);
+      if (data.finished) {
+        writer.close();
+      } else {
+        writer.write(
+          encoder.encode(
+            unparse([columns.map((col) => data.row[col.name])], {
+              delimiter: ";",
+            }) + "\r\n"
+          )
+        );
+      }
+    };
 
-      writer.close();
-    } catch (error) {
-      console.error(error);
-      setSnackContent([
-        "error",
-        "An Error Occured",
-        "Download process stuck due to some table configuration",
-      ]);
-    }
+    dbWorker.value.postMessage({
+      id: "download table",
+      action: "each",
+      sql: `SELECT * FROM '${name}' ${filterToString(filter)}`,
+      params: filterToValues(filter),
+    });
   }, [filter]);
 
   return (
@@ -224,7 +251,7 @@ function DbTable({ name, isInFormats }) {
         maxPage={Math.ceil(count / 10)}
         count={count}
       />
-      <DetailModal
+      {/* <DetailModal
         open={detailOpen}
         setOpen={setDetailOpen}
         tableName={name}
@@ -238,7 +265,7 @@ function DbTable({ name, isInFormats }) {
         filter={filter}
         setFilter={setFilter}
         columns={columns}
-      />
+      /> */}
     </section>
   );
 }
