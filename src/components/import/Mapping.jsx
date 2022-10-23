@@ -97,7 +97,7 @@ function Mapping({ fields, file }) {
           )} );`,
         });
 
-        stepFunction = (row) => {
+        stepFunction = (row, parser) => {
           Object.keys(row.data).forEach((key) => {
             if (row.data[key].includes(",") && realKeys.includes(key)) {
               row.data[key] = realTransformer(row.data[key]);
@@ -116,12 +116,19 @@ function Mapping({ fields, file }) {
             .join(", ")} );
           `;
 
+          dbWorker.value.onmessage = ({ data }) => {
+            if (data.id === "insert row") {
+              parser.resume();
+            }
+          };
+
           dbWorker.value.postMessage({
             id: "insert row",
             action: "exec",
             sql: statement,
             params: Object.keys(formData).map((key) => row.data[key]),
           });
+          parser.pause();
         };
       } else {
         const mapping = Object.fromEntries(form.entries());
@@ -146,12 +153,12 @@ function Mapping({ fields, file }) {
         dbWorker.value.postMessage({
           id: "create table",
           action: "exec",
-          sql: `CREATE TABLE IF NOT EXISTS '${tabName}'( ${formatColumns(
+          sql: `CREATE TABLE IF NOT EXISTS '${tableName}'( ${formatColumns(
             columns
           )} );`,
         });
 
-        stepFunction = (row) => {
+        stepFunction = (row, parser) => {
           Object.keys(row.data).forEach((key) => {
             if (row.data[key].includes(",") && realKeys.includes(key)) {
               row.data[key] = realTransformer(row.data[key]);
@@ -165,22 +172,28 @@ function Mapping({ fields, file }) {
             }
           });
           const statement = `
-            INSERT INTO '${tabName}' VALUES ( ${columns
+            INSERT INTO '${tableName}' VALUES ( ${columns
             .map(() => "?")
             .join(", ")} );
             `;
+
+          dbWorker.value.onmessage = ({ data }) => {
+            if (data.id === "insert row") {
+              parser.resume();
+            }
+          };
           dbWorker.value.postMessage({
             id: "insert row",
             action: "exec",
             sql: statement,
             params: columns.map((col) => row.data[mapping[col.name]]),
           });
+          parser.pause();
         };
       }
 
       parse(file, {
         header: withHeader.value,
-        worker: true,
         skipEmptyLines: "greedy",
         step: stepFunction,
         error: function (error) {
