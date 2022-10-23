@@ -1,13 +1,15 @@
-import { useErrorBoundary } from "preact/hooks";
+import { useErrorBoundary, useState } from "preact/hooks";
 import PageError from "../components/core/PageError";
 import DbTable from "../components/manage/DbTable";
 import EmptyDb from "../components/manage/EmptyDb";
+import TableTabs from "../components/manage/TableTabs";
 import { formats } from "../contexts";
 import { useTables } from "../hooks";
 import { setSnackContent } from "../utils";
 
 function Manage() {
   const { dbTables } = useTables();
+  const [activeTable, setActiveTable] = useState(0);
 
   const [error, resetError] = useErrorBoundary((error) => {
     console.error(error);
@@ -17,7 +19,6 @@ function Manage() {
       "Don't worry, refresh button is your friend",
     ]);
   });
-
   if (error) {
     return <PageError resetError={resetError} />;
   } else {
@@ -28,13 +29,20 @@ function Manage() {
         </div>
         <div className='mx-auto max-w-7xl px-4 sm:px-6 md:px-8'>
           {(!dbTables || !dbTables.length) && <EmptyDb />}
-          {dbTables &&
-            dbTables.map((el) => (
-              <DbTable
-                name={el[0]}
-                isInFormats={Object.keys(formats.value).includes(el[0])}
+          {dbTables && activeTable !== null && (
+            <DbTable
+              name={dbTables[activeTable]}
+              isInFormats={Object.keys(formats.value).includes(
+                dbTables[activeTable]
+              )}
+            >
+              <TableTabs
+                dbTables={dbTables}
+                setActiveTable={setActiveTable}
+                activeTable={activeTable}
               />
-            ))}
+            </DbTable>
+          )}
         </div>
       </main>
     );

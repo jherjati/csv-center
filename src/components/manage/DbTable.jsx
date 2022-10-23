@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from "preact/hooks";
+import { useState, useCallback, useEffect, useRef } from "preact/hooks";
 import streamSaver from "streamsaver";
 import { unparse } from "papaparse";
 import { format as dateFormat } from "date-fns";
@@ -15,33 +15,15 @@ import {
   Bars3Icon,
 } from "@heroicons/react/20/solid";
 import { types } from "../../constants";
+import { filterToString, filterToValues } from "../../utils";
 
-const filterToString = (filter) =>
-  filter.length
-    ? "WHERE " +
-      filter
-        .map((el) =>
-          [
-            el[0],
-            el[1],
-            ["IS NULL", "IS NOT NULL"].includes(el[1]) ? "" : "?",
-          ].join(" ")
-        )
-        .join(" AND ")
-    : "";
-const filterToValues = (filter) =>
-  filter
-    .filter((el) => !["IS NULL", "IS NOT NULL"].includes(el[1]))
-    .map((el) =>
-      ["LIKE", "NOT LIKE"].includes(el[1]) ? "%" + el[2] + "%" : el[2]
-    );
-
-function DbTable({ name, isInFormats }) {
+function DbTable({ name, isInFormats, children }) {
   const [detailOpen, setDetailOpen] = useState(false);
   const [filterOpen, setFilterOpen] = useState(false);
   const [filter, setFilter] = useState([]);
   const [focusId, setFocusId] = useState(undefined);
   const [page, setPage] = useState(1);
+  const [isDownload, setIsDownload] = useState(false);
 
   const { sortAsc, handleSortClick, sortString } = useSort();
 
@@ -60,38 +42,11 @@ function DbTable({ name, isInFormats }) {
   }, [name, isInFormats]);
 
   // Data
+  const dateIndeks = useRef([]);
   const [data, setData] = useState([]);
   useEffect(() => {
-    const dateIndeks = [];
-
-    dbWorker.value.onmessage = ({ data }) => {
-      if (data.id === "count row") setCount(data.results[0]?.values[0]);
-      else if (data.id === "browse column")
-        setColumns(
-          data.results[0]?.values.map((el) => ({
-            name: el[1],
-            type: el[2].toLowerCase(),
-          }))
-        );
-      else if (data.id === "browse row") {
-        let toReturn = data.results[0];
-        if (toReturn && dateIndeks.length) {
-          toReturn.values = toReturn.values.map((row) => {
-            let newRow = [...row];
-            dateIndeks.forEach((indeks) => {
-              newRow[indeks] = dateFormat(
-                new Date(newRow[indeks] * 1000),
-                "yyyy-MM-dd"
-              );
-            });
-            return newRow;
-          });
-        }
-        setData(toReturn);
-      }
-    };
-
     if (columns.length) {
+      const newDateIndeks = [];
       dbWorker.value.postMessage({
         id: "browse row",
         action: "exec",
@@ -103,7 +58,7 @@ function DbTable({ name, isInFormats }) {
                 .map((ty) => ty.label)
                 .includes(el.type)
             ) {
-              dateIndeks.push(idx);
+              newDateIndeks.push(idx);
             }
             return el.name;
           })
@@ -112,6 +67,7 @@ function DbTable({ name, isInFormats }) {
         )} ${sortString} LIMIT 10 OFFSET ${(page - 1) * 10}`,
         params: filterToValues(filter),
       });
+      dateIndeks.current = newDateIndeks;
     }
   }, [sortString, page, detailOpen, filter, columns]);
 
@@ -131,6 +87,7 @@ function DbTable({ name, isInFormats }) {
     const fileStream = streamSaver.createWriteStream(name + ".csv");
     const writer = fileStream.getWriter();
     const encoder = new TextEncoder();
+    setIsDownload(true);
     writer.write(
       encoder.encode(columns.map((col) => col.name).join(";") + "\r\n")
     );
@@ -138,6 +95,7 @@ function DbTable({ name, isInFormats }) {
     dbWorker.value.onmessage = ({ data }) => {
       if (data.finished) {
         writer.close();
+        setIsDownload(false);
       } else {
         writer.write(
           encoder.encode(
@@ -157,12 +115,63 @@ function DbTable({ name, isInFormats }) {
     });
   }, [filter]);
 
+  // Message receiver
+  useEffect(() => {
+    if (!isDownload) {
+      dbWorker.value.onmessage = ({ data }) => {
+        if (data.id === "count row") {
+          setCount(data.results[0]?.values[0]);
+        } else if (data.id === "browse column") {
+          setColumns(
+            data.results[0]?.values.map((el) => ({
+              name: el[1],
+              type: el[2].toLowerCase(),
+            }))
+          );
+        } else if (data.id === "read row") {
+          const res = data.results[0];
+          setTimeout(() => {
+            const form = document.getElementById("detail-form");
+            res.columns.forEach((name, idx) => {
+              if (
+                types.find(
+                  (type) =>
+                    type.label === columns.find((col) => col.name === name).type
+                ).input === "date"
+              ) {
+                form[name].value = dateFormat(
+                  new Date(res.values[0][idx] * 1000),
+                  "yyyy-MM-dd"
+                );
+              } else {
+                form[name].value = res.values[0][idx];
+              }
+            });
+          }, 50);
+        } else if (data.id === "browse row") {
+          let toReturn = data.results[0];
+          if (toReturn && dateIndeks.current.length) {
+            toReturn.values = toReturn.values.map((row) => {
+              let newRow = [...row];
+              dateIndeks.current.forEach((indeks) => {
+                newRow[indeks] = dateFormat(
+                  new Date(newRow[indeks] * 1000),
+                  "yyyy-MM-dd"
+                );
+              });
+              return newRow;
+            });
+          }
+          setData(toReturn);
+        }
+      };
+    }
+  }, [isDownload]);
+
   return (
     <section className='my-6 w-full rounded-lg overflow-hidden shadow'>
       <div className='py-3 px-6 bg-white flex justify-between items-center'>
-        <h5 className='text-xl font-semibold text-gray-900 capitalize'>
-          {name}
-        </h5>
+        {children}
         <Actions
           setDetailOpen={setDetailOpen}
           setFilterOpen={setFilterOpen}
@@ -244,13 +253,13 @@ function DbTable({ name, isInFormats }) {
         maxPage={Math.ceil(count / 10)}
         count={count}
       />
-      {/* <DetailModal
+      <DetailModal
         open={detailOpen}
         setOpen={setDetailOpen}
         tableName={name}
         focusId={focusId}
         columns={columns}
-      /> */}
+      />
       {columns.length && (
         <FilterModal
           open={filterOpen}

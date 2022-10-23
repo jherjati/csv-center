@@ -55,7 +55,7 @@ export const useTables = () => {
   const [dbTables, setDbTables] = useState();
   useEffect(() => {
     dbWorker.value.onmessage = ({ data }) => {
-      setDbTables(data.results[0]?.values);
+      setDbTables(data.results[0]?.values?.map((el) => el[0]));
     };
     dbWorker.value.postMessage({
       id: "browse table",

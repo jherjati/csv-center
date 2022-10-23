@@ -45,3 +45,24 @@ export const setSnackContent = (newContent) => {
     snackbar.value = { ...snackbar.value, visible: false };
   }, 3000);
 };
+
+export const filterToString = (filter) =>
+  filter.length
+    ? "WHERE " +
+      filter
+        .map((el) =>
+          [
+            el[0],
+            el[1],
+            ["IS NULL", "IS NOT NULL"].includes(el[1]) ? "" : "?",
+          ].join(" ")
+        )
+        .join(" AND ")
+    : "";
+
+export const filterToValues = (filter) =>
+  filter
+    .filter((el) => !["IS NULL", "IS NOT NULL"].includes(el[1]))
+    .map((el) =>
+      ["LIKE", "NOT LIKE"].includes(el[1]) ? "%" + el[2] + "%" : el[2]
+    );
