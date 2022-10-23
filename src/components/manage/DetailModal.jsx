@@ -1,7 +1,7 @@
 import { Dialog, Transition } from "@headlessui/react";
 import { Fragment } from "preact";
 import { useCallback, useEffect } from "preact/hooks";
-import { db, dbWorker } from "../../contexts";
+import { dbWorker } from "../../contexts";
 import { TrashIcon } from "@heroicons/react/20/solid";
 import { types } from "../../constants";
 import { parse } from "date-fns";

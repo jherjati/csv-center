@@ -17,7 +17,6 @@ specifiers:
   preact-compat: ^3.19.0
   react: npm:@preact/compat
   react-dom: npm:@preact/compat
-  sql.js: ^1.8.0
   streamsaver: ^2.0.6
   tailwindcss: ^3.1.8
   vite: ^3.1.0
@@ -36,7 +35,6 @@ dependencies:
   preact-compat: 3.19.0_preact@10.11.1
   react: /@preact/compat/17.1.2_preact@10.11.1
   react-dom: /@preact/compat/17.1.2_preact@10.11.1
-  sql.js: 1.8.0
   streamsaver: 2.0.6
   wouter-preact: 2.8.0-alpha.2_preact@10.11.1
 
@@ -3064,10 +3062,6 @@ packages:
   /sourcemap-codec/1.4.8:
     resolution: {integrity: sha512-9NykojV5Uih4lgo5So5dtw+f0JgJX30KCNI8gwhz2J9A15wD0Ml6tjHKwf6fTSa6fAdVBdZeNOs9eJ71qCk8vA==}
     dev: true
-
-  /sql.js/1.8.0:
-    resolution: {integrity: sha512-3HD8pSkZL+5YvYUI8nlvNILs61ALqq34xgmF+BHpqxe68yZIJ1H+sIVIODvni25+CcxHUxDyrTJUL0lE/m7afw==}
-    dev: false
 
   /standalone-react-addons-pure-render-mixin/0.1.1:
     resolution: {integrity: sha512-HFkwqpJmvz4vxHyzdeUcjtsp8Am+NauLXdU2/YXT1/InPbszaRo1cLPAy/58H7oOPNNjteqHcv04JEw+d9C+Xw==}
