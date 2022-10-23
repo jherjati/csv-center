@@ -51,7 +51,7 @@ export default function DetailModal({
       });
       setOpen(false);
     },
-    [db.value, focusId]
+    [focusId]
   );
 
   return (
@@ -97,9 +97,11 @@ export default function DetailModal({
                       <button
                         onClick={(event) => {
                           event.preventDefault();
-                          db.value.run(
-                            `DELETE FROM '${tableName}' WHERE rowid = ${focusId}`
-                          );
+                          dbWorker.value.postMessage({
+                            id: "delete row",
+                            action: "exec",
+                            sql: `DELETE FROM '${tableName}' WHERE rowid = ${focusId}`,
+                          });
                           setOpen(false);
                         }}
                         className='inline-flex items-center rounded-md border border-gray-300 px-3 py-2 text-sm font-medium leading-4 text-gray-600 shadow-sm hover:bg-gray-50 hover:text-gray-900 focus:z-10 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500'
