@@ -14,6 +14,7 @@ import {
 import ChartBox from "./ChartBox";
 import FilterModal from "./FilterModal";
 import { filterToString, filterToValues } from "../../utils";
+import ConfigModal from "./ConfigModal";
 
 Chart.register(
   LineController,
@@ -133,7 +134,7 @@ function TableMetric({ name, children }) {
         <Actions
           filterCount={filter.length}
           onFilterClick={() => setFilterOpen(true)}
-          onConfigClick={() => {}}
+          onConfigClick={() => setConfigOpen(true)}
           onPrintClick={() => {}}
         />
       </div>
@@ -154,6 +155,7 @@ function TableMetric({ name, children }) {
         filter={filter}
         setFilter={setFilter}
       />
+      <ConfigModal open={configOpen} setOpen={setConfigOpen} tableName={name} />
     </section>
   );
 }
