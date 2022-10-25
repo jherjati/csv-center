@@ -29,7 +29,7 @@ function ChartBox({ data, config }) {
 
   return (
     <div className={`${colSpan} `}>
-      <canvas className='w-full p-3' ref={elRef}></canvas>
+      <canvas className='w-full p-6' ref={elRef}></canvas>
     </div>
   );
 }

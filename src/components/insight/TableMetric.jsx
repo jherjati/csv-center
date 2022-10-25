@@ -29,20 +29,20 @@ function TableMetric({ name, children }) {
   const [config, setConfig] = useState({
     stats: [
       // array of string
-      ...[
-        formats.value[name].find((col) =>
-          ["integer", "real"].includes(col.type)
-        ) &&
-          formats.value[name].find((col) =>
-            ["integer", "real"].includes(col.type)
-          ).name,
-      ],
+      formats.value[name].find((col) => ["integer", "real"].includes(col.type))
+        ?.name,
     ],
     charts: [
       // array of chart config
       {
         type: "line",
-        options: {},
+        options: {
+          scales: {
+            x: {
+              type: "linear",
+            },
+          },
+        },
         span: 6,
         xColumn:
           formats.value[name].filter((col) =>
@@ -67,11 +67,16 @@ function TableMetric({ name, children }) {
             if (idx < config.stats.length) newStatsValues.push(el.values[0]);
             else {
               newChartsValues.push({
-                labels: el.values.map((data) => data[0]),
                 datasets: [
                   {
                     label: el.columns[1],
-                    data: el.values.map((data) => data[1]),
+                    normalized: true,
+                    parsing: false,
+                    borderColor: "orange",
+                    data: el.values.map((value) => ({
+                      x: value[0],
+                      y: value[1],
+                    })),
                   },
                 ],
               });
@@ -86,6 +91,7 @@ function TableMetric({ name, children }) {
         id: "get metric",
         action: "exec",
         sql: `${config.stats
+          .filter((stat) => Boolean(stat))
           .map(
             (stat) =>
               `SELECT MAX(${stat}), AVG(${stat}), MIN(${stat}), COUNT(${stat}) FROM '${name}';`
@@ -106,7 +112,11 @@ function TableMetric({ name, children }) {
     <section className='bg-white overflow-hidden shadow rounded-lg divide-y my-6 pb-6'>
       <div className='py-3 px-6 bg-white flex justify-between items-center'>
         {children}
-        <Actions />
+        <Actions
+          onFilterClick={() => {}}
+          onConfigClick={() => {}}
+          onPrintClick={() => {}}
+        />
       </div>
       {statsValues.map((stat, idx) => (
         <Stats column={config.stats[idx]} values={stat} />
