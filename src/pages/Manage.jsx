@@ -31,18 +31,25 @@ function Manage() {
           {(!dbTables || !dbTables.length) && <EmptyDb />}
           {dbTables && (
             <>
-              <TableTabs
-                dbTables={dbTables}
-                setActiveTable={setActiveTable}
-                activeTable={activeTable}
-              />
               <DbTable
                 key={activeTable}
                 name={dbTables[activeTable]}
                 isInFormats={Object.keys(formats.value).includes(
                   dbTables[activeTable]
                 )}
-              />
+              >
+                <select
+                  className='block w-64 rounded-md border-gray-300 py-2 pl-3 pr-10 text-base focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm'
+                  value={activeTable}
+                  onChange={(e) => {
+                    setActiveTable(e.target.value);
+                  }}
+                >
+                  {dbTables.map((name, idx) => (
+                    <option value={idx}>{name}</option>
+                  ))}
+                </select>
+              </DbTable>
             </>
           )}
         </div>

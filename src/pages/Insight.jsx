@@ -1,4 +1,4 @@
-import { useErrorBoundary } from "preact/hooks";
+import { useErrorBoundary, useState } from "preact/hooks";
 import PageError from "../components/core/PageError";
 import TableMetric from "../components/insight/TableMetric";
 import EmptyDb from "../components/manage/EmptyDb";
@@ -8,6 +8,7 @@ import { setSnackContent } from "../utils";
 
 function Insight() {
   const { dbTables } = useTables();
+  const [activeTable, setActiveTable] = useState(0);
 
   const [error, resetError] = useErrorBoundary((error) => {
     console.error(error);
@@ -17,7 +18,6 @@ function Insight() {
       "Don't worry, refresh button is your friend",
     ]);
   });
-
   if (error) {
     return <PageError resetError={resetError} />;
   } else {
@@ -30,9 +30,22 @@ function Insight() {
           {(!dbTables || !dbTables.length) && <EmptyDb />}
           {dbTables && (
             <TableMetric
-              name={dbTables[0]}
-              columns={formats.value[dbTables[0]]}
-            />
+              key={activeTable}
+              name={dbTables[activeTable]}
+              columns={formats.value[dbTables[activeTable]]}
+            >
+              <select
+                className='block w-64 rounded-md border-gray-300 py-2 pl-3 pr-10 text-base focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm'
+                value={activeTable}
+                onChange={(e) => {
+                  setActiveTable(e.target.value);
+                }}
+              >
+                {dbTables.map((name, idx) => (
+                  <option value={idx}>{name}</option>
+                ))}
+              </select>
+            </TableMetric>
           )}
         </div>
       </main>

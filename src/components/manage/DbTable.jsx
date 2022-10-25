@@ -17,7 +17,7 @@ import {
 import { types } from "../../constants";
 import { filterToString, filterToValues } from "../../utils";
 
-function DbTable({ name, isInFormats }) {
+function DbTable({ name, isInFormats, children }) {
   const [detailOpen, setDetailOpen] = useState(false);
   const [filterOpen, setFilterOpen] = useState(false);
   const [filter, setFilter] = useState([]);
@@ -174,11 +174,9 @@ function DbTable({ name, isInFormats }) {
   }, [name, isDownload]);
 
   return (
-    <section className='mb-6 w-full rounded-b-lg overflow-hidden'>
+    <section className='my-6 w-full rounded-lg overflow-hidden shadow '>
       <div className='py-3 px-6 bg-white flex justify-between items-center'>
-        <h4 className='text-xl font-semibold text-gray-900 capitalize'>
-          {name}
-        </h4>
+        {children}
         <Actions
           setDetailOpen={setDetailOpen}
           setFilterOpen={setFilterOpen}
