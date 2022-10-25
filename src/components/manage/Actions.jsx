@@ -32,6 +32,20 @@ export default function Actions({
       <button
         type='button'
         className='relative inline-flex items-center border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 focus:z-10 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500'
+        onClick={() => {
+          setFocusId(undefined);
+          setDetailOpen(true);
+        }}
+      >
+        <DocumentPlusIcon
+          className='-ml-1 mr-2 h-5 w-5 text-gray-400'
+          aria-hidden='true'
+        />
+        Add
+      </button>
+      <button
+        type='button'
+        className='relative inline-flex items-center rounded-r-md border -ml-px border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 focus:z-10 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500'
         onClick={handleExport}
       >
         <DocumentArrowUpIcon
@@ -39,20 +53,6 @@ export default function Actions({
           aria-hidden='true'
         />
         Export
-      </button>
-      <button
-        onClick={() => {
-          setFocusId(undefined);
-          setDetailOpen(true);
-        }}
-        type='button'
-        className='relative inline-flex items-center rounded-r-md border -ml-px border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 focus:z-10 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500'
-      >
-        <DocumentPlusIcon
-          className='-ml-1 mr-2 h-5 w-5 text-gray-400'
-          aria-hidden='true'
-        />
-        Add
       </button>
     </span>
   );

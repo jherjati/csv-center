@@ -1,7 +1,7 @@
 import {
-  DocumentArrowUpIcon,
-  DocumentMagnifyingGlassIcon,
-  DocumentChartBarIcon,
+  FunnelIcon,
+  PrinterIcon,
+  Cog8ToothIcon,
 } from "@heroicons/react/20/solid";
 
 export default function Actions({ filterCount }) {
@@ -12,7 +12,7 @@ export default function Actions({ filterCount }) {
         className='relative inline-flex items-center rounded-l-md border -mr-px border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 focus:z-10 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500'
         onClick={() => {}}
       >
-        <DocumentMagnifyingGlassIcon
+        <FunnelIcon
           className='-ml-1 mr-2 h-5 w-5 text-gray-400'
           aria-hidden='true'
         />
@@ -28,22 +28,22 @@ export default function Actions({ filterCount }) {
         className='relative inline-flex items-center border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 focus:z-10 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500'
         onClick={() => {}}
       >
-        <DocumentArrowUpIcon
+        <Cog8ToothIcon
           className='-ml-1 mr-2 h-5 w-5 text-gray-400'
           aria-hidden='true'
         />
-        Export
+        Config
       </button>
       <button
         onClick={() => {}}
         type='button'
         className='relative inline-flex items-center rounded-r-md border -ml-px border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 focus:z-10 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500'
       >
-        <DocumentChartBarIcon
+        <PrinterIcon
           className='-ml-1 mr-2 h-5 w-5 text-gray-400'
           aria-hidden='true'
         />
-        Config
+        Print
       </button>
     </span>
   );
