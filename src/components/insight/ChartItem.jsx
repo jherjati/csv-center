@@ -1,7 +1,7 @@
 import { Chart } from "frappe-charts/dist/frappe-charts.min.esm";
 import { useCallback, useEffect, useMemo, useRef } from "preact/hooks";
 
-function ChartItem({ config, data, span }) {
+function ChartItem({ config, data }) {
   const chartRef = useRef();
 
   const elRef = useCallback((node) => {
@@ -13,7 +13,7 @@ function ChartItem({ config, data, span }) {
   }, [data]);
 
   const colSpan = useMemo(() => {
-    switch (span) {
+    switch (config.span) {
       case 1:
         return "col-span-1";
       case 2:
@@ -29,7 +29,7 @@ function ChartItem({ config, data, span }) {
       default:
         return "col-span-6";
     }
-  }, [span]);
+  }, []);
 
   return (
     <aside className={` ${colSpan} min-h-max`}>
