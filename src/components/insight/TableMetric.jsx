@@ -24,7 +24,7 @@ function TableMetric({ name, children }) {
       // array of chart config
       {
         type: "line",
-        colors: ["green"],
+        colors: ["orange"],
         lineOptions: {
           dotSize: 1.25,
           regionFill: 1,
@@ -40,11 +40,11 @@ function TableMetric({ name, children }) {
         xColumn:
           formats.value[name].filter((col) =>
             ["integer", "real"].includes(col.type)
-          )[0] ?? null,
+          )[0].name ?? null,
         yColumn:
           formats.value[name].filter((col) =>
             ["integer", "real"].includes(col.type)
-          )[1] ?? null,
+          )[1].name ?? null,
         dataLimit: 100,
       },
     ],
