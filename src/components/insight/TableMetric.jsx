@@ -12,6 +12,8 @@ import {
   Tooltip,
 } from "chart.js";
 import ChartBox from "./ChartBox";
+import FilterModal from "./FilterModal";
+import { filterToString, filterToValues } from "../../utils";
 
 Chart.register(
   LineController,
@@ -25,6 +27,8 @@ Chart.register(
 function TableMetric({ name, children }) {
   const [statsValues, setStatsValues] = useState([]);
   const [chartsValues, setChartsValues] = useState([]);
+
+  const [filter, setFilter] = useState([]);
 
   const [config, setConfig] = useState({
     stats: [
@@ -87,33 +91,48 @@ function TableMetric({ name, children }) {
         }
       };
 
+      const params = filterToValues(filter);
+      const sql = `${config.stats
+        .filter((stat) => Boolean(stat))
+        .map(
+          (stat) =>
+            `SELECT MAX(${stat}), AVG(${stat}), MIN(${stat}), COUNT(${stat}) FROM '${name}' ${filterToString(
+              filter
+            )};`
+        )
+        .join(" ")}
+          ${config.charts
+            .filter((chart) => chart.xColumn && chart.yColumn)
+            .map(
+              (chart) =>
+                `SELECT ${chart.xColumn}, ${
+                  chart.yColumn
+                } FROM '${name}' ${filterToString(filter)} ORDER BY ${
+                  chart.xColumn
+                } LIMIT ${chart.dataLimit};`
+            )
+            .join(" ")}
+        `;
+
       dbWorker.value.postMessage({
         id: "get metric",
         action: "exec",
-        sql: `${config.stats
-          .filter((stat) => Boolean(stat))
-          .map(
-            (stat) =>
-              `SELECT MAX(${stat}), AVG(${stat}), MIN(${stat}), COUNT(${stat}) FROM '${name}';`
-          )
-          .join(" ")}
-            ${config.charts
-              .filter((chart) => chart.xColumn && chart.yColumn)
-              .map(
-                (chart) =>
-                  `SELECT ${chart.xColumn}, ${chart.yColumn} FROM '${name}' ORDER BY ${chart.xColumn} LIMIT ${chart.dataLimit}`
-              )}
-          `,
+        sql,
+        params,
       });
     }
-  }, [config]);
+  }, [config, filter]);
+
+  const [filterOpen, setFilterOpen] = useState(false);
+  const [configOpen, setConfigOpen] = useState(false);
 
   return (
     <section className='bg-white overflow-hidden shadow rounded-lg divide-y my-6 pb-6'>
       <div className='py-3 px-6 bg-white flex justify-between items-center'>
         {children}
         <Actions
-          onFilterClick={() => {}}
+          filterCount={filter.length}
+          onFilterClick={() => setFilterOpen(true)}
           onConfigClick={() => {}}
           onPrintClick={() => {}}
         />
@@ -127,6 +146,14 @@ function TableMetric({ name, children }) {
         ))}
       </div>
       <hr />
+      <FilterModal
+        open={filterOpen}
+        setOpen={setFilterOpen}
+        tableName={name}
+        columns={formats.value[name]}
+        filter={filter}
+        setFilter={setFilter}
+      />
     </section>
   );
 }
