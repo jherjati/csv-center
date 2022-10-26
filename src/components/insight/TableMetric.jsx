@@ -57,7 +57,8 @@ function TableMetric({ name, children }) {
           formats.value[name].filter((col) =>
             ["integer", "real"].includes(col.type)
           )[1].name ?? null,
-        dataLimit: 500,
+        dataLimit: 50,
+        borderColor: "#000000",
       },
     ],
   });
@@ -77,7 +78,8 @@ function TableMetric({ name, children }) {
                     label: el.columns[1],
                     normalized: true,
                     parsing: false,
-                    borderColor: "orange",
+                    borderColor:
+                      config.charts[idx - config.stats.length].borderColor,
                     data: el.values.map((value) => ({
                       x: value[0],
                       y: value[1],

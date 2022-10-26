@@ -1,7 +1,7 @@
 import { Dialog, Transition } from "@headlessui/react";
-import { PlusSmallIcon } from "@heroicons/react/20/solid";
+import { MinusSmallIcon, PlusSmallIcon } from "@heroicons/react/20/solid";
 import { Fragment } from "preact";
-import { useState } from "preact/hooks";
+import { useEffect, useState } from "preact/hooks";
 import { formats } from "../../contexts";
 
 export default function ConfigModal({
@@ -11,6 +11,15 @@ export default function ConfigModal({
   config,
   setConfig,
 }) {
+  const [stats, setStats] = useState(config.stats);
+  const [charts, setCharts] = useState(config.charts);
+  useEffect(() => {
+    if (open) {
+      setStats(config.stats);
+      setCharts(config.charts);
+    }
+  }, [open]);
+
   const handleSubmit = (event) => {
     event.preventDefault();
     const form = new FormData(event.target);
@@ -24,7 +33,7 @@ export default function ConfigModal({
       } else {
         const [_, idx, name] = key.split("_");
         const newChart = { ...charts[idx] };
-        newChart[name] = data[key];
+        newChart[name] = name === "span" ? parseInt(data[key]) : data[key];
         charts[idx] = newChart;
       }
     });
@@ -82,12 +91,12 @@ export default function ConfigModal({
                     <hr className='my-3' />
                   </div>
 
-                  <div className='grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6'>
-                    {config.stats.map((stat, idx) => (
-                      <div className='sm:col-span-3'>
+                  <div className='grid grid-cols-1 gap-y-6 gap-x-3 sm:grid-cols-6'>
+                    {stats.map((stat, idx) => (
+                      <div className='sm:col-span-3 grid grid-cols-6 gap-x-2'>
                         <select
                           name={"stat_" + idx}
-                          className='shadow-sm focus:ring-teal-500 focus:border-teal-500 block w-full sm:text-sm border-gray-300 rounded-md'
+                          className='shadow-sm focus:ring-teal-500 focus:border-teal-500 block col-span-5 sm:text-sm border-gray-300 rounded-md'
                           defaultValue={stat}
                         >
                           {formats.value[tableName]
@@ -98,11 +107,25 @@ export default function ConfigModal({
                               <option value={col.name}>{col.name}</option>
                             ))}
                         </select>
+                        <button
+                          onClick={(event) => {
+                            event.preventDefault();
+                            setStats((prev) =>
+                              prev.filter((_, indeks) => indeks !== idx)
+                            );
+                          }}
+                          className='col-span-1 bg-white border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500 grid place-content-center'
+                        >
+                          <MinusSmallIcon className='h-6 w-6' />
+                        </button>
                       </div>
                     ))}
                     <button
-                      onClick={(event) => event.preventDefault()}
-                      className='sm:col-span-3 border border-gray-300 hover:border-gray-600 text-gray-300 hover:text-gray-600 bg-gray-50 hover:bg-gray-100 rounded-lg border-dashed grid place-content-center'
+                      onClick={(event) => {
+                        event.preventDefault();
+                        setStats((prev) => [...prev, undefined]);
+                      }}
+                      className='sm:col-span-3 border py-2 border-gray-300 hover:border-gray-600 text-gray-300 hover:text-gray-600 bg-gray-50 hover:bg-gray-100 rounded-lg border-dashed grid place-content-center'
                     >
                       <PlusSmallIcon className='h-6 w-6' />
                     </button>
@@ -118,99 +141,121 @@ export default function ConfigModal({
                     <hr className='my-3' />
                   </div>
 
-                  {config.charts.map((chart, idx) => (
-                    <div className='border rounded-lg p-3'>
-                      <div className='grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6'>
-                        <div className='sm:col-span-3'>
-                          <label
-                            htmlFor={`chart_${idx}_type`}
-                            className='block text-sm font-medium text-gray-700'
-                          >
-                            Chart Type
-                          </label>
-                          <select
-                            name={`chart_${idx}_type`}
-                            className='mt-1 shadow-sm focus:ring-teal-500 focus:border-teal-500 block w-full sm:text-sm border-gray-300 rounded-md'
-                            defaultValue={chart["type"]}
-                          >
-                            <option value='line'>line</option>
-                            <option value='bar'>bar</option>
-                          </select>
-                        </div>
+                  {charts.map((chart, idx) => (
+                    <div className='grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6'>
+                      <div className='sm:col-span-3'>
+                        <label
+                          htmlFor={`chart_${idx}_type`}
+                          className='block text-sm font-medium text-gray-700'
+                        >
+                          Chart Type
+                        </label>
+                        <select
+                          name={`chart_${idx}_type`}
+                          className='mt-1 shadow-sm focus:ring-teal-500 focus:border-teal-500 block w-full sm:text-sm border-gray-300 rounded-md'
+                          defaultValue={chart["type"]}
+                        >
+                          <option value='line'>line</option>
+                        </select>
+                      </div>
 
-                        <div className='sm:col-span-3'>
-                          <label
-                            htmlFor={`chart_${idx}_span`}
-                            className='block text-sm font-medium text-gray-700'
-                          >
-                            Chart Width
-                          </label>
-                          <select
-                            name={`chart_${idx}_span`}
-                            className='mt-1 shadow-sm focus:ring-teal-500 focus:border-teal-500 block w-full sm:text-sm border-gray-300 rounded-md'
-                            defaultValue={chart["span"]}
-                          >
-                            <option value={1}>1</option>
-                            <option value={2}>2</option>
-                            <option value={3}>3</option>
-                            <option value={4}>4</option>
-                            <option value={5}>5</option>
-                            <option value={6}>6</option>
-                          </select>
-                        </div>
+                      <div className='sm:col-span-3'>
+                        <label
+                          htmlFor={`chart_${idx}_span`}
+                          className='block text-sm font-medium text-gray-700'
+                        >
+                          Chart Width
+                        </label>
+                        <select
+                          name={`chart_${idx}_span`}
+                          className='mt-1 shadow-sm focus:ring-teal-500 focus:border-teal-500 block w-full sm:text-sm border-gray-300 rounded-md'
+                          defaultValue={chart["span"]}
+                        >
+                          <option value={1}>1</option>
+                          <option value={2}>2</option>
+                          <option value={3}>3</option>
+                          <option value={4}>4</option>
+                          <option value={5}>5</option>
+                          <option value={6}>6</option>
+                        </select>
+                      </div>
 
-                        <div className='sm:col-span-3'>
-                          <label
-                            htmlFor={"chart_${idx}_xColumn"}
-                            className='block text-sm font-medium text-gray-700'
-                          >
-                            X Axis Column
-                          </label>
-                          <select
-                            name={`chart_${idx}_xColumn`}
-                            className='mt-1 shadow-sm focus:ring-teal-500 focus:border-teal-500 block w-full sm:text-sm border-gray-300 rounded-md'
-                            defaultValue={chart["xColumn"]}
-                          >
-                            {formats.value[tableName]
-                              .filter((col) =>
-                                ["integer", "real"].includes(col.type)
-                              )
-                              .map((col) => (
-                                <option value={col.name}>{col.name}</option>
-                              ))}
-                          </select>
-                        </div>
+                      <div className='sm:col-span-3'>
+                        <label
+                          htmlFor={"chart_${idx}_xColumn"}
+                          className='block text-sm font-medium text-gray-700'
+                        >
+                          X Axis Column
+                        </label>
+                        <select
+                          name={`chart_${idx}_xColumn`}
+                          className='mt-1 shadow-sm focus:ring-teal-500 focus:border-teal-500 block w-full sm:text-sm border-gray-300 rounded-md'
+                          defaultValue={chart["xColumn"]}
+                        >
+                          {formats.value[tableName]
+                            .filter((col) =>
+                              ["integer", "real"].includes(col.type)
+                            )
+                            .map((col) => (
+                              <option value={col.name}>{col.name}</option>
+                            ))}
+                        </select>
+                      </div>
 
-                        <div className='sm:col-span-3'>
-                          <label
-                            htmlFor={`chart_${idx}_yColumn`}
-                            className='block text-sm font-medium text-gray-700'
-                          >
-                            Y Axis Column
-                          </label>
-                          <select
-                            name={`chart_${idx}_yColumn`}
-                            className='mt-1 shadow-sm focus:ring-teal-500 focus:border-teal-500 block w-full sm:text-sm border-gray-300 rounded-md'
-                            defaultValue={chart["yColumn"]}
-                          >
-                            {formats.value[tableName]
-                              .filter((col) =>
-                                ["integer", "real"].includes(col.type)
-                              )
-                              .map((col) => (
-                                <option value={col.name}>{col.name}</option>
-                              ))}
-                          </select>
-                        </div>
+                      <div className='sm:col-span-3'>
+                        <label
+                          htmlFor={`chart_${idx}_yColumn`}
+                          className='block text-sm font-medium text-gray-700'
+                        >
+                          Y Axis Column
+                        </label>
+                        <select
+                          name={`chart_${idx}_yColumn`}
+                          className='mt-1 shadow-sm focus:ring-teal-500 focus:border-teal-500 block w-full sm:text-sm border-gray-300 rounded-md'
+                          defaultValue={chart["yColumn"]}
+                        >
+                          {formats.value[tableName]
+                            .filter((col) =>
+                              ["integer", "real"].includes(col.type)
+                            )
+                            .map((col) => (
+                              <option value={col.name}>{col.name}</option>
+                            ))}
+                        </select>
+                      </div>
+
+                      <div className='sm:col-span-3'>
+                        <label
+                          htmlFor={`chart_${idx}_dataLimit`}
+                          className='block text-sm font-medium text-gray-700'
+                        >
+                          First Data Limit
+                        </label>
+                        <input
+                          type='number'
+                          step={25}
+                          name={`chart_${idx}_dataLimit`}
+                          className='mt-1 shadow-sm focus:ring-teal-500 focus:border-teal-500 block w-full sm:text-sm border-gray-300 rounded-md'
+                          defaultValue={chart["dataLimit"]}
+                        ></input>
+                      </div>
+
+                      <div className='sm:col-span-3'>
+                        <label
+                          htmlFor={`chart_${idx}_borderColor`}
+                          className='block text-sm font-medium text-gray-700'
+                        >
+                          Border Color
+                        </label>
+                        <input
+                          type='color'
+                          name={`chart_${idx}_borderColor`}
+                          className='mt-1 shadow-sm focus:ring-teal-500 focus:border-teal-500 block w-full h-10 p-0 border-0 sm:text-sm border-gray-300 rounded-md'
+                          defaultValue={chart["borderColor"]}
+                        ></input>
                       </div>
                     </div>
                   ))}
-                  <button
-                    onClick={(event) => event.preventDefault()}
-                    className='w-full mt-3 py-2 border border-gray-300 hover:border-gray-600 text-gray-300 hover:text-gray-600 bg-gray-50 hover:bg-gray-100 rounded-lg border-dashed grid place-content-center'
-                  >
-                    <PlusSmallIcon className='h-6 w-6' />
-                  </button>
 
                   <div className='flex justify-center border-t mt-3 pt-3 border-teal-100'>
                     <button
