@@ -57,7 +57,7 @@ function TableMetric({ name, children }) {
           formats.value[name].filter((col) =>
             ["integer", "real"].includes(col.type)
           )[1].name ?? null,
-        dataLimit: 100,
+        dataLimit: 500,
       },
     ],
   });
@@ -142,8 +142,8 @@ function TableMetric({ name, children }) {
         <Stats column={config.stats[idx]} values={stat} />
       ))}
       <div className='w-full grid grid-cols-6 pb-6'>
-        {chartsValues.map((chart, idx) => (
-          <ChartBox key={idx} data={chart} config={config.charts[idx]} />
+        {chartsValues.map((dataset, idx) => (
+          <ChartBox key={idx} data={dataset} config={config.charts[idx]} />
         ))}
       </div>
       <hr />
@@ -155,7 +155,13 @@ function TableMetric({ name, children }) {
         filter={filter}
         setFilter={setFilter}
       />
-      <ConfigModal open={configOpen} setOpen={setConfigOpen} tableName={name} />
+      <ConfigModal
+        open={configOpen}
+        setOpen={setConfigOpen}
+        tableName={name}
+        config={config}
+        setConfig={setConfig}
+      />
     </section>
   );
 }

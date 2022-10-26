@@ -1,12 +1,22 @@
-import { useCallback, useMemo } from "preact/hooks";
+import { useCallback, useEffect, useMemo, useRef } from "preact/hooks";
 import { Chart } from "chart.js";
 
 function ChartBox({ data, config }) {
-  const elRef = useCallback((node) => {
-    if (node) {
-      new Chart(node.getContext("2d"), { ...config, data });
+  const elRef = useRef();
+  const chartRef = useRef();
+
+  useEffect(() => {
+    if (elRef.current) {
+      chartRef.current = new Chart(elRef.current.getContext("2d"), {
+        ...config,
+        data,
+      });
     }
-  }, []);
+
+    return () => {
+      if (chartRef.current) chartRef.current.destroy();
+    };
+  }, [data]);
 
   const colSpan = useMemo(() => {
     switch (config.span) {
