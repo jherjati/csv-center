@@ -45,7 +45,9 @@ function TableMetric({ name, children }) {
           scales: {
             x: {
               type: "linear",
+              title: { display: true, text: "X Axis Column" },
             },
+            y: { title: { display: true, text: "Y Axis Column" } },
           },
         },
         span: 6,
@@ -57,7 +59,7 @@ function TableMetric({ name, children }) {
           formats.value[name].filter((col) =>
             ["integer", "real"].includes(col.type)
           )[1].name ?? null,
-        dataLimit: 50,
+        dataLimit: 500,
         borderColor: "#000000",
       },
     ],

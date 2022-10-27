@@ -34,6 +34,15 @@ export default function ConfigModal({
         const [_, idx, name] = key.split("_");
         const newChart = { ...charts[idx] };
         newChart[name] = name === "span" ? parseInt(data[key]) : data[key];
+
+        if (name.includes("Column")) {
+          const axis = name.replace("Column", "");
+          newChart.options.scales[axis].title = {
+            display: true,
+            text: data[key],
+          };
+        }
+
         charts[idx] = newChart;
       }
     });
