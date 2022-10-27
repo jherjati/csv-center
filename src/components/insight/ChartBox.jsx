@@ -35,7 +35,7 @@ function ChartBox({ data, config }) {
       default:
         return "col-span-6";
     }
-  }, []);
+  }, [config.span]);
 
   return (
     <div className={`${colSpan} `}>

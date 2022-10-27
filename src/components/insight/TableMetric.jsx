@@ -60,7 +60,8 @@ function TableMetric({ name, children }) {
             ["integer", "real"].includes(col.type)
           )[1].name ?? null,
         dataLimit: 500,
-        borderColor: "#000000",
+        borderColor: "#FFA500",
+        fill: false,
       },
     ],
   });
