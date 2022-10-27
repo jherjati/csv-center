@@ -33,7 +33,12 @@ export default function ConfigModal({
       } else {
         const [_, idx, name] = key.split("_");
         const newChart = { ...charts[idx] };
-        newChart[name] = name === "span" ? parseInt(data[key]) : data[key];
+
+        if (name === "span") {
+          newChart[name] = parseInt(data[key]);
+        } else {
+          newChart[name] = data[key];
+        }
 
         if (name.includes("Column")) {
           const axis = name.replace("Column", "");
@@ -42,10 +47,10 @@ export default function ConfigModal({
             text: data[key],
           };
         }
-
         charts[idx] = newChart;
       }
     });
+
     setConfig({ stats, charts });
     setOpen(false);
   };

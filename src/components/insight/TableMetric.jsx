@@ -15,6 +15,7 @@ import ChartBox from "./ChartBox";
 import FilterModal from "./FilterModal";
 import { filterToString, filterToValues } from "../../utils";
 import ConfigModal from "./ConfigModal";
+import annotationPlugin from "chartjs-plugin-annotation";
 
 Chart.register(
   LineController,
@@ -22,7 +23,8 @@ Chart.register(
   LinearScale,
   PointElement,
   LineElement,
-  Tooltip
+  Tooltip,
+  annotationPlugin
 );
 
 function TableMetric({ name, children }) {
@@ -48,6 +50,27 @@ function TableMetric({ name, children }) {
               title: { display: true, text: "X Axis Column" },
             },
             y: { title: { display: true, text: "Y Axis Column" } },
+          },
+          plugins: {
+            annotation: {
+              annotations: {
+                box1: {
+                  type: "box",
+                  yMin: 88,
+                  yMax: 89,
+                  backgroundColor: "rgba(255, 99, 132, 0.25)",
+                  label: {
+                    // drawTime: "afterDraw",
+                    display: true,
+                    content: "Dangerous values",
+                    position: {
+                      x: "start",
+                      y: "start",
+                    },
+                  },
+                },
+              },
+            },
           },
         },
         span: 6,

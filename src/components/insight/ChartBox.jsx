@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef } from "preact/hooks";
+import { useEffect, useMemo, useRef } from "preact/hooks";
 import { Chart } from "chart.js";
 
 function ChartBox({ data, config }) {
