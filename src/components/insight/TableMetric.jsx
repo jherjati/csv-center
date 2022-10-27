@@ -55,17 +55,15 @@ function TableMetric({ name, children }) {
             annotation: {
               annotations: {
                 box1: {
+                  display: false,
                   type: "box",
-                  yMin: 88,
-                  yMax: 89,
                   backgroundColor: "rgba(255, 99, 132, 0.25)",
                   label: {
-                    // drawTime: "afterDraw",
+                    drawTime: "afterDraw",
                     display: true,
-                    content: "Dangerous values",
                     position: {
                       x: "start",
-                      y: "start",
+                      y: "center",
                     },
                   },
                 },
@@ -82,7 +80,7 @@ function TableMetric({ name, children }) {
           formats.value[name].filter((col) =>
             ["integer", "real"].includes(col.type)
           )[1].name ?? null,
-        dataLimit: 500,
+        dataLimit: 250,
         borderColor: "#FFA500",
         fill: false,
       },

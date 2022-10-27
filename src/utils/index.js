@@ -66,3 +66,20 @@ export const filterToValues = (filter) =>
     .map((el) =>
       ["LIKE", "NOT LIKE"].includes(el[1]) ? "%" + el[2] + "%" : el[2]
     );
+
+export function getPropByString(obj, str) {
+  try {
+    const path = str.split(".");
+    let toReturn = { ...obj };
+    path.forEach((key) => {
+      toReturn = toReturn[key];
+    });
+    return toReturn;
+  } catch (_) {}
+}
+
+export function setPropByString(obj = {}, str, val) {
+  const keys = str.split(".");
+  const last = keys.pop();
+  keys.reduce((o, k) => (o[k] ??= {}), obj)[last] = val;
+}

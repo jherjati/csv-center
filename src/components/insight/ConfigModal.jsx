@@ -3,6 +3,7 @@ import { MinusSmallIcon, PlusSmallIcon } from "@heroicons/react/20/solid";
 import { Fragment } from "preact";
 import { useEffect, useState } from "preact/hooks";
 import { formats } from "../../contexts";
+import { getPropByString, setPropByString } from "../../utils";
 
 export default function ConfigModal({
   open,
@@ -36,6 +37,22 @@ export default function ConfigModal({
 
         if (name === "span") {
           newChart[name] = parseInt(data[key]);
+        } else if (name.includes("annotation")) {
+          if (data[key]) {
+            setPropByString(
+              newChart,
+              "options.plugins.annotation.annotations.box1.display",
+              true
+            );
+            setPropByString(newChart, name, data[key]);
+          } else {
+            setPropByString(
+              newChart,
+              "options.plugins.annotation.annotations.box1.display",
+              false
+            );
+            setPropByString(newChart, name, data[key]);
+          }
         } else {
           newChart[name] = data[key];
         }
@@ -47,6 +64,7 @@ export default function ConfigModal({
             text: data[key],
           };
         }
+
         charts[idx] = newChart;
       }
     });
@@ -266,6 +284,66 @@ export default function ConfigModal({
                           name={`chart_${idx}_borderColor`}
                           className='mt-1 shadow-sm focus:ring-teal-500 focus:border-teal-500 block w-full h-10 p-0 border-0 sm:text-sm border-gray-300 rounded-md'
                           defaultValue={chart["borderColor"]}
+                        ></input>
+                      </div>
+
+                      <div className='sm:col-span-3'>
+                        <label
+                          htmlFor={`chart_${idx}_options.plugins.annotation.annotations.box1.yMin`}
+                          className='block text-sm font-medium text-gray-700'
+                        >
+                          Annotation Y Min
+                        </label>
+                        <input
+                          type='number'
+                          step='any'
+                          name={`chart_${idx}_options.plugins.annotation.annotations.box1.yMin`}
+                          className='mt-1 shadow-sm focus:ring-teal-500 focus:border-teal-500 block w-full sm:text-sm border-gray-300 rounded-md'
+                          defaultValue={
+                            getPropByString(
+                              chart,
+                              "options.plugins.annotation.annotations.box1.yMin"
+                            ) ?? ""
+                          }
+                        ></input>
+                      </div>
+
+                      <div className='sm:col-span-3'>
+                        <label
+                          htmlFor={`chart_${idx}_options.plugins.annotation.annotations.box1.yMax`}
+                          className='block text-sm font-medium text-gray-700'
+                        >
+                          Annotation Y Max
+                        </label>
+                        <input
+                          type='number'
+                          step='any'
+                          name={`chart_${idx}_options.plugins.annotation.annotations.box1.yMax`}
+                          className='mt-1 shadow-sm focus:ring-teal-500 focus:border-teal-500 block w-full sm:text-sm border-gray-300 rounded-md'
+                          defaultValue={
+                            getPropByString(
+                              chart,
+                              "options.plugins.annotation.annotations.box1.yMax"
+                            ) ?? ""
+                          }
+                        ></input>
+                      </div>
+
+                      <div className='sm:col-span-3'>
+                        <label
+                          htmlFor={`chart_${idx}_options.plugins.annotation.annotations.box1.label.content`}
+                          className='block text-sm font-medium text-gray-700'
+                        >
+                          Annotation Label
+                        </label>
+                        <input
+                          type='text'
+                          name={`chart_${idx}_options.plugins.annotation.annotations.box1.label.content`}
+                          className='mt-1 shadow-sm focus:ring-teal-500 focus:border-teal-500 block w-full sm:text-sm border-gray-300 rounded-md'
+                          defaultValue={getPropByString(
+                            chart,
+                            "options.plugins.annotation.annotations.box1.label.content"
+                          )}
                         ></input>
                       </div>
                     </div>
