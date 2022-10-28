@@ -6,6 +6,7 @@ const stopDefault = (event) => {
 function Dropzone({ setFile }) {
   return (
     <section
+      style={{ animation: "forwards fadein1 1.2s" }}
       className='mt-6'
       onDrop={stopDefault}
       onDragEnter={stopDefault}
