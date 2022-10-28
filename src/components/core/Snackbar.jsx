@@ -67,16 +67,6 @@ const SnackBar = () => {
           </div>
         </Transition>
       </div>
-      <style>{`
-        @keyframes run {
-          to {
-            transform: translate(0%);
-          }
-          from {
-            transform: translate(-100%);
-          }
-        }
-      `}</style>
     </div>
   );
 };

@@ -247,7 +247,7 @@ function Mapping({ fields, file }) {
   return (
     <>
       <form
-        className='px-6 pb-6 bg-white rounded-lg shadow'
+        className='mt-6 px-6 pb-6 bg-white rounded-lg shadow'
         onSubmit={handleImport}
       >
         <title className='py-3 flex justify-between items-center'>

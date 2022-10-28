@@ -2,7 +2,7 @@ import Toggle from "./Toggle";
 
 export default function PreviewTable({ fields, rows, fileString }) {
   return (
-    <section className='my-6 p-6 bg-white rounded-lg shadow'>
+    <section className='mt-6 p-6 bg-white rounded-lg shadow'>
       <div className='flex justify-between items-center'>
         <span>
           <h1 className='text-xl font-semibold text-gray-900 inline mr-3'>
