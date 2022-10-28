@@ -20,17 +20,17 @@ function ChartBox({ data, config }) {
 
   const colSpan = useMemo(() => {
     switch (config.span) {
-      case 1:
+      case "1":
         return "col-span-1";
-      case 2:
+      case "2":
         return "col-span-2";
-      case 3:
+      case "3":
         return "col-span-3";
-      case 4:
+      case "4":
         return "col-span-4";
-      case 5:
+      case "5":
         return "col-span-5";
-      case 6:
+      case "6":
         return "col-span-6";
       default:
         return "col-span-6";

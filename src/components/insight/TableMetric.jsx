@@ -5,10 +5,12 @@ import Stats from "./Stats";
 import {
   Chart,
   LineController,
+  BarController,
   CategoryScale,
   LinearScale,
   PointElement,
   LineElement,
+  BarElement,
   Tooltip,
 } from "chart.js";
 import ChartBox from "./ChartBox";
@@ -19,10 +21,12 @@ import annotationPlugin from "chartjs-plugin-annotation";
 
 Chart.register(
   LineController,
+  BarController,
   CategoryScale,
   LinearScale,
   PointElement,
   LineElement,
+  BarElement,
   Tooltip,
   annotationPlugin
 );
@@ -97,11 +101,15 @@ function TableMetric({ name, children }) {
             if (idx < config.stats.length) newStatsValues.push(el.values[0]);
             else {
               newChartsValues.push({
+                labels:
+                  config.charts[idx - config.stats.length].type === "line"
+                    ? []
+                    : el.values.map((value) => value[0]),
                 datasets: [
                   {
                     label: el.columns[1],
                     normalized: true,
-                    parsing: false,
+                    parsing: el.columns[1].includes("("),
                     borderColor:
                       config.charts[idx - config.stats.length].borderColor,
                     data: el.values.map((value) => ({
@@ -130,13 +138,18 @@ function TableMetric({ name, children }) {
         .join(" ")}
           ${config.charts
             .filter((chart) => chart.xColumn && chart.yColumn)
-            .map(
-              (chart) =>
-                `SELECT ${chart.xColumn}, ${
-                  chart.yColumn
-                } FROM '${name}' ${filterToString(filter)} ORDER BY ${
-                  chart.xColumn
-                } LIMIT ${chart.dataLimit};`
+            .map((chart) =>
+              chart.type === "bar"
+                ? `SELECT ${chart.xColumn}, count(${
+                    chart.yColumn
+                  }) FROM '${name}' ${filterToString(filter)} GROUP BY ${
+                    chart.xColumn
+                  } ORDER BY count(${chart.yColumn});`
+                : `SELECT ${chart.xColumn}, ${
+                    chart.yColumn
+                  } FROM '${name}' ${filterToString(filter)} ORDER BY ${
+                    chart.xColumn
+                  } LIMIT ${chart.dataLimit};`
             )
             .join(" ")}
         `;

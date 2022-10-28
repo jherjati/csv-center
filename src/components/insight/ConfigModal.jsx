@@ -14,6 +14,8 @@ export default function ConfigModal({
 }) {
   const [stats, setStats] = useState(config.stats);
   const [charts, setCharts] = useState(config.charts);
+  const [type, setType] = useState("line");
+
   useEffect(() => {
     if (open) {
       setStats(config.stats);
@@ -35,9 +37,7 @@ export default function ConfigModal({
         const [_, idx, name] = key.split("_");
         const newChart = { ...charts[idx] };
 
-        if (name === "span") {
-          newChart[name] = parseInt(data[key]);
-        } else if (name.includes("annotation")) {
+        if (name.includes("annotation")) {
           if (data[key]) {
             setPropByString(
               newChart,
@@ -63,6 +63,13 @@ export default function ConfigModal({
             display: true,
             text: data[key],
           };
+        }
+        if (name === "type") {
+          newChart.options.scales.x.type =
+            data[key] === "bar" ? "category" : "linear";
+          newChart.options.scales.x.offset = data[key] === "bar";
+          newChart.options.scales.x.grid.offset = data[key] === "bar";
+          newChart.options.scales.y.beginAtZero = data[key] === "bar";
         }
 
         charts[idx] = newChart;
@@ -186,8 +193,10 @@ export default function ConfigModal({
                           name={`chart_${idx}_type`}
                           className='mt-1 shadow-sm focus:ring-teal-500 focus:border-teal-500 block w-full sm:text-sm border-gray-300 rounded-md'
                           defaultValue={chart["type"]}
+                          onChange={(event) => setType(event.target.value)}
                         >
                           <option value='line'>line</option>
+                          <option value='bar'>bar</option>
                         </select>
                       </div>
 
@@ -226,7 +235,9 @@ export default function ConfigModal({
                         >
                           {formats.value[tableName]
                             .filter((col) =>
-                              ["integer", "real"].includes(col.type)
+                              type === "line"
+                                ? ["integer", "real"].includes(col.type)
+                                : true
                             )
                             .map((col) => (
                               <option value={col.name}>{col.name}</option>
