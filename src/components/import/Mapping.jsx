@@ -34,6 +34,13 @@ function Mapping({ fields, file, tabName, setTabName }) {
       const form = new FormData(event.target);
       let stepFunction,
         tableName = tabName;
+      let uniParser;
+
+      dbWorker.value.onmessage = ({ data }) => {
+        if (data.id === "insert row") {
+          uniParser.resume();
+        }
+      };
 
       if (tabName === "Dynamic") {
         tableName = file.name.split(".")[0];
@@ -95,12 +102,7 @@ function Mapping({ fields, file, tabName, setTabName }) {
             .join(", ")} );
           `;
 
-          dbWorker.value.onmessage = ({ data }) => {
-            if (data.id === "insert row") {
-              parser.resume();
-            }
-          };
-
+          uniParser = parser;
           dbWorker.value.postMessage({
             id: "insert row",
             action: "exec",
@@ -156,11 +158,7 @@ function Mapping({ fields, file, tabName, setTabName }) {
             .join(", ")} );
             `;
 
-          dbWorker.value.onmessage = ({ data }) => {
-            if (data.id === "insert row") {
-              parser.resume();
-            }
-          };
+          uniParser = parser;
           dbWorker.value.postMessage({
             id: "insert row",
             action: "exec",
