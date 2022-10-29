@@ -4,7 +4,7 @@ import PageError from "../components/core/PageError";
 import Dropzone from "../components/import/Dropzone";
 import Mapping from "../components/import/Mapping";
 import PreviewTable from "../components/import/PreviewTable";
-import { withHeader } from "../contexts";
+import { formats, withHeader } from "../contexts";
 import { setSnackContent } from "../utils";
 
 function Import() {
@@ -41,6 +41,14 @@ function Import() {
       }
   }, [file, withHeader.value]);
 
+  const [tabName, setTabName] = useState("Dynamic");
+  useEffect(() => {
+    if (file) {
+      const tableName = file.name.split(".")[0];
+      if (Object.keys(formats.value).includes(tableName)) setTabName(tableName);
+    }
+  }, [file]);
+
   if (error) {
     return <PageError resetError={resetError} />;
   } else {
@@ -65,7 +73,12 @@ function Import() {
                 : ""
             }
           />
-          <Mapping fields={fields} file={file} />
+          <Mapping
+            fields={fields}
+            file={file}
+            tabName={tabName}
+            setTabName={setTabName}
+          />
         </div>
       </main>
     );

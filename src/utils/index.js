@@ -1,3 +1,4 @@
+import { types } from "../constants";
 import { snackbar } from "../contexts";
 
 export function paginate(page, maxPage) {
@@ -83,3 +84,27 @@ export function setPropByString(obj = {}, str, val) {
   const last = keys.pop();
   keys.reduce((o, k) => (o[k] ??= {}), obj)[last] = val;
 }
+
+export const formatColumns = (columns) =>
+  columns
+    .map((el) => {
+      return (
+        dbNameEscaper(el.name) +
+        " " +
+        types.find((type) => type.label === el.type).db
+      );
+    })
+    .join(", ");
+
+export const formatDynamic = (data, withHeader) =>
+  Object.keys(data)
+    .map((key) => {
+      let columnName = "column_" + key;
+      if (withHeader) {
+        columnName = dbNameEscaper(key);
+      }
+      return (
+        columnName + " " + types.find((type) => type.label === data[key]).db
+      );
+    })
+    .join(", ");

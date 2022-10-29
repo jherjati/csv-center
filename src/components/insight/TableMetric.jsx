@@ -86,6 +86,7 @@ function TableMetric({ name, children }) {
           )[1].name ?? null,
         dataLimit: 250,
         borderColor: "#ffa500",
+        backgroundColor: "#ee4b2b",
         fill: false,
       },
     ],

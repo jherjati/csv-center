@@ -10,37 +10,16 @@ import FormSection from "./FormSection";
 import { types } from "../../constants";
 import {
   dbNameEscaper,
+  formatColumns,
+  formatDynamic,
   realTransformer,
   setSnackContent,
   symbolReplacer,
 } from "../../utils";
 
-const formatColumns = (columns) =>
-  columns
-    .map((el) => {
-      return (
-        dbNameEscaper(el.name) +
-        " " +
-        types.find((type) => type.label === el.type).db
-      );
-    })
-    .join(", ");
-const formatDynamic = (data, withHeader) =>
-  Object.keys(data)
-    .map((key) => {
-      let columnName = "column_" + key;
-      if (withHeader) {
-        columnName = dbNameEscaper(key);
-      }
-      return (
-        columnName + " " + types.find((type) => type.label === data[key]).db
-      );
-    })
-    .join(", ");
-
-function Mapping({ fields, file }) {
+function Mapping({ fields, file, tabName, setTabName }) {
   const [_, setLocation] = useLocation();
-  const [tabName, setTabName] = useState("Dynamic");
+
   const columns = useMemo(
     () => (tabName === "Dynamic" ? [] : formats.value[tabName]),
     [tabName, formats.value]
