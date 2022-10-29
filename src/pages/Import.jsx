@@ -1,5 +1,6 @@
 import { parse } from "papaparse";
 import { useEffect, useErrorBoundary, useState } from "preact/hooks";
+import OrAction from "../components/core/OrAction";
 import PageError from "../components/core/PageError";
 import Dropzone from "../components/import/Dropzone";
 import Mapping from "../components/import/Mapping";
@@ -57,7 +58,7 @@ function Import() {
         <div className='mx-auto max-w-7xl px-4 sm:px-6 lg:px-8'>
           <h1 className='text-2xl font-semibold text-gray-900'>Import</h1>
         </div>
-        <div className='mx-auto max-w-7xl px-4 sm:px-6 md:px-8'>
+        <div className='mx-auto max-w-7xl px-4 sm:px-6 md:px-8 mb-6'>
           <Dropzone
             setFields={setFields}
             fields={fields}
@@ -80,6 +81,12 @@ function Import() {
             setTabName={setTabName}
           />
         </div>
+        <OrAction
+          label={"Load Previous Session"}
+          onAction={(event) => {
+            event.preventDefault();
+          }}
+        />
       </main>
     );
   }
