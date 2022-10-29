@@ -18,6 +18,7 @@ import FilterModal from "./FilterModal";
 import { filterToString, filterToValues } from "../../utils";
 import ConfigModal from "./ConfigModal";
 import annotationPlugin from "chartjs-plugin-annotation";
+import { forwardRef } from "react";
 
 Chart.register(
   LineController,
@@ -31,7 +32,7 @@ Chart.register(
   annotationPlugin
 );
 
-function TableMetric({ name, children }) {
+const TableMetric = forwardRef(({ name, children, handlePrint }, ref) => {
   const [statsValues, setStatsValues] = useState([]);
   const [chartsValues, setChartsValues] = useState([]);
 
@@ -177,16 +178,19 @@ function TableMetric({ name, children }) {
           filterCount={filter.length}
           onFilterClick={() => setFilterOpen(true)}
           onConfigClick={() => setConfigOpen(true)}
-          onPrintClick={() => {}}
+          onPrintClick={handlePrint}
         />
       </div>
-      {statsValues.map((stat, idx) => (
-        <Stats column={config.stats[idx]} values={stat} />
-      ))}
-      <div className='w-full grid grid-cols-6 pb-6'>
-        {chartsValues.map((dataset, idx) => (
-          <ChartBox key={idx} data={dataset} config={config.charts[idx]} />
+      <div ref={ref}>
+        {statsValues.map((stat, idx) => (
+          <Stats column={config.stats[idx]} values={stat} />
         ))}
+        <hr />
+        <div className='w-full grid grid-cols-6'>
+          {chartsValues.map((dataset, idx) => (
+            <ChartBox key={idx} data={dataset} config={config.charts[idx]} />
+          ))}
+        </div>
       </div>
       <hr />
       <FilterModal
@@ -206,6 +210,6 @@ function TableMetric({ name, children }) {
       />
     </section>
   );
-}
+});
 
 export default TableMetric;

@@ -1,4 +1,5 @@
-import { useErrorBoundary, useState } from "preact/hooks";
+import { useErrorBoundary, useRef, useState } from "preact/hooks";
+import { useReactToPrint } from "react-to-print";
 import PageError from "../components/core/PageError";
 import TableMetric from "../components/insight/TableMetric";
 import EmptyDb from "../components/manage/EmptyDb";
@@ -18,6 +19,12 @@ function Insight() {
       "Don't worry, refresh button is your friend",
     ]);
   });
+
+  const componentRef = useRef();
+  const handlePrint = useReactToPrint({
+    content: () => componentRef.current,
+  });
+
   if (error) {
     return <PageError resetError={resetError} />;
   } else {
@@ -33,6 +40,8 @@ function Insight() {
               key={activeTable}
               name={dbTables[activeTable]}
               columns={formats.value[dbTables[activeTable]]}
+              ref={componentRef}
+              handlePrint={handlePrint}
             >
               <select
                 className='block w-64 rounded-md border-gray-300 py-2 pl-3 pr-10 text-base focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm'

@@ -22,6 +22,7 @@
     "preact-compat": "^3.19.0",
     "react": "npm:@preact/compat",
     "react-dom": "npm:@preact/compat",
+    "react-to-print": "^2.14.7",
     "streamsaver": "^2.0.6",
     "wouter-preact": "^2.8.0-alpha.2"
   },
