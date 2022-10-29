@@ -51,16 +51,18 @@ function Manage() {
             </DbTable>
           )}
         </div>
-        <OrAction
-          label={"Save Current Session"}
-          onClick={(event) => {
-            event.preventDefault();
-            dbWorker.value.postMessage({
-              id: "save session",
-              action: "export",
-            });
-          }}
-        />
+        {dbTables && (
+          <OrAction
+            label={"Save Current Session"}
+            onClick={(event) => {
+              event.preventDefault();
+              dbWorker.value.postMessage({
+                id: "save session",
+                action: "export",
+              });
+            }}
+          />
+        )}
       </main>
     );
   }
