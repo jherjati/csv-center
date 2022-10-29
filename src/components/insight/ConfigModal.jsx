@@ -4,6 +4,7 @@ import { Fragment } from "preact";
 import { useEffect, useState } from "preact/hooks";
 import { formats } from "../../contexts";
 import { getPropByString, setPropByString } from "../../utils";
+import { Ticks, CategoryScale } from "chart.js";
 
 export default function ConfigModal({
   open,
@@ -37,26 +38,15 @@ export default function ConfigModal({
         const [_, idx, name] = key.split("_");
         const newChart = { ...charts[idx] };
 
-        if (name.includes("annotation")) {
-          if (data[key]) {
-            setPropByString(
-              newChart,
-              "options.plugins.annotation.annotations.box1.display",
-              true
-            );
-            setPropByString(newChart, name, data[key]);
-          } else {
-            setPropByString(
-              newChart,
-              "options.plugins.annotation.annotations.box1.display",
-              false
-            );
-            setPropByString(newChart, name, data[key]);
-          }
-        } else {
-          newChart[name] = data[key];
-        }
+        setPropByString(newChart, name, data[key]);
 
+        if (name.includes("annotation")) {
+          setPropByString(
+            newChart,
+            "options.plugins.annotation.annotations.box1.display",
+            Boolean(data[key])
+          );
+        }
         if (name.includes("Column")) {
           const axis = name.replace("Column", "");
           newChart.options.scales[axis].title = {
@@ -69,6 +59,10 @@ export default function ConfigModal({
             data[key] === "bar" ? "category" : "linear";
           newChart.options.scales.x.offset = data[key] === "bar";
           newChart.options.scales.x.grid.offset = data[key] === "bar";
+          newChart.options.scales.x.ticks.callback =
+            data[key] === "bar"
+              ? CategoryScale.prototype.getLabelForValue
+              : Ticks.formatters.numeric;
           newChart.options.scales.y.beginAtZero = data[key] === "bar";
         }
 
@@ -226,7 +220,7 @@ export default function ConfigModal({
                           htmlFor={"chart_${idx}_xColumn"}
                           className='block text-sm font-medium text-gray-700'
                         >
-                          X Axis Column
+                          X Axis Column {type === "bar" ? "(Group By)" : ""}
                         </label>
                         <select
                           name={`chart_${idx}_xColumn`}
@@ -267,21 +261,43 @@ export default function ConfigModal({
                         </select>
                       </div>
 
-                      <div className='sm:col-span-3'>
-                        <label
-                          htmlFor={`chart_${idx}_dataLimit`}
-                          className='block text-sm font-medium text-gray-700'
-                        >
-                          First Data Limit
-                        </label>
-                        <input
-                          type='number'
-                          step={25}
-                          name={`chart_${idx}_dataLimit`}
-                          className='mt-1 shadow-sm focus:ring-teal-500 focus:border-teal-500 block w-full sm:text-sm border-gray-300 rounded-md'
-                          defaultValue={chart["dataLimit"]}
-                        ></input>
-                      </div>
+                      {type === "line" ? (
+                        <div className='sm:col-span-3'>
+                          <label
+                            htmlFor={`chart_${idx}_dataLimit`}
+                            className='block text-sm font-medium text-gray-700'
+                          >
+                            First Data Limit
+                          </label>
+                          <input
+                            type='number'
+                            step={25}
+                            name={`chart_${idx}_dataLimit`}
+                            className='mt-1 shadow-sm focus:ring-teal-500 focus:border-teal-500 block w-full sm:text-sm border-gray-300 rounded-md'
+                            defaultValue={chart["dataLimit"]}
+                          ></input>
+                        </div>
+                      ) : (
+                        <div className='sm:col-span-3'>
+                          <label
+                            htmlFor={`chart_${idx}_dataOperator`}
+                            className='block text-sm font-medium text-gray-700'
+                          >
+                            Y Axis Operator
+                          </label>
+                          <select
+                            name={`chart_${idx}_dataOperator`}
+                            className='mt-1 shadow-sm focus:ring-teal-500 focus:border-teal-500 block w-full sm:text-sm border-gray-300 rounded-md'
+                            defaultValue={chart["dataOperator"]}
+                          >
+                            <option value='count'>count</option>
+                            <option value='min'>min</option>
+                            <option value='max'>max</option>
+                            <option value='avg'>avg</option>
+                            <option value='sum'>sum</option>
+                          </select>
+                        </div>
+                      )}
 
                       <div className='sm:col-span-3'>
                         <label
@@ -295,6 +311,21 @@ export default function ConfigModal({
                           name={`chart_${idx}_borderColor`}
                           className='mt-1 shadow-sm focus:ring-teal-500 focus:border-teal-500 block w-full h-10 p-0 border-0 sm:text-sm border-gray-300 rounded-md'
                           defaultValue={chart["borderColor"]}
+                        ></input>
+                      </div>
+
+                      <div className='sm:col-span-3'>
+                        <label
+                          htmlFor={`chart_${idx}_backgroundColor`}
+                          className='block text-sm font-medium text-gray-700'
+                        >
+                          Background Color
+                        </label>
+                        <input
+                          type='color'
+                          name={`chart_${idx}_backgroundColor`}
+                          className='mt-1 shadow-sm focus:ring-teal-500 focus:border-teal-500 block w-full h-10 p-0 border-0 sm:text-sm border-gray-300 rounded-md'
+                          defaultValue={chart["backgroundColor"]}
                         ></input>
                       </div>
 

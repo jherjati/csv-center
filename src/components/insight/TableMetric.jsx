@@ -85,7 +85,7 @@ function TableMetric({ name, children }) {
             ["integer", "real"].includes(col.type)
           )[1].name ?? null,
         dataLimit: 250,
-        borderColor: "#FFA500",
+        borderColor: "#ffa500",
         fill: false,
       },
     ],
@@ -109,9 +109,11 @@ function TableMetric({ name, children }) {
                   {
                     label: el.columns[1],
                     normalized: true,
-                    parsing: el.columns[1].includes("("),
+                    parsing: el.columns[1].includes("("), //bar chart need parsing, bar chart use operator
                     borderColor:
                       config.charts[idx - config.stats.length].borderColor,
+                    backgroundColor:
+                      config.charts[idx - config.stats.length].backgroundColor,
                     data: el.values.map((value) => ({
                       x: value[0],
                       y: value[1],
@@ -140,11 +142,11 @@ function TableMetric({ name, children }) {
             .filter((chart) => chart.xColumn && chart.yColumn)
             .map((chart) =>
               chart.type === "bar"
-                ? `SELECT ${chart.xColumn}, count(${
+                ? `SELECT ${chart.xColumn}, ${chart.dataOperator}(${
                     chart.yColumn
                   }) FROM '${name}' ${filterToString(filter)} GROUP BY ${
                     chart.xColumn
-                  } ORDER BY count(${chart.yColumn});`
+                  } ORDER BY ${chart.dataOperator}(${chart.yColumn});`
                 : `SELECT ${chart.xColumn}, ${
                     chart.yColumn
                   } FROM '${name}' ${filterToString(filter)} ORDER BY ${
