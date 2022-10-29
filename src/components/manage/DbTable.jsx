@@ -23,7 +23,6 @@ function DbTable({ name, isInFormats, children }) {
   const [filter, setFilter] = useState([]);
   const [focusId, setFocusId] = useState(undefined);
   const [page, setPage] = useState(1);
-  const [isDownload, setIsDownload] = useState(false);
 
   const { sortAsc, handleSortClick, sortString } = useSort();
 
@@ -89,7 +88,6 @@ function DbTable({ name, isInFormats, children }) {
     const fileStream = streamSaver.createWriteStream(name + ".csv");
     const writer = fileStream.getWriter();
     const encoder = new TextEncoder();
-    setIsDownload(true);
     writer.write(
       encoder.encode(columns.map((col) => col.name).join(";") + "\r\n")
     );
@@ -97,7 +95,6 @@ function DbTable({ name, isInFormats, children }) {
     dbWorker.value.onmessage = ({ data }) => {
       if (data.finished) {
         writer.close();
-        setIsDownload(false);
       } else {
         writer.write(
           encoder.encode(
@@ -119,59 +116,68 @@ function DbTable({ name, isInFormats, children }) {
 
   // Message receiver
   useEffect(() => {
-    if (!isDownload) {
-      dbWorker.value.onmessage = ({ data }) => {
-        try {
-          if (data.id === "count row") {
-            setCount(data.results[0]?.values[0]);
-          } else if (data.id === "browse column") {
-            setColumns(
-              data.results[0]?.values.map((el) => ({
-                name: el[1],
-                type: el[2].toLowerCase(),
-              }))
-            );
-          } else if (data.id === "read row") {
-            const res = data.results[0];
-            setTimeout(() => {
-              const form = document.getElementById("detail-form");
-              res.columns.forEach((name, idx) => {
-                if (
-                  types.find(
-                    (type) =>
-                      type.label ===
-                      columns.find((col) => col.name === name).type
-                  ).input === "date"
-                ) {
-                  form[name].value = dateFormat(
-                    new Date(res.values[0][idx] * 1000),
-                    "yyyy-MM-dd"
-                  );
-                } else {
-                  form[name].value = res.values[0][idx];
-                }
+    dbWorker.value.onmessage = ({ data }) => {
+      try {
+        if (data.id === "count row") {
+          setCount(data.results[0]?.values[0]);
+        } else if (data.id === "browse column") {
+          setColumns(
+            data.results[0]?.values.map((el) => ({
+              name: el[1],
+              type: el[2].toLowerCase(),
+            }))
+          );
+        } else if (data.id === "read row") {
+          const res = data.results[0];
+          setTimeout(() => {
+            const form = document.getElementById("detail-form");
+            res.columns.forEach((name, idx) => {
+              if (
+                types.find(
+                  (type) =>
+                    type.label === columns.find((col) => col.name === name).type
+                ).input === "date"
+              ) {
+                form[name].value = dateFormat(
+                  new Date(res.values[0][idx] * 1000),
+                  "yyyy-MM-dd"
+                );
+              } else {
+                form[name].value = res.values[0][idx];
+              }
+            });
+          }, 50);
+        } else if (data.id === "browse row") {
+          let toReturn = data.results[0];
+          if (toReturn && dateIndeks.current.length) {
+            toReturn.values = toReturn.values.map((row) => {
+              let newRow = [...row];
+              dateIndeks.current.forEach((indeks) => {
+                newRow[indeks] = dateFormat(
+                  new Date(newRow[indeks] * 1000),
+                  "yyyy-MM-dd"
+                );
               });
-            }, 50);
-          } else if (data.id === "browse row") {
-            let toReturn = data.results[0];
-            if (toReturn && dateIndeks.current.length) {
-              toReturn.values = toReturn.values.map((row) => {
-                let newRow = [...row];
-                dateIndeks.current.forEach((indeks) => {
-                  newRow[indeks] = dateFormat(
-                    new Date(newRow[indeks] * 1000),
-                    "yyyy-MM-dd"
-                  );
-                });
-                return newRow;
-              });
-            }
-            setData(toReturn);
+              return newRow;
+            });
           }
-        } catch (error) {}
-      };
-    }
-  }, [name, isDownload]);
+          setData(toReturn);
+        } else if (data.id === "export table") {
+          if (data.finished) {
+            writer.close();
+          } else {
+            writer.write(
+              encoder.encode(
+                unparse([columns.map((col) => data.row[col.name])], {
+                  delimiter: ";",
+                }) + "\r\n"
+              )
+            );
+          }
+        }
+      } catch (error) {}
+    };
+  }, [name]);
 
   return (
     <section className='my-6 w-full rounded-lg overflow-hidden shadow '>
