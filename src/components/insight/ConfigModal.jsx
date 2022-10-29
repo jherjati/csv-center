@@ -231,7 +231,7 @@ export default function ConfigModal({
                             .filter((col) =>
                               type === "line"
                                 ? ["integer", "real"].includes(col.type)
-                                : true
+                                : ["integer", "text"].includes(col.type)
                             )
                             .map((col) => (
                               <option value={col.name}>{col.name}</option>
