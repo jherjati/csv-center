@@ -174,6 +174,19 @@ function DbTable({ name, isInFormats, children }) {
               )
             );
           }
+        } else if (data.id === "save session") {
+          const arraybuff = data.buffer;
+          const blob = new Blob([arraybuff]);
+          const a = document.createElement("a");
+          document.body.appendChild(a);
+          a.href = window.URL.createObjectURL(blob);
+          a.download = "sql.db";
+          a.onclick = function () {
+            setTimeout(function () {
+              window.URL.revokeObjectURL(a.href);
+            }, 1500);
+          };
+          a.click();
         }
       } catch (error) {}
     };

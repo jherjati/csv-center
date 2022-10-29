@@ -3,7 +3,7 @@ import OrAction from "../components/core/OrAction";
 import PageError from "../components/core/PageError";
 import DbTable from "../components/manage/DbTable";
 import EmptyDb from "../components/manage/EmptyDb";
-import { formats } from "../contexts";
+import { dbWorker, formats } from "../contexts";
 import { useTables } from "../hooks";
 import { setSnackContent } from "../utils";
 
@@ -55,6 +55,10 @@ function Manage() {
           label={"Save Current Session"}
           onAction={(event) => {
             event.preventDefault();
+            dbWorker.value.postMessage({
+              id: "save session",
+              action: "export",
+            });
           }}
         />
       </main>
