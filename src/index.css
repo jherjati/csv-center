@@ -16,7 +16,7 @@
     opacity: 0;
     transform: translate(10%);
   }
-  33% {
+  25% {
     opacity: 1;
     transform: translate(-0%);
   }
@@ -25,11 +25,11 @@
   0% {
     opacity: 0;
   }
-  33% {
+  25% {
     opacity: 0;
     transform: translate(10%);
   }
-  66% {
+  50% {
     opacity: 1;
     transform: translate(-0%);
   }
@@ -38,7 +38,20 @@
   0% {
     opacity: 0;
   }
-  66% {
+  50% {
+    opacity: 0;
+    transform: translate(10%);
+  }
+  75% {
+    opacity: 1;
+    transform: translate(-0%);
+  }
+}
+@keyframes fadein4 {
+  0% {
+    opacity: 0;
+  }
+  75% {
     opacity: 0;
     transform: translate(10%);
   }

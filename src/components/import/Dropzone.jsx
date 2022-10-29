@@ -6,7 +6,7 @@ const stopDefault = (event) => {
 function Dropzone({ setFile }) {
   return (
     <section
-      style={{ animation: "forwards fadein1 1.2s" }}
+      style={{ animation: "forwards fadein1 1.6s" }}
       className='mt-6'
       onDrop={stopDefault}
       onDragEnter={stopDefault}
@@ -25,6 +25,7 @@ function Dropzone({ setFile }) {
         }}
       />
       <label
+        role='button'
         htmlFor='dropzone'
         className='block bg-white p-6 rounded-lg shadow w-full'
         onDrop={(event) => {

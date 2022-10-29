@@ -53,7 +53,7 @@ function Manage() {
         </div>
         <OrAction
           label={"Save Current Session"}
-          onAction={(event) => {
+          onClick={(event) => {
             event.preventDefault();
             dbWorker.value.postMessage({
               id: "save session",

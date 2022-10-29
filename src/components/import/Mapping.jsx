@@ -226,7 +226,7 @@ function Mapping({ fields, file, tabName, setTabName }) {
   return (
     <>
       <form
-        style={{ animation: "forwards fadein3 1.2s" }}
+        style={{ animation: "forwards fadein3 1.6s" }}
         className='mt-6 px-6 pb-6 bg-white rounded-lg shadow'
         onSubmit={handleImport}
       >

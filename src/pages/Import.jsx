@@ -5,10 +5,12 @@ import PageError from "../components/core/PageError";
 import Dropzone from "../components/import/Dropzone";
 import Mapping from "../components/import/Mapping";
 import PreviewTable from "../components/import/PreviewTable";
-import { formats, withHeader } from "../contexts";
+import { dbWorker, formats, withHeader } from "../contexts";
 import { setSnackContent } from "../utils";
+import { useLocation } from "wouter-preact";
 
 function Import() {
+  const [_, setLocation] = useLocation();
   const [fields, setFields] = useState([]);
   const [file, setFile] = useState();
   const [error, resetError] = useErrorBoundary((error) => {
@@ -82,9 +84,29 @@ function Import() {
           />
         </div>
         <OrAction
-          label={"Load Previous Session"}
-          onAction={(event) => {
-            event.preventDefault();
+          label='Load Previous Session'
+          onChange={(event) => {
+            const reader = new FileReader();
+            dbWorker.value.onmessage = function ({ data }) {
+              if (data.id === "load_session") {
+                setLocation("/manage");
+              }
+            };
+            reader.onload = function () {
+              try {
+                dbWorker.value.postMessage(
+                  { id: "load_session", action: "open", buffer: reader.result },
+                  [reader.result]
+                );
+              } catch (error) {
+                dbWorker.value.postMessage({
+                  id: "load_session",
+                  action: "open",
+                  buffer: reader.result,
+                });
+              }
+            };
+            reader.readAsArrayBuffer(event.target.files[0]);
           }}
         />
       </main>
