@@ -2,23 +2,18 @@ import { Dialog, Transition } from "@headlessui/react";
 import { MinusSmallIcon, PlusSmallIcon } from "@heroicons/react/20/solid";
 import { Fragment } from "preact";
 import { useEffect, useState } from "preact/hooks";
-import { formats } from "../../contexts";
+import { formats, metricConfigs } from "../../contexts";
 import { getPropByString, setPropByString } from "../../utils";
 import { Ticks, CategoryScale } from "chart.js";
 
-export default function ConfigModal({
-  open,
-  setOpen,
-  tableName,
-  config,
-  setConfig,
-}) {
-  const [stats, setStats] = useState(config.stats);
-  const [charts, setCharts] = useState(config.charts);
+export default function ConfigModal({ open, setOpen, tableName }) {
+  const [stats, setStats] = useState([]);
+  const [charts, setCharts] = useState([]);
   const [type, setType] = useState("line");
 
   useEffect(() => {
     if (open) {
+      const config = metricConfigs.value[tableName];
       setStats(config.stats);
       setCharts(config.charts);
     }
@@ -29,7 +24,7 @@ export default function ConfigModal({
     const form = new FormData(event.target);
     const data = Object.fromEntries(form.entries());
     const stats = [];
-    const charts = [...config.charts];
+    const charts = [...metricConfigs.value[tableName].charts];
 
     Object.keys(data).forEach((key) => {
       if (key.includes("stat")) {
@@ -70,7 +65,10 @@ export default function ConfigModal({
       }
     });
 
-    setConfig({ stats, charts });
+    metricConfigs.value = {
+      ...metricConfigs.value,
+      [tableName]: { stats, charts },
+    };
     setOpen(false);
   };
 

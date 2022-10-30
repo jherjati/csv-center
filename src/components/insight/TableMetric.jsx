@@ -1,5 +1,5 @@
 import { useEffect, useState } from "preact/hooks";
-import { dbWorker, formats } from "../../contexts";
+import { dbWorker, formats, metricConfigs } from "../../contexts";
 import Actions from "./Actions";
 import Stats from "./Stats";
 import {
@@ -38,60 +38,81 @@ const TableMetric = forwardRef(({ name, children, handlePrint }, ref) => {
 
   const [filter, setFilter] = useState([]);
 
-  const [config, setConfig] = useState({
-    stats: [
-      // array of string
-      formats.value[name].find((col) => ["integer", "real"].includes(col.type))
-        ?.name,
-    ],
-    charts: [
-      // array of chart config
-      {
-        type: "line",
-        options: {
-          scales: {
-            x: {
-              type: "linear",
-              title: { display: true, text: "X Axis Column" },
-            },
-            y: { title: { display: true, text: "Y Axis Column" } },
-          },
-          plugins: {
-            annotation: {
-              annotations: {
-                box1: {
-                  display: false,
-                  type: "box",
-                  backgroundColor: "rgba(255, 99, 132, 0.25)",
-                  label: {
-                    drawTime: "afterDraw",
-                    display: true,
-                    position: {
-                      x: "start",
-                      y: "center",
+  useEffect(() => {
+    if (!metricConfigs.value[name])
+      metricConfigs.value = {
+        ...metricConfigs.value,
+        [name]: {
+          stats: [
+            // array of string
+            formats.value[name].find((col) =>
+              ["integer", "real"].includes(col.type)
+            )?.name,
+          ],
+          charts: [
+            // array of chart config
+            {
+              type: "line",
+              options: {
+                scales: {
+                  x: {
+                    type: "linear",
+                    title: {
+                      display: true,
+                      text: formats.value[name].filter((col) =>
+                        ["integer", "real"].includes(col.type)
+                      )[0]?.name,
+                    },
+                  },
+                  y: {
+                    title: {
+                      display: true,
+                      text: formats.value[name].filter((col) =>
+                        ["integer", "real"].includes(col.type)
+                      )[1]?.name,
+                    },
+                  },
+                },
+                plugins: {
+                  annotation: {
+                    annotations: {
+                      box1: {
+                        display: false,
+                        type: "box",
+                        backgroundColor: "rgba(255, 99, 132, 0.25)",
+                        label: {
+                          drawTime: "afterDraw",
+                          display: true,
+                          position: {
+                            x: "start",
+                            y: "center",
+                          },
+                        },
+                      },
                     },
                   },
                 },
               },
+              span: 6,
+              xColumn: formats.value[name].filter((col) =>
+                ["integer", "real"].includes(col.type)
+              )[0]?.name,
+              yColumn: formats.value[name].filter((col) =>
+                ["integer", "real"].includes(col.type)
+              )[1]?.name,
+              dataLimit: 250,
+              borderColor: "#ffa500",
+              backgroundColor: "#ee4b2b",
+              fill: false,
             },
-          },
+          ],
         },
-        span: 6,
-        xColumn: formats.value[name].filter((col) =>
-          ["integer", "real"].includes(col.type)
-        )[0]?.name,
-        yColumn: formats.value[name].filter((col) =>
-          ["integer", "real"].includes(col.type)
-        )[1]?.name,
-        dataLimit: 250,
-        borderColor: "#ffa500",
-        backgroundColor: "#ee4b2b",
-        fill: false,
-      },
-    ],
-  });
+      };
+  }, []);
 
   useEffect(() => {
+    const config = metricConfigs.value[name];
+
     if (config.stats.length || config.charts.length) {
       dbWorker.value.onmessage = ({ data }) => {
         if (data.id === "get metric") {
@@ -173,7 +194,7 @@ const TableMetric = forwardRef(({ name, children, handlePrint }, ref) => {
         params,
       });
     }
-  }, [config, filter]);
+  }, [metricConfigs.value, filter]);
 
   const [filterOpen, setFilterOpen] = useState(false);
   const [configOpen, setConfigOpen] = useState(false);
@@ -191,12 +212,16 @@ const TableMetric = forwardRef(({ name, children, handlePrint }, ref) => {
       </div>
       <div ref={ref}>
         {statsValues.map((stat, idx) => (
-          <Stats column={config.stats[idx]} values={stat} />
+          <Stats column={metricConfigs.value[name].stats[idx]} values={stat} />
         ))}
         <hr />
         <div className='w-full grid grid-cols-6'>
           {chartsValues.map((dataset, idx) => (
-            <ChartBox key={idx} data={dataset} config={config.charts[idx]} />
+            <ChartBox
+              key={idx}
+              data={dataset}
+              config={metricConfigs.value[name].charts[idx]}
+            />
           ))}
         </div>
       </div>
@@ -209,13 +234,7 @@ const TableMetric = forwardRef(({ name, children, handlePrint }, ref) => {
         filter={filter}
         setFilter={setFilter}
       />
-      <ConfigModal
-        open={configOpen}
-        setOpen={setConfigOpen}
-        tableName={name}
-        config={config}
-        setConfig={setConfig}
-      />
+      <ConfigModal open={configOpen} setOpen={setConfigOpen} tableName={name} />
     </section>
   );
 });

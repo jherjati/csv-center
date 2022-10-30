@@ -18,3 +18,5 @@ export const snackbar = signal({
     "Anyone with a link can now view this file.",
   ],
 });
+
+export const metricConfigs = signal({});
