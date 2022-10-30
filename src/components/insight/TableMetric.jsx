@@ -15,7 +15,7 @@ import {
 } from "chart.js";
 import ChartBox from "./ChartBox";
 import FilterModal from "./FilterModal";
-import { filterToString, filterToValues } from "../../utils";
+import { filterToString, filterToValues, setSnackContent } from "../../utils";
 import ConfigModal from "./ConfigModal";
 import annotationPlugin from "chartjs-plugin-annotation";
 import { forwardRef } from "react";
@@ -77,14 +77,12 @@ const TableMetric = forwardRef(({ name, children, handlePrint }, ref) => {
           },
         },
         span: 6,
-        xColumn:
-          formats.value[name].filter((col) =>
-            ["integer", "real"].includes(col.type)
-          )[0].name ?? null,
-        yColumn:
-          formats.value[name].filter((col) =>
-            ["integer", "real"].includes(col.type)
-          )[1].name ?? null,
+        xColumn: formats.value[name].filter((col) =>
+          ["integer", "real"].includes(col.type)
+        )[0]?.name,
+        yColumn: formats.value[name].filter((col) =>
+          ["integer", "real"].includes(col.type)
+        )[1]?.name,
         dataLimit: 250,
         borderColor: "#ffa500",
         backgroundColor: "#ee4b2b",
@@ -131,6 +129,9 @@ const TableMetric = forwardRef(({ name, children, handlePrint }, ref) => {
       };
 
       const params = filterToValues(filter);
+      const availableCharts = config.charts.filter(
+        (chart) => chart.xColumn && chart.yColumn
+      );
       const sql = `${config.stats
         .filter((stat) => Boolean(stat))
         .map(
@@ -140,8 +141,7 @@ const TableMetric = forwardRef(({ name, children, handlePrint }, ref) => {
             )};`
         )
         .join(" ")}
-          ${config.charts
-            .filter((chart) => chart.xColumn && chart.yColumn)
+          ${availableCharts
             .map((chart) =>
               chart.type === "bar"
                 ? `SELECT ${chart.xColumn}, ${chart.dataOperator}(${
@@ -157,6 +157,14 @@ const TableMetric = forwardRef(({ name, children, handlePrint }, ref) => {
             )
             .join(" ")}
         `;
+
+      if (!availableCharts.length) {
+        setSnackContent([
+          "error",
+          "Insufficient Data",
+          "Chart requires at least 2 real or integer columns",
+        ]);
+      }
 
       dbWorker.value.postMessage({
         id: "get metric",
