@@ -35,7 +35,6 @@ Chart.register(
 const TableMetric = forwardRef(({ name, children, handlePrint }, ref) => {
   const [statsValues, setStatsValues] = useState([]);
   const [chartsValues, setChartsValues] = useState([]);
-
   const [filter, setFilter] = useState([]);
 
   useEffect(() => {
@@ -230,7 +229,6 @@ const TableMetric = forwardRef(({ name, children, handlePrint }, ref) => {
         open={filterOpen}
         setOpen={setFilterOpen}
         tableName={name}
-        columns={formats.value[name]}
         filter={filter}
         setFilter={setFilter}
       />

@@ -5,6 +5,7 @@ import { operators, types } from "../../constants";
 import { PlusIcon, TrashIcon, XMarkIcon } from "@heroicons/react/20/solid";
 import { parse, format } from "date-fns";
 import { setSnackContent } from "../../utils";
+import { formats } from "../../contexts";
 
 export default function FilterModal({
   open,
@@ -12,8 +13,8 @@ export default function FilterModal({
   tableName,
   filter,
   setFilter,
-  columns,
 }) {
+  const columns = formats.value[tableName];
   const [activeType, setActiveType] = useState(columns[0].type);
 
   const handleSubmit = (event) => {
