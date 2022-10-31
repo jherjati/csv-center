@@ -23,6 +23,7 @@ function DbTable({ name, isInFormats, children }) {
   const [filter, setFilter] = useState([]);
   const [focusId, setFocusId] = useState(undefined);
   const [page, setPage] = useState(1);
+  const writerRef = useRef();
 
   const { sortAsc, handleSortClick, sortString } = useSort();
 
@@ -86,26 +87,11 @@ function DbTable({ name, isInFormats, children }) {
   // Export
   const handleExport = useCallback(() => {
     const fileStream = streamSaver.createWriteStream(name + ".csv");
-    const writer = fileStream.getWriter();
     const encoder = new TextEncoder();
-    writer.write(
+    writerRef.current = fileStream.getWriter();
+    writerRef.current.write(
       encoder.encode(columns.map((col) => col.name).join(";") + "\r\n")
     );
-
-    dbWorker.value.onmessage = ({ data }) => {
-      if (data.finished) {
-        writer.close();
-      } else {
-        writer.write(
-          encoder.encode(
-            unparse([columns.map((col) => data.row[col.name])], {
-              delimiter: ";",
-            }) + "\r\n"
-          )
-        );
-      }
-    };
-
     dbWorker.value.postMessage({
       id: "export table",
       action: "each",
@@ -163,16 +149,17 @@ function DbTable({ name, isInFormats, children }) {
           }
           setData(toReturn);
         } else if (data.id === "export table") {
-          if (data.finished) {
-            writer.close();
-          } else {
-            writer.write(
+          const encoder = new TextEncoder();
+          if (!data.finished) {
+            writerRef.current.write(
               encoder.encode(
                 unparse([columns.map((col) => data.row[col.name])], {
                   delimiter: ";",
                 }) + "\r\n"
               )
             );
+          } else {
+            writerRef.current.close();
           }
         } else if (data.id === "save session") {
           const arraybuff = data.buffer;
