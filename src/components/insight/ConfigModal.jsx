@@ -9,15 +9,14 @@ import { Ticks, CategoryScale } from "chart.js";
 export default function ConfigModal({ open, setOpen, tableName }) {
   const [stats, setStats] = useState([]);
   const [charts, setCharts] = useState([]);
-  const [type, setType] = useState(
-    metricConfigs.value[tableName].charts[0].type
-  );
+  const [type, setType] = useState("line");
 
   useEffect(() => {
     if (open) {
       const config = metricConfigs.value[tableName];
       setStats(config.stats);
       setCharts(config.charts);
+      setType(config.charts[0].type);
     }
   }, [open]);
 
