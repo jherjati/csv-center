@@ -5,7 +5,6 @@ import {
   ArrowPathRoundedSquareIcon,
 } from "@heroicons/react/24/outline";
 import { formats } from "../contexts";
-import { getPropByString } from "../utils";
 
 export const navigation = [
   { name: "Import", href: "/", icon: ArrowDownOnSquareIcon },
@@ -81,6 +80,12 @@ export const chartForm = {
       options: () => [1, 2, 3, 4, 5, 6],
     },
     {
+      name: "dataLimit",
+      label: "First Data Limit",
+      type: "number",
+      step: 25,
+    },
+    {
       name: "xColumn",
       label: "X Axis Column",
       type: "select",
@@ -97,37 +102,37 @@ export const chartForm = {
         formats.value[tableName]
           .filter((col) => ["integer", "real"].includes(col.type))
           .map((col) => col.name),
-    },
-    {
-      name: "dataLimit",
-      label: "First Data Limit",
-      type: "number",
-      step: 25,
+      section: "data",
     },
     {
       name: "borderColor",
       label: "Border Color",
       type: "color",
+      section: "data",
     },
     {
       name: "backgroundColor",
       label: "Background Color",
       type: "color",
+      section: "data",
     },
     {
       name: "options.plugins.annotation.annotations.box1.yMin",
-      label: "Annotation Y Min",
+      label: "Y Min",
       type: "number",
+      section: "annotation",
     },
     {
       name: "options.plugins.annotation.annotations.box1.yMax",
-      label: "Annotation Y Max",
+      label: "Y Max",
       type: "number",
+      section: "annotation",
     },
     {
       name: "options.plugins.annotation.annotations.box1.label.content",
-      label: "Annotation Label",
+      label: "Label",
       type: "text",
+      section: "annotation",
     },
   ],
   bar: [
@@ -147,6 +152,13 @@ export const chartForm = {
           .map((col) => col.name),
     },
     {
+      name: "dataOperator",
+      label: "Y Axis Operator",
+      type: "select",
+      options: () => ["count", "min", "max", "avg", "sum"],
+      section: "data",
+    },
+    {
       name: "yColumn",
       label: "Y Axis Column",
       type: "select",
@@ -154,37 +166,37 @@ export const chartForm = {
         formats.value[tableName]
           .filter((col) => ["integer", "real"].includes(col.type))
           .map((col) => col.name),
-    },
-    {
-      name: "dataOperator",
-      label: "Y Axis Operator",
-      type: "select",
-      options: () => ["count", "min", "max", "avg", "sum"],
+      section: "data",
     },
     {
       name: "borderColor",
       label: "Border Color",
       type: "color",
+      section: "data",
     },
     {
       name: "backgroundColor",
       label: "Background Color",
       type: "color",
+      section: "data",
     },
     {
       name: "options.plugins.annotation.annotations.box1.yMin",
-      label: "Annotation Y Min",
+      label: "Y Min",
       type: "number",
+      section: "annotation",
     },
     {
       name: "options.plugins.annotation.annotations.box1.yMax",
-      label: "Annotation Y Max",
+      label: "Y Max",
       type: "number",
+      section: "annotation",
     },
     {
       name: "options.plugins.annotation.annotations.box1.label.content",
-      label: "Annotation Label",
+      label: "Label",
       type: "text",
+      section: "annotation",
     },
   ],
 };
