@@ -1,5 +1,9 @@
 import { Dialog, Transition } from "@headlessui/react";
-import { PlusSmallIcon, TrashIcon } from "@heroicons/react/20/solid";
+import {
+  MinusSmallIcon,
+  PlusSmallIcon,
+  TrashIcon,
+} from "@heroicons/react/20/solid";
 import { Fragment } from "preact";
 import { useEffect, useState } from "preact/hooks";
 import { formats, metricConfigs } from "../../contexts";
@@ -19,6 +23,7 @@ export default function ConfigModal({ open, setOpen, tableName }) {
       setStats(config.stats);
       setCharts(config.charts);
       setType(config.charts[0].type);
+      setDatasetLength(config.charts[0].yColumn.length);
     }
   }, [open]);
 
@@ -28,6 +33,13 @@ export default function ConfigModal({ open, setOpen, tableName }) {
     const data = Object.fromEntries(form.entries());
     const stats = [];
     const charts = [...metricConfigs.value[tableName].charts];
+
+    charts[0].yColumn = charts[0].yColumn.slice(0, datasetLength);
+    charts[0].borderColor = charts[0].borderColor.slice(0, datasetLength);
+    charts[0].backgroundColor = charts[0].backgroundColor.slice(
+      0,
+      datasetLength
+    );
 
     Object.keys(data).forEach((key) => {
       if (key.includes("stat")) {
@@ -186,7 +198,10 @@ export default function ConfigModal({ open, setOpen, tableName }) {
                           name={`chart_${chartIdx}_type`}
                           className='mt-1 shadow-sm focus:ring-teal-500 focus:border-teal-500 block w-full sm:text-sm border-gray-300 rounded-md'
                           defaultValue={chart["type"]}
-                          onChange={(event) => setType(event.target.value)}
+                          onChange={(event) => {
+                            setType(event.target.value);
+                            setDatasetLength(1);
+                          }}
                         >
                           <option value='line'>line</option>
                           <option value='bar'>bar</option>
@@ -243,13 +258,42 @@ export default function ConfigModal({ open, setOpen, tableName }) {
                         <h6 className='absolute top-0 left-0 -mt-3 ml-4 bg-white px-3 text-sm font-medium text-gray-900'>
                           Dataset
                         </h6>
+                        {type === "line" && (
+                          <div className='absolute top-0 right-0 -mt-3 mr-4 bg-white text-sm font-medium text-gray-900 flex rounded-md shadow-sm'>
+                            <button
+                              disabled={datasetLength === 1}
+                              className='rounded-l-md border -mr-px border-gray-300 bg-white hover:bg-gray-50 focus:z-10 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500'
+                              onClick={(event) => {
+                                event.preventDefault();
+                                setDatasetLength(datasetLength - 1);
+                              }}
+                            >
+                              <MinusSmallIcon
+                                className='h-5 w-5 text-gray-400'
+                                aria-hidden='true'
+                              />
+                            </button>
+                            <button
+                              className='rounded-r-md border -ml-px border-gray-300 bg-white hover:bg-gray-50 focus:z-10 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500'
+                              onClick={(event) => {
+                                event.preventDefault();
+                                setDatasetLength(datasetLength + 1);
+                              }}
+                            >
+                              <PlusSmallIcon
+                                className='h-5 w-5 text-gray-400'
+                                aria-hidden='true'
+                              />
+                            </button>
+                          </div>
+                        )}
                         {Array.from({ length: datasetLength }).map(
                           (_, dataIdx) =>
                             chartForm[type]
                               .filter((input) => input.section === "data")
                               .map((input) =>
                                 input.type === "select" ? (
-                                  <div className='sm:col-span-3'>
+                                  <div className='sm:col-span-4'>
                                     <label
                                       htmlFor={`chart_${chartIdx}_${input.name}.${dataIdx}`}
                                       className='block text-sm font-medium text-gray-700'
@@ -272,7 +316,7 @@ export default function ConfigModal({ open, setOpen, tableName }) {
                                     </select>
                                   </div>
                                 ) : (
-                                  <div className='sm:col-span-3'>
+                                  <div className='sm:col-span-4'>
                                     <label
                                       htmlFor={`chart_${chartIdx}_${input.name}.${dataIdx}`}
                                       className='block text-sm font-medium text-gray-700'
@@ -309,7 +353,7 @@ export default function ConfigModal({ open, setOpen, tableName }) {
                           .filter((input) => input.section === "annotation")
                           .map((input) =>
                             input.type === "select" ? (
-                              <div className='sm:col-span-3'>
+                              <div className='sm:col-span-4'>
                                 <label
                                   htmlFor={`chart_${chartIdx}_${input.name}`}
                                   className='block text-sm font-medium text-gray-700'
@@ -327,7 +371,7 @@ export default function ConfigModal({ open, setOpen, tableName }) {
                                 </select>
                               </div>
                             ) : (
-                              <div className='sm:col-span-3'>
+                              <div className='sm:col-span-4'>
                                 <label
                                   htmlFor={`chart_${chartIdx}_${input.name}`}
                                   className='block text-sm font-medium text-gray-700'

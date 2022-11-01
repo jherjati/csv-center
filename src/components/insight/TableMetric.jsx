@@ -130,12 +130,14 @@ const TableMetric = forwardRef(({ name, children, handlePrint }, ref) => {
                 datasets: config.charts[
                   idx - config.stats.length
                 ].borderColor.map((col, colIdx) => ({
-                  label: result.columns[1],
+                  label: result.columns[colIdx + 1],
                   normalized: true,
-                  parsing: result.columns[1].includes("("), //bar chart need parsing, bar chart use operator
+                  parsing: result.columns[colIdx + 1].includes("("), //bar chart need parsing, bar chart use operator
                   borderColor: col,
                   backgroundColor:
-                    config.charts[idx - config.stats.length].backgroundColor,
+                    config.charts[idx - config.stats.length].backgroundColor[
+                      colIdx
+                    ],
                   data: result.values.map((value) => ({
                     x: value[0],
                     y: value[colIdx + 1],
