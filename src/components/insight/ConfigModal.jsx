@@ -11,6 +11,7 @@ export default function ConfigModal({ open, setOpen, tableName }) {
   const [stats, setStats] = useState([]);
   const [charts, setCharts] = useState([]);
   const [type, setType] = useState("line");
+  const [datasetLength, setDatasetLength] = useState(1);
 
   useEffect(() => {
     if (open) {
@@ -44,7 +45,7 @@ export default function ConfigModal({ open, setOpen, tableName }) {
             Boolean(data[key])
           );
         } else if (name.includes("Column")) {
-          const axis = name.replace("Column", "");
+          const axis = name.split("Column")[0];
           newChart.options.scales[axis].title = {
             display: true,
             text: data[key],
@@ -123,10 +124,10 @@ export default function ConfigModal({ open, setOpen, tableName }) {
                   </div>
                   {/* Stats section */}
                   <div className='grid grid-cols-1 gap-y-6 gap-x-3 sm:grid-cols-9'>
-                    {stats.map((stat, idx) => (
+                    {stats.map((stat, statIdx) => (
                       <div className='sm:col-span-3 grid grid-cols-6 gap-x-2'>
                         <select
-                          name={"stat_" + idx}
+                          name={"stat_" + statIdx}
                           className='shadow-sm focus:ring-teal-500 focus:border-teal-500 block col-span-5 sm:text-sm border-gray-300 rounded-md'
                           defaultValue={stat}
                         >
@@ -142,7 +143,7 @@ export default function ConfigModal({ open, setOpen, tableName }) {
                           onClick={(event) => {
                             event.preventDefault();
                             setStats((prev) =>
-                              prev.filter((_, indeks) => indeks !== idx)
+                              prev.filter((_, indeks) => indeks !== statIdx)
                             );
                           }}
                           className='col-span-1 bg-white border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500 grid place-content-center'
@@ -172,17 +173,17 @@ export default function ConfigModal({ open, setOpen, tableName }) {
                     <hr className='my-3' />
                   </div>
 
-                  {charts.map((chart, idx) => (
+                  {charts.map((chart, chartIdx) => (
                     <div className='grid gap-y-6 gap-x-4 grid-cols-12'>
                       <div className='sm:col-span-12'>
                         <label
-                          htmlFor={`chart_${idx}_type`}
+                          htmlFor={`chart_${chartIdx}_type`}
                           className='block text-sm font-medium text-gray-700'
                         >
                           Chart Type
                         </label>
                         <select
-                          name={`chart_${idx}_type`}
+                          name={`chart_${chartIdx}_type`}
                           className='mt-1 shadow-sm focus:ring-teal-500 focus:border-teal-500 block w-full sm:text-sm border-gray-300 rounded-md'
                           defaultValue={chart["type"]}
                           onChange={(event) => setType(event.target.value)}
@@ -198,13 +199,13 @@ export default function ConfigModal({ open, setOpen, tableName }) {
                           input.type === "select" ? (
                             <div className='sm:col-span-3'>
                               <label
-                                htmlFor={`chart_${idx}_${input.name}`}
+                                htmlFor={`chart_${chartIdx}_${input.name}`}
                                 className='block text-sm font-medium text-gray-700'
                               >
                                 {input.label}
                               </label>
                               <select
-                                name={`chart_${idx}_${input.name}`}
+                                name={`chart_${chartIdx}_${input.name}`}
                                 className='mt-1 shadow-sm focus:ring-teal-500 focus:border-teal-500 block w-full sm:text-sm border-gray-300 rounded-md'
                                 defaultValue={chart[input.name]}
                               >
@@ -216,7 +217,7 @@ export default function ConfigModal({ open, setOpen, tableName }) {
                           ) : (
                             <div className='sm:col-span-3'>
                               <label
-                                htmlFor={`chart_${idx}_${input.name}`}
+                                htmlFor={`chart_${chartIdx}_${input.name}`}
                                 className='block text-sm font-medium text-gray-700'
                               >
                                 {input.label}
@@ -224,7 +225,7 @@ export default function ConfigModal({ open, setOpen, tableName }) {
                               <input
                                 type={input.type}
                                 step={input.step}
-                                name={`chart_${idx}_${input.name}`}
+                                name={`chart_${chartIdx}_${input.name}`}
                                 className={`mt-1 shadow-sm focus:ring-teal-500 focus:border-teal-500 block w-full ${
                                   input.type === "color"
                                     ? "h-10 p-0 border-0"
@@ -242,53 +243,62 @@ export default function ConfigModal({ open, setOpen, tableName }) {
                         <h6 className='absolute top-0 left-0 -mt-3 ml-4 bg-white px-3 text-sm font-medium text-gray-900'>
                           Dataset
                         </h6>
-                        {chartForm[type]
-                          .filter((input) => input.section === "data")
-                          .map((input) =>
-                            input.type === "select" ? (
-                              <div className='sm:col-span-3'>
-                                <label
-                                  htmlFor={`chart_${idx}_${input.name}`}
-                                  className='block text-sm font-medium text-gray-700'
-                                >
-                                  {input.label}
-                                </label>
-                                <select
-                                  name={`chart_${idx}_${input.name}`}
-                                  className='mt-1 shadow-sm focus:ring-teal-500 focus:border-teal-500 block w-full sm:text-sm border-gray-300 rounded-md'
-                                  defaultValue={
-                                    getPropByString(chart, input.name) ?? ""
-                                  }
-                                >
-                                  {input.options(tableName).map((opt) => (
-                                    <option value={opt}>{opt}</option>
-                                  ))}
-                                </select>
-                              </div>
-                            ) : (
-                              <div className='sm:col-span-3'>
-                                <label
-                                  htmlFor={`chart_${idx}_${input.name}`}
-                                  className='block text-sm font-medium text-gray-700'
-                                >
-                                  {input.label}
-                                </label>
-                                <input
-                                  type={input.type}
-                                  step={input.step}
-                                  name={`chart_${idx}_${input.name}`}
-                                  className={`mt-1 shadow-sm focus:ring-teal-500 focus:border-teal-500 block w-full ${
-                                    input.type === "color"
-                                      ? "h-10 p-0 border-0"
-                                      : ""
-                                  } sm:text-sm border-gray-300 rounded-md`}
-                                  defaultValue={
-                                    getPropByString(chart, input.name) ?? ""
-                                  }
-                                />
-                              </div>
-                            )
-                          )}
+                        {Array.from({ length: datasetLength }).map(
+                          (_, dataIdx) =>
+                            chartForm[type]
+                              .filter((input) => input.section === "data")
+                              .map((input) =>
+                                input.type === "select" ? (
+                                  <div className='sm:col-span-3'>
+                                    <label
+                                      htmlFor={`chart_${chartIdx}_${input.name}.${dataIdx}`}
+                                      className='block text-sm font-medium text-gray-700'
+                                    >
+                                      {input.label}
+                                    </label>
+                                    <select
+                                      name={`chart_${chartIdx}_${input.name}.${dataIdx}`}
+                                      className='mt-1 shadow-sm focus:ring-teal-500 focus:border-teal-500 block w-full sm:text-sm border-gray-300 rounded-md'
+                                      defaultValue={
+                                        getPropByString(
+                                          chart,
+                                          input.name + "." + dataIdx
+                                        ) ?? ""
+                                      }
+                                    >
+                                      {input.options(tableName).map((opt) => (
+                                        <option value={opt}>{opt}</option>
+                                      ))}
+                                    </select>
+                                  </div>
+                                ) : (
+                                  <div className='sm:col-span-3'>
+                                    <label
+                                      htmlFor={`chart_${chartIdx}_${input.name}.${dataIdx}`}
+                                      className='block text-sm font-medium text-gray-700'
+                                    >
+                                      {input.label}
+                                    </label>
+                                    <input
+                                      type={input.type}
+                                      step={input.step}
+                                      name={`chart_${chartIdx}_${input.name}.${dataIdx}`}
+                                      className={`mt-1 shadow-sm focus:ring-teal-500 focus:border-teal-500 block w-full ${
+                                        input.type === "color"
+                                          ? "h-10 p-0 border-0"
+                                          : ""
+                                      } sm:text-sm border-gray-300 rounded-md`}
+                                      defaultValue={
+                                        getPropByString(
+                                          chart,
+                                          input.name + "." + dataIdx
+                                        ) ?? ""
+                                      }
+                                    />
+                                  </div>
+                                )
+                              )
+                        )}
                       </div>
 
                       <div className='relative border rounded-lg px-3 pt-6 pb-3 col-span-12 grid grid-cols-12 gap-y-6 gap-x-4'>
@@ -301,13 +311,13 @@ export default function ConfigModal({ open, setOpen, tableName }) {
                             input.type === "select" ? (
                               <div className='sm:col-span-3'>
                                 <label
-                                  htmlFor={`chart_${idx}_${input.name}`}
+                                  htmlFor={`chart_${chartIdx}_${input.name}`}
                                   className='block text-sm font-medium text-gray-700'
                                 >
                                   {input.label}
                                 </label>
                                 <select
-                                  name={`chart_${idx}_${input.name}`}
+                                  name={`chart_${chartIdx}_${input.name}`}
                                   className='mt-1 shadow-sm focus:ring-teal-500 focus:border-teal-500 block w-full sm:text-sm border-gray-300 rounded-md'
                                   defaultValue={chart[input.name]}
                                 >
@@ -319,7 +329,7 @@ export default function ConfigModal({ open, setOpen, tableName }) {
                             ) : (
                               <div className='sm:col-span-3'>
                                 <label
-                                  htmlFor={`chart_${idx}_${input.name}`}
+                                  htmlFor={`chart_${chartIdx}_${input.name}`}
                                   className='block text-sm font-medium text-gray-700'
                                 >
                                   {input.label}
@@ -327,7 +337,7 @@ export default function ConfigModal({ open, setOpen, tableName }) {
                                 <input
                                   type={input.type}
                                   step={input.step}
-                                  name={`chart_${idx}_${input.name}`}
+                                  name={`chart_${chartIdx}_${input.name}`}
                                   className={`mt-1 shadow-sm focus:ring-teal-500 focus:border-teal-500 block w-full ${
                                     input.type === "color"
                                       ? "h-10 p-0 border-0"

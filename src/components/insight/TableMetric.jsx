@@ -96,13 +96,14 @@ const TableMetric = forwardRef(({ name, children, handlePrint }, ref) => {
               xColumn: formats.value[name].filter((col) =>
                 ["integer", "real"].includes(col.type)
               )[0]?.name,
-              yColumn: formats.value[name].filter((col) =>
-                ["integer", "real"].includes(col.type)
-              )[1]?.name,
               dataLimit: 250,
-              borderColor: "#ffa500",
-              backgroundColor: "#ee4b2b",
-              fill: false,
+              yColumn: [
+                formats.value[name].filter((col) =>
+                  ["integer", "real"].includes(col.type)
+                )[1]?.name,
+              ],
+              borderColor: ["#ffa500"],
+              backgroundColor: ["#ee4b2b"],
             },
           ],
         },
@@ -117,29 +118,29 @@ const TableMetric = forwardRef(({ name, children, handlePrint }, ref) => {
         if (data.id === "get metric") {
           const newStatsValues = [],
             newChartsValues = [];
-          data.results.map((el, idx) => {
-            if (idx < config.stats.length) newStatsValues.push(el.values[0]);
+          data.results.map((result, idx) => {
+            if (idx < config.stats.length)
+              newStatsValues.push(result.values[0]);
             else {
               newChartsValues.push({
                 labels:
                   config.charts[idx - config.stats.length].type === "line"
                     ? []
-                    : el.values.map((value) => value[0]),
-                datasets: [
-                  {
-                    label: el.columns[1],
-                    normalized: true,
-                    parsing: el.columns[1].includes("("), //bar chart need parsing, bar chart use operator
-                    borderColor:
-                      config.charts[idx - config.stats.length].borderColor,
-                    backgroundColor:
-                      config.charts[idx - config.stats.length].backgroundColor,
-                    data: el.values.map((value) => ({
-                      x: value[0],
-                      y: value[1],
-                    })),
-                  },
-                ],
+                    : result.values.map((value) => value[0]),
+                datasets: config.charts[
+                  idx - config.stats.length
+                ].borderColor.map((col, colIdx) => ({
+                  label: result.columns[1],
+                  normalized: true,
+                  parsing: result.columns[1].includes("("), //bar chart need parsing, bar chart use operator
+                  borderColor: col,
+                  backgroundColor:
+                    config.charts[idx - config.stats.length].backgroundColor,
+                  data: result.values.map((value) => ({
+                    x: value[0],
+                    y: value[colIdx + 1],
+                  })),
+                })),
               });
             }
           });
@@ -150,7 +151,7 @@ const TableMetric = forwardRef(({ name, children, handlePrint }, ref) => {
 
       const params = filterToValues(filter);
       const availableCharts = config.charts.filter(
-        (chart) => chart.xColumn && chart.yColumn
+        (chart) => chart.xColumn && chart.yColumn.length
       );
       const sql = `${config.stats
         .filter((stat) => Boolean(stat))
@@ -164,14 +165,14 @@ const TableMetric = forwardRef(({ name, children, handlePrint }, ref) => {
           ${availableCharts
             .map((chart) =>
               chart.type === "bar"
-                ? `SELECT ${chart.xColumn}, ${chart.dataOperator}(${
-                    chart.yColumn
+                ? `SELECT ${chart.xColumn}, ${chart.dataOperator[0]}(${
+                    chart.yColumn[0]
                   }) FROM '${name}' ${filterToString(filter)} GROUP BY ${
                     chart.xColumn
-                  } ORDER BY ${chart.dataOperator}(${chart.yColumn});`
-                : `SELECT ${chart.xColumn}, ${
-                    chart.yColumn
-                  } FROM '${name}' ${filterToString(filter)} ORDER BY ${
+                  } ORDER BY ${chart.dataOperator[0]}(${chart.yColumn[0]});`
+                : `SELECT ${chart.xColumn}, ${chart.yColumn.join(
+                    ", "
+                  )} FROM '${name}' ${filterToString(filter)} ORDER BY ${
                     chart.xColumn
                   } LIMIT ${chart.dataLimit};`
             )
