@@ -121,7 +121,7 @@ export default function ConfigModal({ open, setOpen, tableName }) {
                     </p>
                     <hr className='my-3' />
                   </div>
-
+                  {/* Stats section */}
                   <div className='grid grid-cols-1 gap-y-6 gap-x-3 sm:grid-cols-9'>
                     {stats.map((stat, idx) => (
                       <div className='sm:col-span-3 grid grid-cols-6 gap-x-2'>
@@ -161,7 +161,7 @@ export default function ConfigModal({ open, setOpen, tableName }) {
                       <PlusSmallIcon className='h-6 w-6' />
                     </button>
                   </div>
-
+                  {/* Charts section */}
                   <div>
                     <h5 className='mt-6 leading-6 text-md font-medium text-gray-900'>
                       Charts
@@ -256,7 +256,9 @@ export default function ConfigModal({ open, setOpen, tableName }) {
                                 <select
                                   name={`chart_${idx}_${input.name}`}
                                   className='mt-1 shadow-sm focus:ring-teal-500 focus:border-teal-500 block w-full sm:text-sm border-gray-300 rounded-md'
-                                  defaultValue={chart[input.name]}
+                                  defaultValue={
+                                    getPropByString(chart, input.name) ?? ""
+                                  }
                                 >
                                   {input.options(tableName).map((opt) => (
                                     <option value={opt}>{opt}</option>
