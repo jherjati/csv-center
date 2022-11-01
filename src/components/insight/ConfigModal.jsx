@@ -1,10 +1,11 @@
 import { Dialog, Transition } from "@headlessui/react";
-import { MinusSmallIcon, PlusSmallIcon } from "@heroicons/react/20/solid";
+import { PlusSmallIcon, TrashIcon } from "@heroicons/react/20/solid";
 import { Fragment } from "preact";
 import { useEffect, useState } from "preact/hooks";
 import { formats, metricConfigs } from "../../contexts";
 import { getPropByString, setPropByString } from "../../utils";
 import { Ticks, CategoryScale } from "chart.js";
+import { chartForm } from "../../constants";
 
 export default function ConfigModal({ open, setOpen, tableName }) {
   const [stats, setStats] = useState([]);
@@ -99,7 +100,7 @@ export default function ConfigModal({ open, setOpen, tableName }) {
               leaveFrom='opacity-100 translate-y-0 sm:scale-100'
               leaveTo='opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95'
             >
-              <Dialog.Panel className='relative transform overflow-hidden rounded-lg bg-white px-4 pt-5 pb-4 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-xl sm:p-6'>
+              <Dialog.Panel className='relative transform overflow-hidden rounded-lg bg-white px-4 pt-5 pb-4 text-left shadow-xl transition-all sm:my-8 w-full max-w-4xl sm:p-6'>
                 <form
                   id='detail-form'
                   onSubmit={handleSubmit}
@@ -123,7 +124,7 @@ export default function ConfigModal({ open, setOpen, tableName }) {
                     <hr className='my-3' />
                   </div>
 
-                  <div className='grid grid-cols-1 gap-y-6 gap-x-3 sm:grid-cols-6'>
+                  <div className='grid grid-cols-1 gap-y-6 gap-x-3 sm:grid-cols-9'>
                     {stats.map((stat, idx) => (
                       <div className='sm:col-span-3 grid grid-cols-6 gap-x-2'>
                         <select
@@ -148,7 +149,7 @@ export default function ConfigModal({ open, setOpen, tableName }) {
                           }}
                           className='col-span-1 bg-white border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500 grid place-content-center'
                         >
-                          <MinusSmallIcon className='h-6 w-6' />
+                          <TrashIcon className='h-4 w-4' />
                         </button>
                       </div>
                     ))}
@@ -174,8 +175,8 @@ export default function ConfigModal({ open, setOpen, tableName }) {
                   </div>
 
                   {charts.map((chart, idx) => (
-                    <div className='grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6'>
-                      <div className='sm:col-span-3'>
+                    <div className='grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-12'>
+                      <div className='sm:col-span-12'>
                         <label
                           htmlFor={`chart_${idx}_type`}
                           className='block text-sm font-medium text-gray-700'
@@ -193,200 +194,49 @@ export default function ConfigModal({ open, setOpen, tableName }) {
                         </select>
                       </div>
 
-                      <div className='sm:col-span-3'>
-                        <label
-                          htmlFor={`chart_${idx}_span`}
-                          className='block text-sm font-medium text-gray-700'
-                        >
-                          Chart Width
-                        </label>
-                        <select
-                          name={`chart_${idx}_span`}
-                          className='mt-1 shadow-sm focus:ring-teal-500 focus:border-teal-500 block w-full sm:text-sm border-gray-300 rounded-md'
-                          defaultValue={chart["span"]}
-                        >
-                          <option value={1}>1</option>
-                          <option value={2}>2</option>
-                          <option value={3}>3</option>
-                          <option value={4}>4</option>
-                          <option value={5}>5</option>
-                          <option value={6}>6</option>
-                        </select>
-                      </div>
-
-                      <div className='sm:col-span-3'>
-                        <label
-                          htmlFor={"chart_${idx}_xColumn"}
-                          className='block text-sm font-medium text-gray-700'
-                        >
-                          X Axis Column {type === "bar" ? "(Group By)" : ""}
-                        </label>
-                        <select
-                          name={`chart_${idx}_xColumn`}
-                          className='mt-1 shadow-sm focus:ring-teal-500 focus:border-teal-500 block w-full sm:text-sm border-gray-300 rounded-md'
-                          defaultValue={chart["xColumn"]}
-                        >
-                          {formats.value[tableName]
-                            .filter((col) =>
-                              type === "line"
-                                ? ["integer", "real"].includes(col.type)
-                                : ["integer", "text"].includes(col.type)
-                            )
-                            .map((col) => (
-                              <option value={col.name}>{col.name}</option>
-                            ))}
-                        </select>
-                      </div>
-
-                      <div className='sm:col-span-3'>
-                        <label
-                          htmlFor={`chart_${idx}_yColumn`}
-                          className='block text-sm font-medium text-gray-700'
-                        >
-                          Y Axis Column
-                        </label>
-                        <select
-                          name={`chart_${idx}_yColumn`}
-                          className='mt-1 shadow-sm focus:ring-teal-500 focus:border-teal-500 block w-full sm:text-sm border-gray-300 rounded-md'
-                          defaultValue={chart["yColumn"]}
-                        >
-                          {formats.value[tableName]
-                            .filter((col) =>
-                              ["integer", "real"].includes(col.type)
-                            )
-                            .map((col) => (
-                              <option value={col.name}>{col.name}</option>
-                            ))}
-                        </select>
-                      </div>
-
-                      {type === "line" ? (
-                        <div className='sm:col-span-3'>
-                          <label
-                            htmlFor={`chart_${idx}_dataLimit`}
-                            className='block text-sm font-medium text-gray-700'
-                          >
-                            First Data Limit
-                          </label>
-                          <input
-                            type='number'
-                            step={25}
-                            name={`chart_${idx}_dataLimit`}
-                            className='mt-1 shadow-sm focus:ring-teal-500 focus:border-teal-500 block w-full sm:text-sm border-gray-300 rounded-md'
-                            defaultValue={chart["dataLimit"]}
-                          ></input>
-                        </div>
-                      ) : (
-                        <div className='sm:col-span-3'>
-                          <label
-                            htmlFor={`chart_${idx}_dataOperator`}
-                            className='block text-sm font-medium text-gray-700'
-                          >
-                            Y Axis Operator
-                          </label>
-                          <select
-                            name={`chart_${idx}_dataOperator`}
-                            className='mt-1 shadow-sm focus:ring-teal-500 focus:border-teal-500 block w-full sm:text-sm border-gray-300 rounded-md'
-                            defaultValue={chart["dataOperator"]}
-                          >
-                            <option value='count'>count</option>
-                            <option value='min'>min</option>
-                            <option value='max'>max</option>
-                            <option value='avg'>avg</option>
-                            <option value='sum'>sum</option>
-                          </select>
-                        </div>
+                      {chartForm[type].map((input) =>
+                        input.type === "select" ? (
+                          <div className='sm:col-span-3'>
+                            <label
+                              htmlFor={`chart_${idx}_${input.name}`}
+                              className='block text-sm font-medium text-gray-700'
+                            >
+                              {input.label}
+                            </label>
+                            <select
+                              name={`chart_${idx}_${input.name}`}
+                              className='mt-1 shadow-sm focus:ring-teal-500 focus:border-teal-500 block w-full sm:text-sm border-gray-300 rounded-md'
+                              defaultValue={chart[input.name]}
+                            >
+                              {input.options(tableName).map((opt) => (
+                                <option value={opt}>{opt}</option>
+                              ))}
+                            </select>
+                          </div>
+                        ) : (
+                          <div className='sm:col-span-3'>
+                            <label
+                              htmlFor={`chart_${idx}_${input.name}`}
+                              className='block text-sm font-medium text-gray-700'
+                            >
+                              {input.label}
+                            </label>
+                            <input
+                              type={input.type}
+                              step={input.step}
+                              name={`chart_${idx}_${input.name}`}
+                              className={`mt-1 shadow-sm focus:ring-teal-500 focus:border-teal-500 block w-full ${
+                                input.type === "color"
+                                  ? "h-10 p-0 border-0"
+                                  : ""
+                              } sm:text-sm border-gray-300 rounded-md`}
+                              defaultValue={
+                                getPropByString(chart, input.name) ?? ""
+                              }
+                            />
+                          </div>
+                        )
                       )}
-
-                      <div className='sm:col-span-3'>
-                        <label
-                          htmlFor={`chart_${idx}_borderColor`}
-                          className='block text-sm font-medium text-gray-700'
-                        >
-                          Border Color
-                        </label>
-                        <input
-                          type='color'
-                          name={`chart_${idx}_borderColor`}
-                          className='mt-1 shadow-sm focus:ring-teal-500 focus:border-teal-500 block w-full h-10 p-0 border-0 sm:text-sm border-gray-300 rounded-md'
-                          defaultValue={chart["borderColor"]}
-                        ></input>
-                      </div>
-
-                      <div className='sm:col-span-3'>
-                        <label
-                          htmlFor={`chart_${idx}_backgroundColor`}
-                          className='block text-sm font-medium text-gray-700'
-                        >
-                          Background Color
-                        </label>
-                        <input
-                          type='color'
-                          name={`chart_${idx}_backgroundColor`}
-                          className='mt-1 shadow-sm focus:ring-teal-500 focus:border-teal-500 block w-full h-10 p-0 border-0 sm:text-sm border-gray-300 rounded-md'
-                          defaultValue={chart["backgroundColor"]}
-                        ></input>
-                      </div>
-
-                      <div className='sm:col-span-3'>
-                        <label
-                          htmlFor={`chart_${idx}_options.plugins.annotation.annotations.box1.yMin`}
-                          className='block text-sm font-medium text-gray-700'
-                        >
-                          Annotation Y Min
-                        </label>
-                        <input
-                          type='number'
-                          step='any'
-                          name={`chart_${idx}_options.plugins.annotation.annotations.box1.yMin`}
-                          className='mt-1 shadow-sm focus:ring-teal-500 focus:border-teal-500 block w-full sm:text-sm border-gray-300 rounded-md'
-                          defaultValue={
-                            getPropByString(
-                              chart,
-                              "options.plugins.annotation.annotations.box1.yMin"
-                            ) ?? ""
-                          }
-                        ></input>
-                      </div>
-
-                      <div className='sm:col-span-3'>
-                        <label
-                          htmlFor={`chart_${idx}_options.plugins.annotation.annotations.box1.yMax`}
-                          className='block text-sm font-medium text-gray-700'
-                        >
-                          Annotation Y Max
-                        </label>
-                        <input
-                          type='number'
-                          step='any'
-                          name={`chart_${idx}_options.plugins.annotation.annotations.box1.yMax`}
-                          className='mt-1 shadow-sm focus:ring-teal-500 focus:border-teal-500 block w-full sm:text-sm border-gray-300 rounded-md'
-                          defaultValue={
-                            getPropByString(
-                              chart,
-                              "options.plugins.annotation.annotations.box1.yMax"
-                            ) ?? ""
-                          }
-                        ></input>
-                      </div>
-
-                      <div className='sm:col-span-3'>
-                        <label
-                          htmlFor={`chart_${idx}_options.plugins.annotation.annotations.box1.label.content`}
-                          className='block text-sm font-medium text-gray-700'
-                        >
-                          Annotation Label
-                        </label>
-                        <input
-                          type='text'
-                          name={`chart_${idx}_options.plugins.annotation.annotations.box1.label.content`}
-                          className='mt-1 shadow-sm focus:ring-teal-500 focus:border-teal-500 block w-full sm:text-sm border-gray-300 rounded-md'
-                          defaultValue={getPropByString(
-                            chart,
-                            "options.plugins.annotation.annotations.box1.label.content"
-                          )}
-                        ></input>
-                      </div>
                     </div>
                   ))}
 
