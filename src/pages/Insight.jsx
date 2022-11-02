@@ -2,7 +2,7 @@ import { useErrorBoundary, useRef, useState } from "preact/hooks";
 import { useReactToPrint } from "react-to-print";
 import PageError from "../components/core/PageError";
 import TableMetric from "../components/insight/TableMetric";
-import EmptyDb from "../components/manage/EmptyDb";
+import EmptyDb from "../components/core/EmptyDb";
 import { formats } from "../contexts";
 import { useTables } from "../hooks";
 import { setSnackContent } from "../utils";
