@@ -17,20 +17,22 @@ export default function FormatModal({
   const [columns, setColumns] = useState([]);
 
   useEffect(() => {
-    if (focusFormat) {
-      setTableName(focusFormat);
-      setColumns(
-        formats.value[focusFormat].map((el) => [
-          el.name,
-          el.type,
-          el.aliases.join(","),
-        ])
-      );
-    } else {
-      setTableName("");
-      setColumns([]);
+    if (open) {
+      if (focusFormat) {
+        setTableName(focusFormat);
+        setColumns(
+          formats.value[focusFormat].map((el) => [
+            el.name,
+            el.type,
+            el.aliases.join(","),
+          ])
+        );
+      } else {
+        setTableName("");
+        setColumns([]);
+      }
     }
-  }, [focusFormat]);
+  }, [open]);
 
   const deleteFormat = (event) => {
     event.preventDefault();
