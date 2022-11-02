@@ -1,6 +1,6 @@
 import { useEffect, useState } from "preact/hooks";
 import { dbWorker, formats, metricConfigs } from "../../contexts";
-import Actions from "./Actions";
+import Actions from "../core/Actions";
 import Stats from "./Stats";
 import {
   Chart,
@@ -19,6 +19,11 @@ import { filterToString, filterToValues, setSnackContent } from "../../utils";
 import ConfigModal from "./ConfigModal";
 import annotationPlugin from "chartjs-plugin-annotation";
 import { forwardRef } from "react";
+import {
+  Cog8ToothIcon,
+  FunnelIcon,
+  PrinterIcon,
+} from "@heroicons/react/20/solid";
 
 Chart.register(
   LineController,
@@ -206,10 +211,14 @@ const TableMetric = forwardRef(({ name, children, handlePrint }, ref) => {
       <div className='py-3 px-6 bg-white flex justify-between items-center'>
         {children}
         <Actions
-          filterCount={filter.length}
-          onFilterClick={() => setFilterOpen(true)}
-          onConfigClick={() => setConfigOpen(true)}
-          onPrintClick={handlePrint}
+          count={filter.length}
+          icons={[FunnelIcon, Cog8ToothIcon, PrinterIcon]}
+          labels={["Filter", "Config", "Print"]}
+          handlers={[
+            () => setFilterOpen(true),
+            () => setConfigOpen(true),
+            handlePrint,
+          ]}
         />
       </div>
       <div ref={ref} className='border-y border-gray-200'>

@@ -5,7 +5,7 @@ import { format as dateFormat } from "date-fns";
 
 import { dbWorker, formats } from "../../contexts";
 import { useSort } from "../../hooks";
-import Actions from "./Actions";
+import Actions from "../core/Actions";
 import Pagination from "./Pagination";
 import DetailModal from "./DetailModal";
 import FilterModal from "./FilterModal";
@@ -13,6 +13,9 @@ import {
   BarsArrowDownIcon,
   BarsArrowUpIcon,
   Bars3Icon,
+  DocumentMagnifyingGlassIcon,
+  DocumentPlusIcon,
+  DocumentArrowUpIcon,
 } from "@heroicons/react/20/solid";
 import { onBefoleUnload, types } from "../../constants";
 import { filterToString, filterToValues } from "../../utils";
@@ -186,11 +189,21 @@ function DbTable({ name, isInFormats, children }) {
       <div className='py-3 px-6 bg-white flex justify-between items-center'>
         {children}
         <Actions
-          setDetailOpen={setDetailOpen}
-          setFilterOpen={setFilterOpen}
-          setFocusId={setFocusId}
-          handleExport={handleExport}
-          filterCount={filter.length}
+          count={filter.length}
+          icons={[
+            DocumentMagnifyingGlassIcon,
+            DocumentPlusIcon,
+            DocumentArrowUpIcon,
+          ]}
+          labels={["Filter", "Add", "Export"]}
+          handlers={[
+            () => setFilterOpen(true),
+            () => {
+              setFocusId(undefined);
+              setDetailOpen(true);
+            },
+            handleExport,
+          ]}
         />
       </div>
       <div className='overflow-scroll w-full'>
