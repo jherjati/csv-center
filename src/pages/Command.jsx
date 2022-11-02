@@ -26,7 +26,7 @@ PRAGMA table_info('Exception_Report');
     editor.current = localEditor;
 
     dbWorker.value.onmessage = ({ data }) => {
-      setResults(data.results ?? []);
+      if (data.id === "execute command") setResults(data.results ?? []);
     };
   }, []);
 
@@ -38,10 +38,22 @@ PRAGMA table_info('Exception_Report');
     });
   };
 
+  const onClear = () => {
+    editor.current.dispatch(
+      editor.current.state.update({
+        changes: {
+          from: 0,
+          to: editor.current.state.doc.length,
+          insert: "\n\n\n\n\n\n\n\n\n\n",
+        },
+      })
+    );
+  };
+
   return (
     <main className='py-6'>
       <div className='mx-auto max-w-7xl px-4 sm:px-6 lg:px-8'>
-        <h1 className='text-2xl font-semibold text-gray-900'>Command</h1>
+        <h1 className='text-2xl font-semibold text-gray-900'>SQL Command</h1>
       </div>
       <div className='mx-auto max-w-7xl px-4 sm:px-6 md:px-8'>
         {/* Replace with your content */}
@@ -49,7 +61,7 @@ PRAGMA table_info('Exception_Report');
           <div ref={ref} className='border bg-white' />
           <div className='flex justify-center border-t mt-3 pt-3 border-teal-100'>
             <button
-              onClick={() => {}}
+              onClick={onClear}
               className='bg-white py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500'
             >
               Clear
@@ -64,7 +76,7 @@ PRAGMA table_info('Exception_Report');
           {results.map((res) => (
             <section
               style={{ animation: "forwards fadein1 1.6s" }}
-              className='mt-6 p-6 bg-white rounded-lg shadow'
+              className='mt-6 px-6 pb-6 pt-3 bg-white rounded-lg shadow'
             >
               <div className='-mx-4 flex flex-col sm:-mx-6 md:mx-0 overflow-x-scroll'>
                 <table className='min-w-full divide-y divide-gray-300'>
