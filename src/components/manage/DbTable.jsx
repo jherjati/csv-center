@@ -14,7 +14,7 @@ import {
   BarsArrowUpIcon,
   Bars3Icon,
 } from "@heroicons/react/20/solid";
-import { types } from "../../constants";
+import { onBefoleUnload, types } from "../../constants";
 import { filterToString, filterToValues } from "../../utils";
 
 function DbTable({ name, isInFormats, children }) {
@@ -86,6 +86,7 @@ function DbTable({ name, isInFormats, children }) {
 
   // Export
   const handleExport = useCallback(() => {
+    window.removeEventListener("beforeunload", onBefoleUnload);
     const fileStream = streamSaver.createWriteStream(name + ".csv");
     const encoder = new TextEncoder();
     writerRef.current = fileStream.getWriter();
@@ -158,6 +159,7 @@ function DbTable({ name, isInFormats, children }) {
                 }) + "\r\n"
               )
             );
+            window.addEventListener("beforeunload", onBefoleUnload);
           } else {
             writerRef.current.close();
           }

@@ -1,4 +1,5 @@
 import { useCallback, useState, useMemo, useEffect } from "preact/hooks";
+import { onBefoleUnload } from "../constants";
 import { dbWorker } from "../contexts";
 
 export const useSort = () => {
@@ -33,11 +34,7 @@ export const useSort = () => {
 export const useInitDB = () => {
   useEffect(() => {
     try {
-      window.addEventListener("beforeunload", (event) => {
-        event.preventDefault();
-        return (event.returnValue =
-          "Are you sure you saved your work before leaving?");
-      });
+      window.addEventListener("beforeunload", onBefoleUnload);
       dbWorker.value.onerror = (error) => {
         console.error(error);
       };

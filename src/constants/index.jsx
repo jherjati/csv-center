@@ -200,3 +200,9 @@ export const chartForm = {
     },
   ],
 };
+
+export const onBefoleUnload = (event) => {
+  event.preventDefault();
+  return (event.returnValue =
+    "Are you sure you saved your work before leaving?");
+};
