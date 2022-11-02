@@ -202,7 +202,7 @@ const TableMetric = forwardRef(({ name, children, handlePrint }, ref) => {
   const [configOpen, setConfigOpen] = useState(false);
 
   return (
-    <section className='bg-white overflow-hidden shadow rounded-lg divide-y my-6 pb-6'>
+    <section className='bg-white overflow-hidden shadow rounded-lg my-6 pb-6'>
       <div className='py-3 px-6 bg-white flex justify-between items-center'>
         {children}
         <Actions
@@ -212,11 +212,10 @@ const TableMetric = forwardRef(({ name, children, handlePrint }, ref) => {
           onPrintClick={handlePrint}
         />
       </div>
-      <div ref={ref}>
+      <div ref={ref} className='border-y border-gray-200'>
         {statsValues.map((stat, idx) => (
           <Stats column={metricConfigs.value[name].stats[idx]} values={stat} />
         ))}
-        <hr />
         <div className='w-full grid grid-cols-6'>
           {chartsValues.map((dataset, idx) => (
             <ChartBox
@@ -227,7 +226,6 @@ const TableMetric = forwardRef(({ name, children, handlePrint }, ref) => {
           ))}
         </div>
       </div>
-      <hr />
       <FilterModal
         open={filterOpen}
         setOpen={setFilterOpen}

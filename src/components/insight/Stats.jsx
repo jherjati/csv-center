@@ -24,7 +24,7 @@ export default function Stats({ column, values }) {
     },
   ];
   return (
-    <dl className='grid divide-gray-200 overflow-hidden grid-cols-3 divide-y-0 divide-x'>
+    <dl className='grid divide-gray-200 overflow-hidden grid-cols-3 divide-x border-b border-gray-200'>
       {stats.map((item, idx) => (
         <div key={item.name} className='p-6'>
           <dt className='text-base font-normal text-gray-900'>
