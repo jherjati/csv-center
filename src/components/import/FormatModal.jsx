@@ -66,32 +66,40 @@ export default function FormatModal({
 
   const submitFormat = (event) => {
     event.preventDefault();
-    const newFormats = {};
-    Object.keys(formats.value).forEach((key) => {
-      if (key !== focusFormat) newFormats[key] = formats.value[key];
-    });
-    const newFormat = [];
-    let anyRestrictedKey = false;
-    columns.forEach((el) =>
-      doesContainSymbol(el[0])
-        ? (anyRestrictedKey = true)
-        : newFormat.push({
-            name: el[0],
-            type: el[1],
-            aliases: el[2].split(","),
-          })
-    );
-    if (anyRestrictedKey) {
+    if (!focusFormat && Object.keys(formats.value).includes(tableName)) {
       setSnackContent([
         "error",
         "An Error Occured",
-        "Column name can contain only alphanumeric and underscore character",
+        "Table format with that name already exist",
       ]);
     } else {
-      newFormats[tableName] = newFormat;
-      localStorage.setItem("predefined_tables", JSON.stringify(newFormats));
-      formats.value = newFormats;
-      setOpen(false);
+      const newFormats = {};
+      Object.keys(formats.value).forEach((key) => {
+        if (key !== focusFormat) newFormats[key] = formats.value[key];
+      });
+      const newFormat = [];
+      let anyRestrictedKey = false;
+      columns.forEach((el) =>
+        doesContainSymbol(el[0])
+          ? (anyRestrictedKey = true)
+          : newFormat.push({
+              name: el[0],
+              type: el[1],
+              aliases: el[2].split(","),
+            })
+      );
+      if (anyRestrictedKey) {
+        setSnackContent([
+          "error",
+          "An Error Occured",
+          "Column name can contain only alphanumeric and underscore character",
+        ]);
+      } else {
+        newFormats[tableName] = newFormat;
+        localStorage.setItem("predefined_tables", JSON.stringify(newFormats));
+        formats.value = newFormats;
+        setOpen(false);
+      }
     }
   };
 
