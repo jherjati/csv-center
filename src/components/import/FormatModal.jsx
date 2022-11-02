@@ -48,10 +48,18 @@ export default function FormatModal({
     event.preventDefault();
     const form = new FormData(event.target);
     const data = Object.fromEntries(form.entries());
-    setColumns((prev) => [
-      ...prev,
-      [data["name-add"], data["type-add"], data["aliases-add"]],
-    ]);
+    if (columns.filter((el) => el[0] === data["name-add"]).length) {
+      setSnackContent([
+        "error",
+        "An Error Occured",
+        "Column name can not be duplicated",
+      ]);
+    } else {
+      setColumns((prev) => [
+        ...prev,
+        [data["name-add"], data["type-add"], data["aliases-add"]],
+      ]);
+    }
   };
 
   const submitFormat = (event) => {
@@ -150,7 +158,7 @@ export default function FormatModal({
                       Type
                     </label>
                     <label className='block text-sm font-medium text-gray-700 col-span-3'>
-                      Aliases
+                      Aliases (comma split)
                     </label>
                     <span className='hidden col-span-1'></span>
                     {columns.map((el, id) => (
