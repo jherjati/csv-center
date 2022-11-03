@@ -286,7 +286,7 @@ function DbTable({ name, isInFormats, children }) {
         focusId={focusId}
         columns={columns}
       />
-      {columns.length && (
+      {columns.length ? (
         <FilterModal
           open={filterOpen}
           setOpen={setFilterOpen}
@@ -295,7 +295,7 @@ function DbTable({ name, isInFormats, children }) {
           setFilter={setFilter}
           columns={columns}
         />
-      )}
+      ) : null}
     </section>
   );
 }

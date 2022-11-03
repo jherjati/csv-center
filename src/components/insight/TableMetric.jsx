@@ -264,7 +264,7 @@ const TableMetric = forwardRef(
             ))}
           </div>
         </div>
-        {columns.length && (
+        {columns.length ? (
           <>
             <FilterModal
               open={filterOpen}
@@ -281,7 +281,7 @@ const TableMetric = forwardRef(
               columns={columns}
             />
           </>
-        )}
+        ) : null}
       </section>
     );
   }
