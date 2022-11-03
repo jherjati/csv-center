@@ -16,10 +16,10 @@ export default defineConfig({
         "safari-pinned-tab.svg",
       ],
       manifest: {
-        name: "Kotaku",
-        short_name: "Komparasi Kereta Ukur",
+        name: "CSV Center",
+        short_name: "One Stop CSV Solution",
         description:
-          "Progressive web app untuk membantu pemahaman dan perbandingan data hasil kereta ukur",
+          "Progressive web app to help your work with CSV file. Import, manage, query, and pull insights with ease.",
         theme_color: "#ffffff",
         background_color: "#ffffff",
         display: "standalone",

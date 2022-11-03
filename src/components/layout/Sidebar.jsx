@@ -11,12 +11,7 @@ function Sidebar() {
       <div className='flex min-h-0 flex-1 flex-col bg-gray-800'>
         <div className='flex flex-1 flex-col overflow-y-auto pt-5 pb-4'>
           <div className='flex flex-shrink-0 items-center px-4 space-x-6'>
-            <img
-              className='h-8 w-auto'
-              src='android-chrome-512x512.png'
-              alt='Kotaku'
-            />
-            <h1 className='text-white font-semibold text-lg'>Kotaku</h1>
+            <img className='w-full' src='long_icon.png' alt='CSV Center' />
           </div>
           <nav className='mt-5 flex-1 space-y-1 px-2'>
             {navigation.map((item) => (
