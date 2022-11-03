@@ -1,9 +1,8 @@
 import { useErrorBoundary, useState } from "preact/hooks";
-import OrAction from "../components/core/OrAction";
 import PageError from "../components/core/PageError";
 import DbTable from "../components/manage/DbTable";
 import EmptyDb from "../components/core/EmptyDb";
-import { dbWorker, formats } from "../contexts";
+import { formats } from "../contexts";
 import { useTables } from "../hooks";
 import { setSnackContent } from "../utils";
 
@@ -51,18 +50,6 @@ function Manage() {
             </DbTable>
           )}
         </div>
-        {dbTables && (
-          <OrAction
-            label={"Save Current Session"}
-            onClick={(event) => {
-              event.preventDefault();
-              dbWorker.value.postMessage({
-                id: "save session",
-                action: "export",
-              });
-            }}
-          />
-        )}
       </main>
     );
   }

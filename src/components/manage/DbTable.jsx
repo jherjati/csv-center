@@ -16,6 +16,7 @@ import {
   DocumentMagnifyingGlassIcon,
   DocumentPlusIcon,
   DocumentArrowUpIcon,
+  InboxIcon,
 } from "@heroicons/react/20/solid";
 import { onBefoleUnload, types } from "../../constants";
 import { filterToString, filterToValues } from "../../utils";
@@ -187,7 +188,24 @@ function DbTable({ name, isInFormats, children }) {
   return (
     <section className='my-6 w-full rounded-lg overflow-hidden shadow '>
       <div className='py-3 px-6 bg-white flex justify-between items-center'>
-        {children}
+        <div className='flex space-x-3'>
+          {children}
+          <button
+            className='px-4 py-2 inline-flex items-center rounded-md border border-gray-300 bg-white text-sm font-medium leading-5 text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2'
+            onClick={() => {
+              dbWorker.value.postMessage({
+                id: "save session",
+                action: "export",
+              });
+            }}
+          >
+            <InboxIcon
+              className='-ml-1.5 mr-2 h-5 w-5 text-gray-400'
+              aria-hidden='true'
+            />
+            <p>Save Current Session</p>
+          </button>
+        </div>
         <Actions
           count={filter.length}
           icons={[

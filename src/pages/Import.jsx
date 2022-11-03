@@ -1,6 +1,5 @@
 import { parse } from "papaparse";
 import { useEffect, useErrorBoundary, useState } from "preact/hooks";
-import OrAction from "../components/core/OrAction";
 import PageError from "../components/core/PageError";
 import Dropzone from "../components/import/Dropzone";
 import Mapping from "../components/import/Mapping";
@@ -8,6 +7,7 @@ import PreviewTable from "../components/import/PreviewTable";
 import { dbWorker, formats, withHeader } from "../contexts";
 import { setSnackContent } from "../utils";
 import { useLocation } from "wouter-preact";
+import { InboxArrowDownIcon } from "@heroicons/react/20/solid";
 
 function Import() {
   const [_, setLocation] = useLocation();
@@ -83,32 +83,57 @@ function Import() {
             setTabName={setTabName}
           />
         </div>
-        <OrAction
-          label='Load Previous Session'
-          onChange={(event) => {
-            const reader = new FileReader();
-            dbWorker.value.onmessage = function ({ data }) {
-              if (data.id === "load_session") {
-                setLocation("/manage");
-              }
-            };
-            reader.onload = function () {
-              try {
-                dbWorker.value.postMessage(
-                  { id: "load_session", action: "open", buffer: reader.result },
-                  [reader.result]
-                );
-              } catch (error) {
-                dbWorker.value.postMessage({
-                  id: "load_session",
-                  action: "open",
-                  buffer: reader.result,
-                });
-              }
-            };
-            reader.readAsArrayBuffer(event.target.files[0]);
-          }}
-        />
+        <div
+          style={{ animation: "forwards fadein4 1.6s" }}
+          className='flex items-center px-9'
+        >
+          <span className='pr-3 text-lg font-medium text-gray-900'>Or</span>
+          <div className='border-t border-gray-300 grow' />
+          <input
+            type='file'
+            name='load_session'
+            id='load_session'
+            className='hidden'
+            onChange={(event) => {
+              const reader = new FileReader();
+              dbWorker.value.onmessage = function ({ data }) {
+                if (data.id === "load_session") {
+                  setLocation("/manage");
+                }
+              };
+              reader.onload = function () {
+                try {
+                  dbWorker.value.postMessage(
+                    {
+                      id: "load_session",
+                      action: "open",
+                      buffer: reader.result,
+                    },
+                    [reader.result]
+                  );
+                } catch (error) {
+                  dbWorker.value.postMessage({
+                    id: "load_session",
+                    action: "open",
+                    buffer: reader.result,
+                  });
+                }
+              };
+              reader.readAsArrayBuffer(event.target.files[0]);
+            }}
+          />
+          <label
+            htmlFor='load_session'
+            role='button'
+            className='inline-flex items-center rounded-lg border border-gray-300 bg-white px-4 py-1.5 text-sm font-medium leading-5 text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2'
+          >
+            <InboxArrowDownIcon
+              className='-ml-1.5 mr-2 h-5 w-5 text-gray-400'
+              aria-hidden='true'
+            />
+            <p>Load Previous Session</p>
+          </label>
+        </div>
       </main>
     );
   }
