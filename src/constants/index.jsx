@@ -2,10 +2,9 @@ import {
   FolderIcon,
   ChartPieIcon,
   ArrowDownOnSquareIcon,
-  ArrowPathRoundedSquareIcon,
+  // ArrowPathRoundedSquareIcon,
   CommandLineIcon,
 } from "@heroicons/react/24/outline";
-import { formats } from "../contexts";
 
 export const navigation = [
   { name: "Import", href: "/", icon: ArrowDownOnSquareIcon },
@@ -95,8 +94,8 @@ export const chartForm = {
       name: "xColumn",
       label: "X Axis Column",
       type: "select",
-      options: (tableName) =>
-        formats.value[tableName]
+      options: (columns) =>
+        columns
           .filter((col) => ["integer", "real"].includes(col.type))
           .map((col) => col.name),
     },
@@ -104,8 +103,8 @@ export const chartForm = {
       name: "yColumn",
       label: "Y Axis Column",
       type: "select",
-      options: (tableName) =>
-        formats.value[tableName]
+      options: (columns) =>
+        columns
           .filter((col) => ["integer", "real"].includes(col.type))
           .map((col) => col.name),
       section: "data",
@@ -152,8 +151,8 @@ export const chartForm = {
       name: "xColumn",
       label: "X Axis Column (Group By)",
       type: "select",
-      options: (tableName) =>
-        formats.value[tableName]
+      options: (columns) =>
+        columns
           .filter((col) => ["integer", "text"].includes(col.type))
           .map((col) => col.name),
     },
@@ -168,8 +167,8 @@ export const chartForm = {
       name: "yColumn",
       label: "Y Axis Column",
       type: "select",
-      options: (tableName) =>
-        formats.value[tableName]
+      options: (columns) =>
+        columns
           .filter((col) => ["integer", "real"].includes(col.type))
           .map((col) => col.name),
       section: "data",

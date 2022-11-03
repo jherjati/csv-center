@@ -11,7 +11,7 @@ import { getPropByString, setPropByString } from "../../utils";
 import { Ticks, CategoryScale } from "chart.js";
 import { chartForm } from "../../constants";
 
-export default function ConfigModal({ open, setOpen, tableName }) {
+export default function ConfigModal({ open, setOpen, tableName, columns }) {
   const [stats, setStats] = useState([]);
   const [charts, setCharts] = useState([]);
   const [type, setType] = useState("line");
@@ -143,7 +143,7 @@ export default function ConfigModal({ open, setOpen, tableName }) {
                           className='shadow-sm focus:ring-teal-500 focus:border-teal-500 block col-span-5 sm:text-sm border-gray-300 rounded-md'
                           defaultValue={stat}
                         >
-                          {formats.value[tableName]
+                          {columns
                             .filter((col) =>
                               ["integer", "real"].includes(col.type)
                             )
@@ -224,7 +224,7 @@ export default function ConfigModal({ open, setOpen, tableName }) {
                                 className='mt-1 shadow-sm focus:ring-teal-500 focus:border-teal-500 block w-full sm:text-sm border-gray-300 rounded-md'
                                 defaultValue={chart[input.name]}
                               >
-                                {input.options(tableName).map((opt) => (
+                                {input.options(columns).map((opt) => (
                                   <option value={opt}>{opt}</option>
                                 ))}
                               </select>
@@ -310,7 +310,7 @@ export default function ConfigModal({ open, setOpen, tableName }) {
                                         ) ?? ""
                                       }
                                     >
-                                      {input.options(tableName).map((opt) => (
+                                      {input.options(columns).map((opt) => (
                                         <option value={opt}>{opt}</option>
                                       ))}
                                     </select>
@@ -365,7 +365,7 @@ export default function ConfigModal({ open, setOpen, tableName }) {
                                   className='mt-1 shadow-sm focus:ring-teal-500 focus:border-teal-500 block w-full sm:text-sm border-gray-300 rounded-md'
                                   defaultValue={chart[input.name]}
                                 >
-                                  {input.options(tableName).map((opt) => (
+                                  {input.options(columns).map((opt) => (
                                     <option value={opt}>{opt}</option>
                                   ))}
                                 </select>

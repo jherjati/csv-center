@@ -13,8 +13,8 @@ export default function FilterModal({
   tableName,
   filter,
   setFilter,
+  columns,
 }) {
-  const columns = formats.value[tableName];
   const [activeType, setActiveType] = useState(columns[0].type);
 
   const handleSubmit = (event) => {
