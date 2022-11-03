@@ -179,6 +179,13 @@ const TableMetric = forwardRef(
             });
             setStatsValues(newStatsValues);
             setChartsValues(newChartsValues);
+          } else if (data.id === "browse column") {
+            setColumns(
+              data.results[0]?.values.map((el) => ({
+                name: el[1],
+                type: el[2].toLowerCase(),
+              }))
+            );
           }
         };
 
