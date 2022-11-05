@@ -2,10 +2,13 @@ import { useCallback, useRef, useState } from "preact/hooks";
 import { EditorView, basicSetup } from "codemirror";
 import { sql } from "@codemirror/lang-sql";
 import { dbWorker } from "../contexts";
+import { ArrowPathIcon, BoltSlashIcon } from "@heroicons/react/20/solid";
+import { setSnackContent } from "../utils";
 
 function Command() {
   const editor = useRef();
-  const [results, setResults] = useState([]);
+  const [results, setResults] = useState();
+  const [isLoading, setIsLoading] = useState(false);
 
   const ref = useCallback((node) => {
     const localEditor = new EditorView({
@@ -26,11 +29,18 @@ PRAGMA table_info('Exception_Report');
     editor.current = localEditor;
 
     dbWorker.value.onmessage = ({ data }) => {
-      if (data.id === "execute command") setResults(data.results ?? []);
+      if (data.id === "execute command") {
+        if (data.error) {
+          setSnackContent(["error", "An Error Occured", data.error]);
+        }
+        setResults(data.results);
+      }
+      setIsLoading(false);
     };
   }, []);
 
   const onExecute = () => {
+    setIsLoading(true);
     dbWorker.value.postMessage({
       id: "execute command",
       action: "exec",
@@ -56,7 +66,6 @@ PRAGMA table_info('Exception_Report');
         <h1 className='text-2xl font-semibold text-gray-900'>SQL Command</h1>
       </div>
       <div className='mx-auto max-w-7xl px-4 sm:px-6 md:px-8'>
-        {/* Replace with your content */}
         <div className='py-4'>
           <div ref={ref} className='border bg-white' />
           <div className='flex justify-center border-t mt-3 pt-3 border-teal-100'>
@@ -68,47 +77,59 @@ PRAGMA table_info('Exception_Report');
             </button>
             <button
               onClick={onExecute}
-              className='ml-3 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-teal-600 hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500'
+              className='ml-3 w-20 inline-flex justify-center py-2 text-center border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-teal-600 hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500'
             >
-              Execute
+              {isLoading ? (
+                <ArrowPathIcon className='w-5 h-5 animate-spin' />
+              ) : (
+                "Execute"
+              )}
             </button>
           </div>
-          {results.map((res) => (
-            <section
-              style={{ animation: "forwards fadein1 1.6s" }}
-              className='mt-6 px-6 pb-6 pt-3 bg-white rounded-lg shadow'
-            >
-              <div className='-mx-4 flex flex-col sm:-mx-6 md:mx-0 overflow-x-scroll'>
-                <table className='min-w-full divide-y divide-gray-300'>
-                  <thead>
-                    <tr>
-                      {res.columns.map((el) => (
-                        <th
-                          scope='col'
-                          className='hidden py-3.5 px-3 text-right text-sm font-semibold text-gray-900 sm:table-cell'
-                        >
-                          {el}
-                        </th>
-                      ))}
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {res.values.map((row) => (
-                      <tr className='border-b border-gray-200'>
-                        {row.map((el) => (
-                          <td className='hidden py-4 px-3 text-right text-sm text-gray-500 sm:table-cell'>
-                            {el}
-                          </td>
+          {results ? (
+            results.length ? (
+              results.map((res) => (
+                <section
+                  style={{ animation: "forwards fadein1 1.6s" }}
+                  className='mt-6 px-6 pb-6 pt-3 bg-white rounded-lg shadow'
+                >
+                  <div className='-mx-4 flex flex-col sm:-mx-6 md:mx-0 overflow-x-scroll'>
+                    <table className='min-w-full divide-y divide-gray-300'>
+                      <thead>
+                        <tr>
+                          {res.columns.map((el) => (
+                            <th
+                              scope='col'
+                              className='hidden py-3.5 px-3 text-right text-sm font-semibold text-gray-900 sm:table-cell'
+                            >
+                              {el}
+                            </th>
+                          ))}
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {res.values.map((row) => (
+                          <tr className='border-b border-gray-200'>
+                            {row.map((el) => (
+                              <td className='hidden py-4 px-3 text-right text-sm text-gray-500 sm:table-cell'>
+                                {el}
+                              </td>
+                            ))}
+                          </tr>
                         ))}
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </section>
-          ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </section>
+              ))
+            ) : (
+              <section className='mt-6 p-6 space-y-3 bg-white rounded-lg shadow flex flex-col items-center text-gray-600'>
+                <BoltSlashIcon className='w-12 h-12 mx-auto' />
+                <p>No results were returned by the query</p>
+              </section>
+            )
+          ) : null}
         </div>
-        {/* /End replace */}
       </div>
     </main>
   );
