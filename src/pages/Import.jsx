@@ -61,12 +61,7 @@ function Import() {
           <h1 className='text-2xl font-semibold text-gray-900'>Import</h1>
         </div>
         <div className='mx-auto max-w-7xl px-4 sm:px-6 md:px-8 mb-6'>
-          <Dropzone
-            setFields={setFields}
-            fields={fields}
-            setFile={setFile}
-            file={file}
-          />
+          <Dropzone setFile={setFile} />
           <PreviewTable
             fields={fields}
             rows={prevData}

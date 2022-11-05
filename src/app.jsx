@@ -19,7 +19,7 @@ export default function App() {
     <>
       <Sidebar />
 
-      <div className='flex flex-1 flex-col pl-64'>
+      <div className='flex flex-1 flex-col pl-56'>
         <Switch className='flex-1'>
           <Route path='/'>
             <Suspense fallback={<></>}>
