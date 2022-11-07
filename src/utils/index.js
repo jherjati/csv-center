@@ -3,7 +3,7 @@ import { snackbar } from "../contexts";
 
 export function paginate(page, maxPage) {
   if (maxPage <= 7) {
-    return [1,2,3,4,5,6,7]
+    return Array.from({ length: maxPage }).map((_, i) => i + 1);
   } else if ([1, 2, maxPage - 1, maxPage].includes(page))
     return [1, 2, 3, 0, maxPage - 2, maxPage - 1, maxPage];
   else if ([3, 4].includes(page)) return [1, 0, 3, 4, 5, 0, maxPage];
