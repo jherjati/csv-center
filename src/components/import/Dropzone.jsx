@@ -28,7 +28,7 @@ function Dropzone({ setFile }) {
       <label
         role='button'
         htmlFor='dropzone'
-        className='block bg-white p-6 rounded-lg shadow w-full'
+        className='block bg-white p-3 rounded-lg shadow w-full hover:shadow-md'
         onDrop={(event) => {
           stopDefault(event);
           setFile(event.dataTransfer.files[0]);
@@ -37,7 +37,9 @@ function Dropzone({ setFile }) {
         onDragLeave={stopDefault}
         onDragOver={stopDefault}
       >
-        Drag 'n' drop csv file here, or click to select file
+        <p className='rounded-lg border-2 border-dashed border-gray-200 px-6 py-9'>
+          Drag and drop csv file here, or <strong>click</strong> to select file
+        </p>
       </label>
     </section>
   );

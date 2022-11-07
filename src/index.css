@@ -34,29 +34,3 @@
     transform: translate(-0%);
   }
 }
-@keyframes fadein3 {
-  0% {
-    opacity: 0;
-  }
-  50% {
-    opacity: 0;
-    transform: translate(10%);
-  }
-  75% {
-    opacity: 1;
-    transform: translate(-0%);
-  }
-}
-@keyframes fadein4 {
-  0% {
-    opacity: 0;
-  }
-  75% {
-    opacity: 0;
-    transform: translate(10%);
-  }
-  100% {
-    opacity: 1;
-    transform: translate(-0%);
-  }
-}
