@@ -85,6 +85,7 @@ function Import() {
           <span className='pr-3 text-lg font-medium text-gray-900'>Or</span>
           <div className='border-t border-gray-300 grow' />
           <input
+            accept='.db'
             type='file'
             name='load_session'
             id='load_session'
