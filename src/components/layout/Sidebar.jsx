@@ -4,7 +4,7 @@ import { classNames } from "../../utils";
 import { QuestionMarkCircleIcon } from "@heroicons/react/24/solid";
 
 function Sidebar() {
-  const [location] = useLocation();
+  const [location, setLocation] = useLocation();
 
   return (
     <div className='fixed inset-y-0 flex w-56 flex-col'>
@@ -42,7 +42,12 @@ function Sidebar() {
           </nav>
         </div>
         <div className='flex flex-shrink-0 bg-gray-700'>
-          <button className='p-4 group block w-full flex-shrink-0 hover:bg-gray-700'>
+          <button
+            onClick={() => {
+              setLocation("/guidance");
+            }}
+            className='p-4 group block w-full flex-shrink-0 hover:bg-gray-700'
+          >
             <div className='flex items-center'>
               <QuestionMarkCircleIcon
                 className='mr-3 flex-shrink-0 h-6 w-6 text-gray-400 group-hover:text-gray-300 scale-150'

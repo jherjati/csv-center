@@ -6,6 +6,7 @@ const Import = lazy(() => import("./pages/Import"));
 const Manage = lazy(() => import("./pages/Manage"));
 // const Compare = lazy(() => import("./pages/Compare"));
 const Command = lazy(() => import("./pages/Command"));
+const Guidance = lazy(() => import("./pages/Guidance"));
 
 import SWModal from "./components/core/SWModal";
 import SnackBar from "./components/core/Snackbar";
@@ -44,6 +45,11 @@ export default function App() {
           <Route path='/insight'>
             <Suspense fallback={<></>}>
               <Insight />
+            </Suspense>
+          </Route>
+          <Route path='/guidance'>
+            <Suspense fallback={<></>}>
+              <Guidance />
             </Suspense>
           </Route>
         </Switch>
