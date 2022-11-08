@@ -1,7 +1,11 @@
 import { Fragment, useState } from "react";
 import { Listbox, Transition } from "@headlessui/react";
-import { PaperClipIcon, TagIcon } from "@heroicons/react/20/solid";
-import { classNames } from "../../utils";
+import {
+  ArrowPathIcon,
+  PaperClipIcon,
+  TagIcon,
+} from "@heroicons/react/20/solid";
+import { classNames, setSnackContent } from "../../utils";
 
 const labels = [
   { name: "Bug Report", value: "bug report" },
@@ -11,10 +15,54 @@ const labels = [
 
 export default function UserFeedback() {
   const [labelled, setLabelled] = useState(labels[0]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [filename, setFilename] = useState();
+
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+    try {
+      setIsLoading(true);
+      const form = new FormData(event.target);
+      const data = Object.fromEntries(form.entries());
+      let res;
+      if (filename) {
+        res = await fetch("https://3ey9cs7f.directus.app/files", {
+          method: "POST",
+          body: form,
+        });
+        data.attachment = (await res.json()).data.id;
+      } else {
+        delete data.attachment;
+      }
+      res = await fetch("https://3ey9cs7f.directus.app/items/user_feedback", {
+        method: "POST",
+        body: JSON.stringify(data),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      if (!res.ok) throw new Error("something");
+      event.target.reset();
+      setFilename();
+      setSnackContent([
+        "success",
+        "Feedback Submitted",
+        "Thank you for the feedback, we will consider it carefully",
+      ]);
+    } catch (_) {
+      setSnackContent([
+        "error",
+        "Something unexpected happened",
+        "Maybe you can try again later, don't give up :)",
+      ]);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
     <form
-      action='#'
+      onSubmit={handleSubmit}
       className='relative w-full h-fit ml-6 bg-white rounded-lg overflow-hidden border border-gray-300 shadow-sm focus-within:border-indigo-500 focus-within:ring-1 focus-within:ring-indigo-500'
     >
       <section>
@@ -42,6 +90,12 @@ export default function UserFeedback() {
       </section>
 
       <div className='absolute z-10 right-0 top-0 flex flex-nowrap justify-end space-x-2 py-2 px-3'>
+        <input
+          type='text'
+          className='hidden'
+          name='tags'
+          value={JSON.stringify([labelled.value])}
+        />
         <Listbox
           as='div'
           value={labelled}
@@ -118,7 +172,7 @@ export default function UserFeedback() {
               aria-hidden='true'
             />
             <span className='text-sm italic text-gray-500 group-hover:text-gray-600'>
-              Attach a file
+              {filename ?? "Attach related file"}
             </span>
           </label>
           <input
@@ -126,14 +180,21 @@ export default function UserFeedback() {
             id='attachment'
             type='file'
             className='hidden'
+            onChange={(event) => {
+              setFilename(event.target.files[0].name);
+            }}
           />
         </div>
         <div className='flex-shrink-0'>
           <button
             type='submit'
-            className='inline-flex items-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2'
+            className='w-20 text-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2'
           >
-            Submit
+            {isLoading ? (
+              <ArrowPathIcon className='w-5 h-5 mx-auto animate-spin' />
+            ) : (
+              "Submit"
+            )}
           </button>
         </div>
       </div>
