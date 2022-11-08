@@ -63,30 +63,28 @@ function Import() {
         <div className='mx-auto max-w-7xl px-4 sm:px-6 md:px-8 mb-6'>
           <Dropzone setFile={setFile} />
           {file && (
-            <>
-              <PreviewTable
-                fields={fields}
-                rows={prevData}
-                fileString={
-                  file
-                    ? file.name +
-                      " - " +
-                      parseInt(file.size / 1000) +
-                      " kilobytes"
-                    : ""
-                }
-              />
-              <Mapping
-                fields={fields}
-                file={file}
-                tabName={tabName}
-                setTabName={setTabName}
-              />
-            </>
+            <PreviewTable
+              fields={fields}
+              rows={prevData}
+              fileString={
+                file
+                  ? file.name +
+                    " - " +
+                    parseInt(file.size / 1000) +
+                    " kilobytes"
+                  : ""
+              }
+            />
           )}
+          <Mapping
+            fields={fields}
+            file={file}
+            tabName={tabName}
+            setTabName={setTabName}
+          />
         </div>
         <div
-          style={{ animation: "forwards fadein2 1.6s" }}
+          style={{ animation: "forwards fadein3 1.6s" }}
           className='flex items-center px-9'
         >
           <span className='pr-3 text-lg font-medium text-gray-900'>Or</span>
