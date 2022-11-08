@@ -14,7 +14,7 @@ import {
   Tooltip,
 } from "chart.js";
 import ChartBox from "./ChartBox";
-import FilterModal from "./FilterModal";
+import FilterModal from "../core/FilterModal";
 import { filterToString, filterToValues, setSnackContent } from "../../utils";
 import ConfigModal from "./ConfigModal";
 import annotationPlugin from "chartjs-plugin-annotation";

@@ -8,7 +8,7 @@ import { useSort } from "../../hooks";
 import Actions from "../core/Actions";
 import Pagination from "./Pagination";
 import DetailModal from "./DetailModal";
-import FilterModal from "./FilterModal";
+import FilterModal from "../core/FilterModal";
 import {
   BarsArrowDownIcon,
   BarsArrowUpIcon,
