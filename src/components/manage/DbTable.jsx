@@ -60,7 +60,7 @@ function DbTable({ name, isInFormats, children }) {
           .map((el, idx) => {
             if (
               types
-                .filter((ty) => ty.input === "date")
+                .filter((ty) => ty.label.includes("date"))
                 .map((ty) => ty.label)
                 .includes(el.type)
             ) {
@@ -124,10 +124,13 @@ function DbTable({ name, isInFormats, children }) {
             const form = document.getElementById("detail-form");
             res.columns.forEach((name, idx) => {
               if (
-                types.find(
-                  (type) =>
-                    type.label === columns.find((col) => col.name === name).type
-                ).input === "date"
+                types
+                  .find(
+                    (type) =>
+                      type.label ===
+                      columns.find((col) => col.name === name).type
+                  )
+                  .label.includes("date")
               ) {
                 form[name].value = dateFormat(
                   new Date(res.values[0][idx] * 1000),

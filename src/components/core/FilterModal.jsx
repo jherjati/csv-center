@@ -26,11 +26,13 @@ export default function FilterModal({
         data["opr-add"],
         ["IS NULL", "IS NOT NULL"].includes(data["opr-add"])
           ? ""
-          : types.find(
-              (ty) =>
-                ty.label ===
-                columns.find((col) => col.name === data["col-add"]).type
-            ).input === "date"
+          : types
+              .find(
+                (ty) =>
+                  ty.label ===
+                  columns.find((col) => col.name === data["col-add"]).type
+              )
+              .label.includes("date")
           ? parse(data["val-add"], "yyyy-MM-dd", new Date()) / 1000
           : data["val-add"],
       ];
@@ -140,7 +142,7 @@ export default function FilterModal({
                           type={thisType.input}
                           className={`col-span-3 text-gray-500 shadow-sm focus:ring-teal-500 focus:border-teal-500 block w-full sm:text-sm border-gray-300 h-10`}
                           defaultValue={
-                            thisType.input === "date"
+                            thisType.label.includes("date")
                               ? format(new Date(el[2] * 1000), "yyyy-MM-dd")
                               : el[2]
                           }
