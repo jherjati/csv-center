@@ -21,7 +21,7 @@ WHERE
   type = 'table' 
   AND name NOT LIKE 'sqlite_%';
 
-PRAGMA table_info('Exception_Report');
+PRAGMA table_info('table_name');
 `,
       extensions: [basicSetup, sql()],
       parent: node,
@@ -62,10 +62,10 @@ PRAGMA table_info('Exception_Report');
 
   return (
     <main className='py-6'>
-      <div className='mx-auto max-w-7xl px-4 sm:px-6 lg:px-8'>
+      <div className='mx-auto max-w-7xl px-8'>
         <h1 className='text-2xl font-semibold text-gray-900'>SQLite Command</h1>
       </div>
-      <div className='mx-auto max-w-7xl px-4 sm:px-6 md:px-8'>
+      <div className='mx-auto max-w-7xl px-8'>
         <div className='py-4'>
           <div ref={ref} className='border bg-white' />
           <div className='flex justify-center border-t mt-3 pt-3 border-teal-100'>
