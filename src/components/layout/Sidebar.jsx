@@ -11,8 +11,8 @@ function Sidebar() {
       <div className='flex min-h-0 flex-1 flex-col bg-gray-800'>
         <div className='flex flex-1 flex-col overflow-y-auto pb-4'>
           <img
-            className='w-full bg-white'
-            src='long_icon.png'
+            className='w-56 h-[70px] bg-white'
+            src='long_icon.webp'
             alt='CSV Center'
           />
           <nav className='mt-2 flex-1 space-y-1 px-2'>
