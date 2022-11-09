@@ -6,7 +6,7 @@ import {
 } from "@heroicons/react/20/solid";
 import { Fragment } from "preact";
 import { useEffect, useState } from "preact/hooks";
-import { formats, metricConfigs } from "../../contexts";
+import { metricConfigs } from "../../contexts";
 import { getPropByString, setPropByString } from "../../utils";
 import { Ticks, CategoryScale } from "chart.js";
 import { chartForm } from "../../constants";
@@ -46,10 +46,9 @@ export default function ConfigModal({ open, setOpen, tableName, columns }) {
         stats[key.split("_")[1]] = data[key];
       } else {
         const [_, idx, name] = key.split("_");
-        const newChart = { ...charts[idx] };
-
+        const newChart = charts[idx];
         setPropByString(newChart, name, data[key]);
-
+        // side effect below
         if (name.includes("annotation")) {
           setPropByString(
             newChart,
@@ -63,18 +62,27 @@ export default function ConfigModal({ open, setOpen, tableName, columns }) {
             text: data[key],
           };
         } else if (name === "type") {
-          newChart.options.scales.x.type =
-            data[key] === "bar" ? "category" : "linear";
-          newChart.options.scales.x.offset = data[key] === "bar";
-          newChart.options.scales.x.grid.offset = data[key] === "bar";
-          newChart.options.scales.x.ticks.callback =
-            data[key] === "bar"
-              ? CategoryScale.prototype.getLabelForValue
-              : Ticks.formatters.numeric;
-          newChart.options.scales.y.beginAtZero = data[key] === "bar";
+          switch (data[key]) {
+            case "bar":
+              newChart.options.scales.x.type = "category";
+              newChart.options.scales.x.offset = true;
+              newChart.options.scales.x.grid.offset = true;
+              newChart.options.scales.x.ticks.callback =
+                CategoryScale.prototype.getLabelForValue;
+              newChart.options.scales.y.beginAtZero = true;
+              break;
+            case "line":
+              newChart.options.scales.x.type = "linear";
+              newChart.options.scales.x.offset = false;
+              newChart.options.scales.x.grid.offset = false;
+              newChart.options.scales.x.ticks.callback =
+                Ticks.formatters.numeric;
+              newChart.options.scales.y.beginAtZero = false;
+              break;
+            default:
+              break;
+          }
         }
-
-        charts[idx] = newChart;
       }
     });
 
