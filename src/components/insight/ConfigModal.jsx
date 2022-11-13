@@ -55,7 +55,7 @@ export default function ConfigModal({ open, setOpen, tableName, columns }) {
             "options.plugins.annotation.annotations.box1.display",
             Boolean(data[key])
           );
-        } else if (name.includes("Column")) {
+        } else if (name.includes("xColumn")) {
           const axis = name.split("Column")[0];
           newChart.options.scales[axis].title = {
             display: true,

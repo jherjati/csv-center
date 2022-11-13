@@ -12,6 +12,7 @@ import {
   LineElement,
   BarElement,
   Tooltip,
+  Legend,
 } from "chart.js";
 import ChartBox from "./ChartBox";
 import FilterModal from "../core/FilterModal";
@@ -34,6 +35,7 @@ Chart.register(
   LineElement,
   BarElement,
   Tooltip,
+  Legend,
   annotationPlugin
 );
 
@@ -92,14 +94,6 @@ const TableMetric = forwardRef(
                         text: columns.filter((col) =>
                           ["integer", "real"].includes(col.type)
                         )[0]?.name,
-                      },
-                    },
-                    y: {
-                      title: {
-                        display: true,
-                        text: columns.filter((col) =>
-                          ["integer", "real"].includes(col.type)
-                        )[1]?.name,
                       },
                     },
                   },
