@@ -4,7 +4,7 @@ import { Route, Switch } from "wouter-preact";
 const Insight = lazy(() => import("./pages/Insight"));
 const Import = lazy(() => import("./pages/Import"));
 const Manage = lazy(() => import("./pages/Manage"));
-// const Compare = lazy(() => import("./pages/Compare"));
+const Compare = lazy(() => import("./pages/Compare"));
 const Command = lazy(() => import("./pages/Command"));
 const Guidance = lazy(() => import("./pages/Guidance"));
 
@@ -32,11 +32,11 @@ export default function App() {
               <Manage />
             </Suspense>
           </Route>
-          {/* <Route path='/compare'>
+          <Route path='/compare'>
             <Suspense fallback={<></>}>
               <Compare />
             </Suspense>
-          </Route> */}
+          </Route>
           <Route path='/command'>
             <Suspense fallback={<></>}>
               <Command />

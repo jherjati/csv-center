@@ -2,7 +2,7 @@ import {
   FolderIcon,
   ChartPieIcon,
   ArrowDownOnSquareIcon,
-  // ArrowPathRoundedSquareIcon,
+  ArrowPathRoundedSquareIcon,
   CommandLineIcon,
 } from "@heroicons/react/24/outline";
 
@@ -15,15 +15,16 @@ export const navigation = [
     icon: ChartPieIcon,
   },
   {
+    name: "Compare",
+    href: "/compare",
+    icon: ArrowPathRoundedSquareIcon,
+  },
+
+  {
     name: "Command",
     href: "/command",
     icon: CommandLineIcon,
   },
-  // {
-  //   name: "Compare",
-  //   href: "/compare",
-  //   icon: ArrowPathRoundedSquareIcon,
-  // },
 ];
 
 export const operators = {
