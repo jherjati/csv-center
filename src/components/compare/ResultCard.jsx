@@ -19,7 +19,7 @@ Chart.register(
   Legend
 );
 
-function ResultCard() {
+function ResultCard({ chartConfig, dataConfigs }) {
   const elRef = useRef();
   const chartRef = useRef();
 
@@ -85,26 +85,6 @@ function ResultCard() {
   }, []);
 
   useEffect(() => {
-    const chartConfig = [["options.scales.x.title.text", "coba dynamic"]];
-    const dataConfigs = [
-      {
-        xColumn: "km_hm1",
-        yColumn: "panjang_kerusakan",
-        tableName: "exception_report",
-        limit: 100,
-        backgroundColor: "red",
-        borderColor: "pink",
-      },
-      {
-        xColumn: "km_hm1",
-        yColumn: "kerusakan_mm",
-        tableName: "exception_report_2",
-        limit: 100,
-        backgroundColor: "yellow",
-        borderColor: "orange",
-      },
-    ];
-
     dbWorker.value.onmessage = ({ data }) => {
       const datasets = data.results.map(({ columns, values }, idx) => ({
         label: `${dataConfigs[idx].tableName} (${columns[1]})`,
@@ -129,7 +109,7 @@ function ResultCard() {
       .join(" ; ");
     const params = [];
     dbWorker.value.postMessage({ id: "compare", action: "exec", params, sql });
-  }, []);
+  }, [chartConfig, dataConfigs]);
 
   return (
     <section className='my-6 py-3 bg-white shadow rounded-lg'>
