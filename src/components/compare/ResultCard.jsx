@@ -34,7 +34,7 @@ function ResultCard({ chartConfig, dataConfigs }) {
               type: "linear",
               title: {
                 display: true,
-                text: "km_hm1",
+                text: "X Axis Label",
               },
             },
           },
@@ -113,9 +113,6 @@ function ResultCard({ chartConfig, dataConfigs }) {
 
   return (
     <section className='my-6 py-3 bg-white shadow rounded-lg'>
-      <h4 className='px-6 text-xl font-semibold text-gray-900 capitalize'>
-        Result
-      </h4>
       <canvas className='w-full p-3' ref={elRef}></canvas>
     </section>
   );

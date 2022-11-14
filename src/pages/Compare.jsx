@@ -9,26 +9,9 @@ import ResultCard from "../components/compare/ResultCard";
 function Compare() {
   const { dbTables } = useTables();
   const [chartConfig, setChartConfig] = useState([
-    ["options.scales.x.title.text", "coba dynamic"],
+    ["options.scales.x.title.text", null],
   ]);
-  const [dataConfigs, setDataConfigs] = useState([
-    {
-      xColumn: "km_hm1",
-      yColumn: "panjang_kerusakan",
-      tableName: "exception_report",
-      limit: 100,
-      backgroundColor: "red",
-      borderColor: "pink",
-    },
-    {
-      xColumn: "km_hm1",
-      yColumn: "kerusakan_mm",
-      tableName: "exception_report_2",
-      limit: 100,
-      backgroundColor: "yellow",
-      borderColor: "orange",
-    },
-  ]);
+  const [dataConfigs, setDataConfigs] = useState([]);
 
   const [error, resetError] = useErrorBoundary((error) => {
     console.error(error);
@@ -56,6 +39,7 @@ function Compare() {
                 dataConfigs={dataConfigs}
                 setChartConfig={setChartConfig}
                 setDataConfigs={setDataConfigs}
+                dbTables={dbTables}
               />
             </>
           )}
