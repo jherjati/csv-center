@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "preact/hooks";
+import { useEffect, useRef } from "preact/hooks";
 import {
   Chart,
   LineController,
@@ -9,6 +9,7 @@ import {
   Legend,
 } from "chart.js";
 import { dbWorker } from "../../contexts";
+import { setPropByString } from "../../utils";
 Chart.register(
   LineController,
   LinearScale,
@@ -22,90 +23,110 @@ function ResultCard() {
   const elRef = useRef();
   const chartRef = useRef();
 
-  const [data, setData] = useState({
-    datasets: [
-      {
-        label: "data 1",
-        data: [
-          { x: 0, y: 0 },
-          { x: 1, y: 1 },
-          { x: 2, y: 2 },
-          { x: 3, y: 3 },
-          { x: 4, y: 4 },
-          { x: 5, y: 5 },
-          { x: 6, y: 6 },
-          { x: 7, y: 7 },
-          { x: 8, y: 8 },
-        ],
-      },
-      {
-        label: "data 2",
-        data: [
-          { x: 0, y: 4 },
-          { x: 1, y: 4 },
-          { x: 2, y: 4 },
-          { x: 3, y: 4 },
-          { x: 4, y: 4 },
-          { x: 5, y: 4 },
-          { x: 6, y: 4 },
-          { x: 7, y: 4 },
-          { x: 8, y: 4 },
-        ],
-      },
-    ],
-  });
-
-  const config = {
-    type: "line",
-    options: {
-      responsive: true,
-      scales: {
-        x: {
-          type: "linear",
-          title: {
-            display: true,
-            text: "km_hm1",
-          },
-        },
-      },
-      plugins: {
-        legend: {
-          position: "top",
-        },
-      },
-    },
-  };
-
   useEffect(() => {
     if (elRef.current) {
       chartRef.current = new Chart(elRef.current.getContext("2d"), {
-        ...config,
-        data,
+        type: "line",
+        options: {
+          responsive: true,
+          scales: {
+            x: {
+              type: "linear",
+              title: {
+                display: true,
+                text: "km_hm1",
+              },
+            },
+          },
+          plugins: {
+            legend: {
+              position: "top",
+            },
+          },
+        },
+        data: {
+          datasets: [
+            {
+              label: "data 1",
+              data: [
+                { x: 0, y: 0 },
+                { x: 1, y: 1 },
+                { x: 2, y: 2 },
+                { x: 3, y: 3 },
+                { x: 4, y: 4 },
+                { x: 5, y: 5 },
+                { x: 6, y: 6 },
+                { x: 7, y: 7 },
+                { x: 8, y: 8 },
+              ],
+            },
+            {
+              label: "data 2",
+              data: [
+                { x: 0, y: 4 },
+                { x: 1, y: 4 },
+                { x: 2, y: 4 },
+                { x: 3, y: 4 },
+                { x: 4, y: 4 },
+                { x: 5, y: 4 },
+                { x: 6, y: 4 },
+                { x: 7, y: 4 },
+                { x: 8, y: 4 },
+              ],
+            },
+          ],
+        },
       });
     }
 
     return () => {
       if (chartRef.current) chartRef.current.destroy();
     };
-  }, [data]);
+  }, []);
 
   useEffect(() => {
+    const chartConfig = [["options.scales.x.title.text", "coba dynamic"]];
+    const dataConfigs = [
+      {
+        xColumn: "km_hm1",
+        yColumn: "panjang_kerusakan",
+        tableName: "exception_report",
+        limit: 100,
+        backgroundColor: "red",
+        borderColor: "pink",
+      },
+      {
+        xColumn: "km_hm1",
+        yColumn: "kerusakan_mm",
+        tableName: "exception_report_2",
+        limit: 100,
+        backgroundColor: "yellow",
+        borderColor: "orange",
+      },
+    ];
+
     dbWorker.value.onmessage = ({ data }) => {
       const datasets = data.results.map(({ columns, values }, idx) => ({
-        label: `exception_report_${idx + 1} (${columns[1]})`,
+        label: `${dataConfigs[idx].tableName} (${columns[1]})`,
         data: values.map((val) => ({ x: val[0], y: val[1] })),
         parsing: false,
         normalized: true,
-        borderColor: idx ? "pink" : "orange",
-        backgroundColor: idx ? "red" : "yellow",
+        backgroundColor: dataConfigs[idx].backgroundColor,
+        borderColor: dataConfigs[idx].borderColor,
       }));
-      setData({ datasets });
+      chartRef.current.data = { datasets };
+      chartConfig.forEach((conf) =>
+        setPropByString(chartRef.current, conf[0], conf[1])
+      );
+      chartRef.current.update();
     };
 
-    const sql = `
-    SELECT km_hm1, panjang_kerusakan FROM exception_report ORDER BY km_hm1 LIMIT 100;
-    SELECT km_hm1, kerusakan_mm FROM exception_report_2 ORDER BY km_hm1 LIMIT 100;
-    `;
+    const sql = dataConfigs
+      .map(
+        ({ xColumn, yColumn, tableName, limit }) =>
+          `SELECT ${xColumn}, ${yColumn} FROM ${tableName} ORDER BY ${xColumn} LIMIT ${limit}`
+      )
+      .join(" ; ");
     const params = [];
     dbWorker.value.postMessage({ id: "compare", action: "exec", params, sql });
   }, []);
