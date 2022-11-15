@@ -20,3 +20,16 @@ export const snackbar = signal({
 });
 
 export const metricConfigs = signal({});
+
+export const chartConfig = signal([["options.scales.x.title.text", null]]);
+export const dataConfigs = signal([
+  {
+    id: window.crypto.randomUUID(),
+    tableName: null,
+    xColumn: null,
+    yColumn: null,
+    limit: 250,
+    backgroundColor: null,
+    borderColor: null,
+  },
+]);

@@ -18,20 +18,9 @@ function ConfigCard({
   setDataConfigs,
   dbTables,
 }) {
+  const [localGeneralConfig, setLocalGeneralConfig] = useState(chartConfig);
+  const [localChartConfig, setLocalChartConfig] = useState(dataConfigs);
   const [tabIdx, setTabIdx] = useState(0);
-  const [localGeneralConfig, setLocalGeneralConfig] = useState([
-    ["options.scales.x.title.text", null],
-  ]);
-  const [localChartConfig, setLocalChartConfig] = useState([
-    {
-      tableName: null,
-      xColumn: null,
-      yColumn: null,
-      limit: 250,
-      backgroundColor: null,
-      borderColor: null,
-    },
-  ]);
 
   const handleChange = (event) => {
     setLocalChartConfig((prev) => {
@@ -44,6 +33,7 @@ function ConfigCard({
       return newConfigs;
     });
   };
+
   return (
     <section className='my-6 pt-3 pb-6 bg-white shadow rounded-lg'>
       <h4 className='px-6 text-xl font-semibold text-gray-900 capitalize'>
@@ -78,10 +68,11 @@ function ConfigCard({
             ])
           }
         />
-
+        {/* Tabs */}
         <div className='flex text-sm font-medium mt-3'>
-          {localChartConfig.map(({}, configIdx) => (
+          {localChartConfig.map(({ id }, configIdx) => (
             <button
+              key={id}
               onClick={(event) => {
                 event.preventDefault();
                 setTabIdx(configIdx);
@@ -101,7 +92,21 @@ function ConfigCard({
               >
                 {"Table " + (configIdx + 1)}
               </h6>
-              <XCircleIcon className='w-5 h-5 text-gray-400 hover:text-gray-700' />
+              {Boolean(configIdx) && (
+                <XCircleIcon
+                  onClick={(event) => {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    if (configIdx === tabIdx) {
+                      setTabIdx(0);
+                    }
+                    setLocalChartConfig((prev) => [
+                      ...prev.filter((el) => el.id !== id),
+                    ]);
+                  }}
+                  className='w-5 h-5 text-gray-400 hover:text-gray-700'
+                />
+              )}
             </button>
           ))}
           <button
@@ -109,6 +114,7 @@ function ConfigCard({
               setLocalChartConfig((prev) => [
                 ...prev,
                 {
+                  id: window.crypto.randomUUID(),
                   tableName: null,
                   xColumn: null,
                   yColumn: null,
@@ -123,7 +129,11 @@ function ConfigCard({
             <PlusCircleIcon className='w-5 h-5 text-gray-400 hover:text-gray-700' />
           </button>
         </div>
-        <div className='w-full h-56 border-b border-x border-gray-400 rounded-b-md grid grid-cols-12 p-6 gap-x-4'>
+        {/* Config */}
+        <div
+          key={tabIdx}
+          className='w-full h-56 border-b border-x border-gray-400 rounded-b-md grid grid-cols-12 p-6 gap-x-4'
+        >
           {Object.keys(configForm).map((key) =>
             key === "tableName" ? (
               <div className='col-span-4'>
@@ -189,7 +199,7 @@ function ConfigCard({
           )}
         </div>
         <button className='py-3 px-6 mt-6 rounded-lg block mx-auto bg-teal-600 text-white'>
-          Submit
+          Apply
         </button>
       </form>
     </section>

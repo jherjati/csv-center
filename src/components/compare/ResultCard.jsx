@@ -86,19 +86,21 @@ function ResultCard({ chartConfig, dataConfigs }) {
 
   useEffect(() => {
     dbWorker.value.onmessage = ({ data }) => {
-      const datasets = data.results.map(({ columns, values }, idx) => ({
-        label: `${dataConfigs[idx].tableName} (${columns[1]})`,
-        data: values.map((val) => ({ x: val[0], y: val[1] })),
-        parsing: false,
-        normalized: true,
-        backgroundColor: dataConfigs[idx].backgroundColor,
-        borderColor: dataConfigs[idx].borderColor,
-      }));
-      chartRef.current.data = { datasets };
-      chartConfig.forEach((conf) =>
-        setPropByString(chartRef.current, conf[0], conf[1])
-      );
-      chartRef.current.update();
+      if (data.results?.length) {
+        const datasets = data.results.map(({ columns, values }, idx) => ({
+          label: `${dataConfigs[idx].tableName} (${columns[1]})`,
+          data: values.map((val) => ({ x: val[0], y: val[1] })),
+          parsing: false,
+          normalized: true,
+          backgroundColor: dataConfigs[idx].backgroundColor,
+          borderColor: dataConfigs[idx].borderColor,
+        }));
+        chartRef.current.data = { datasets };
+        chartConfig.forEach((conf) =>
+          setPropByString(chartRef.current, conf[0], conf[1])
+        );
+        chartRef.current.update();
+      }
     };
 
     const sql = dataConfigs

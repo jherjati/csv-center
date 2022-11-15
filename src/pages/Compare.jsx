@@ -1,17 +1,14 @@
-import { useErrorBoundary, useState } from "preact/hooks";
+import { useErrorBoundary } from "preact/hooks";
 import PageError from "../components/core/PageError";
 import EmptyDb from "../components/core/EmptyDb";
 import { useTables } from "../hooks";
 import { setSnackContent } from "../utils";
 import ConfigCard from "../components/compare/ConfigCard";
 import ResultCard from "../components/compare/ResultCard";
+import { chartConfig, dataConfigs } from "../contexts";
 
 function Compare() {
   const { dbTables } = useTables();
-  const [chartConfig, setChartConfig] = useState([
-    ["options.scales.x.title.text", null],
-  ]);
-  const [dataConfigs, setDataConfigs] = useState([]);
 
   const [error, resetError] = useErrorBoundary((error) => {
     console.error(error);
@@ -33,12 +30,15 @@ function Compare() {
           {(!dbTables || !dbTables.length) && <EmptyDb />}
           {dbTables && (
             <>
-              <ResultCard chartConfig={chartConfig} dataConfigs={dataConfigs} />
+              <ResultCard
+                chartConfig={chartConfig.value}
+                dataConfigs={dataConfigs.value}
+              />
               <ConfigCard
-                chartConfig={chartConfig}
-                dataConfigs={dataConfigs}
-                setChartConfig={setChartConfig}
-                setDataConfigs={setDataConfigs}
+                chartConfig={chartConfig.value}
+                dataConfigs={dataConfigs.value}
+                setChartConfig={(i) => (chartConfig.value = i)}
+                setDataConfigs={(i) => (dataConfigs.value = i)}
                 dbTables={dbTables}
               />
             </>
