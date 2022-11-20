@@ -11,6 +11,7 @@
     "push": "aws s3 sync dist s3://csv.center --region ap-southeast-1 --endpoint-url https://s3.ap-southeast-1.amazonaws.com --profile mikoding"
   },
   "dependencies": {
+    "@builder.io/partytown": "^0.7.2",
     "@codemirror/lang-sql": "^6.3.2",
     "@headlessui/react": "^1.7.2",
     "@heroicons/react": "^2.0.11",

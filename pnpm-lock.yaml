@@ -2,6 +2,7 @@ lockfileVersion: 5.3
 
 specifiers:
   '@babel/core': ^7.19.3
+  '@builder.io/partytown': ^0.7.2
   '@codemirror/lang-sql': ^6.3.2
   '@headlessui/react': ^1.7.2
   '@heroicons/react': ^2.0.11
@@ -30,6 +31,7 @@ specifiers:
   wouter-preact: ^2.8.0-alpha.2
 
 dependencies:
+  '@builder.io/partytown': 0.7.2
   '@codemirror/lang-sql': 6.3.2
   '@headlessui/react': 1.7.3_4549b4a5bcffaf846d0a2ca1661fb7ff
   '@heroicons/react': 2.0.12_@preact+compat@17.1.2
@@ -1253,6 +1255,11 @@ packages:
       '@babel/helper-validator-identifier': 7.19.1
       to-fast-properties: 2.0.0
     dev: true
+
+  /@builder.io/partytown/0.7.2:
+    resolution: {integrity: sha512-TmRHuN4gdsOJxBGsPPirJAMuXDm0o9cx9t5ltSson+F+K5ES3eNiBCxBGvSSkoEARvZ+kl1n7WVi+8qNyJdeAQ==}
+    hasBin: true
+    dev: false
 
   /@codemirror/autocomplete/6.3.0:
     resolution: {integrity: sha512-4jEvh3AjJZTDKazd10J6ZsCIqaYxDMCeua5ouQxY8hlFIml+nr7le0SgBhT3SIytFBmdzPK3AUhXGuW3T79nVg==}

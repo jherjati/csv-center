@@ -1,12 +1,17 @@
+import path from "path";
 import { defineConfig } from "vite";
+import alias from "@rollup/plugin-alias";
 import preact from "@preact/preset-vite";
 import { VitePWA } from "vite-plugin-pwa";
-import alias from "@rollup/plugin-alias";
+import { partytownVite } from "@builder.io/partytown/utils";
 
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [
     preact(),
+    partytownVite({
+      dest: path.join(__dirname, "dist", "~partytown"),
+    }),
     VitePWA({
       includeAssets: [
         "favicon.svg",
