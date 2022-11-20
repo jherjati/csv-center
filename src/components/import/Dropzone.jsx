@@ -14,7 +14,7 @@ function Dropzone({ setFile }) {
       onDragOver={stopDefault}
     >
       <input
-        accept='text/csv'
+        // accept='text/csv'
         type='file'
         id='dropzone'
         name='dropzone'
