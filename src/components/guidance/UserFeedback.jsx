@@ -26,7 +26,7 @@ export default function UserFeedback() {
       const data = Object.fromEntries(form.entries());
       let res;
       if (filename) {
-        res = await fetch("https://3ey9cs7f.directus.app/files", {
+        res = await fetch("https://panel.braga.co.id/panel/files", {
           method: "POST",
           body: form,
         });
@@ -34,7 +34,7 @@ export default function UserFeedback() {
       } else {
         delete data.attachment;
       }
-      res = await fetch("https://3ey9cs7f.directus.app/items/user_feedback", {
+      res = await fetch("https://panel.braga.co.id/panel/items/user_feedback", {
         method: "POST",
         body: JSON.stringify(data),
         headers: {
