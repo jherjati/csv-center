@@ -18,7 +18,7 @@ import {
   DocumentArrowUpIcon,
   InboxIcon,
 } from "@heroicons/react/20/solid";
-import { onBefoleUnload, types } from "../../constants";
+import { onBefoleUnload } from "../../constants";
 import { filterToString, filterToValues } from "../../utils";
 
 function DbTable({ name, isInFormats, children }) {
@@ -58,12 +58,7 @@ function DbTable({ name, isInFormats, children }) {
         action: "exec",
         sql: `SELECT ${[{ name: "rowid" }, ...columns]
           .map((el, idx) => {
-            if (
-              types
-                .filter((ty) => ty.label.includes("date"))
-                .map((ty) => ty.label)
-                .includes(el.type)
-            ) {
+            if (el.type?.includes("date")) {
               newDateIndeks.push(idx);
             }
             return el.name;
@@ -124,13 +119,7 @@ function DbTable({ name, isInFormats, children }) {
             const form = document.getElementById("detail-form");
             res.columns.forEach((name, idx) => {
               if (
-                types
-                  .find(
-                    (type) =>
-                      type.label ===
-                      columns.find((col) => col.name === name).type
-                  )
-                  .label.includes("date")
+                columns.find((col) => col.name === name).type.includes("date")
               ) {
                 form[name].value = dateFormat(
                   new Date(res.values[0][idx] * 1000),
@@ -149,7 +138,10 @@ function DbTable({ name, isInFormats, children }) {
               dateIndeks.current.forEach((indeks) => {
                 newRow[indeks] = dateFormat(
                   new Date(newRow[indeks] * 1000),
-                  "yyyy-MM-dd"
+                  /\[(.*?)\]/.exec(
+                    columns.find((col) => col.name === toReturn.columns[indeks])
+                      .type
+                  )[1]
                 );
               });
               return newRow;
@@ -161,9 +153,22 @@ function DbTable({ name, isInFormats, children }) {
           if (!data.finished) {
             writerRef.current.write(
               encoder.encode(
-                unparse([columns.map((col) => data.row[col.name])], {
-                  delimiter: ";",
-                }) + "\r\n"
+                unparse(
+                  [
+                    columns.map(({ name, type }) => {
+                      if (type.includes("date")) {
+                        return dateFormat(
+                          new Date(data.row[name] * 1000),
+                          /\[(.*?)\]/.exec(type)[1]
+                        );
+                      }
+                      return data.row[name];
+                    }),
+                  ],
+                  {
+                    delimiter: ";",
+                  }
+                ) + "\r\n"
               )
             );
             window.addEventListener("beforeunload", onBefoleUnload);

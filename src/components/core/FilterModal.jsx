@@ -1,7 +1,7 @@
 import { Dialog, Transition } from "@headlessui/react";
 import { Fragment } from "preact";
 import { useState } from "preact/hooks";
-import { operators, types } from "../../constants";
+import { getDbType, getInputType, operators } from "../../constants";
 import { PlusIcon, TrashIcon, XMarkIcon } from "@heroicons/react/20/solid";
 import { parse, format } from "date-fns";
 import { setSnackContent } from "../../utils";
@@ -26,13 +26,9 @@ export default function FilterModal({
         data["opr-add"],
         ["IS NULL", "IS NOT NULL"].includes(data["opr-add"])
           ? ""
-          : types
-              .find(
-                (ty) =>
-                  ty.label ===
-                  columns.find((col) => col.name === data["col-add"]).type
-              )
-              .label.includes("date")
+          : columns
+              .find((col) => col.name === data["col-add"])
+              .type.includes("date")
           ? parse(data["val-add"], "yyyy-MM-dd", new Date()) / 1000
           : data["val-add"],
       ];
@@ -100,11 +96,9 @@ export default function FilterModal({
                   </label>
                   <span className='hidden col-span-1'></span>
                   {filter.map((el, id) => {
-                    const thisType = types.find(
-                      (ty) =>
-                        ty.label ===
-                        columns.find((col) => col.name === el[0]).type
-                    );
+                    const thisType = columns.find(
+                      (col) => col.name === el[0]
+                    ).type;
                     return (
                       <>
                         {/* Column */}
@@ -139,10 +133,10 @@ export default function FilterModal({
                         {/* Value */}
                         <input
                           disabled
-                          type={thisType.input}
+                          type={getInputType(thisType)}
                           className={`col-span-3 text-gray-500 shadow-sm focus:ring-teal-500 focus:border-teal-500 block w-full sm:text-sm border-gray-300 h-10`}
                           defaultValue={
-                            thisType.label.includes("date")
+                            thisType.includes("date")
                               ? format(new Date(el[2] * 1000), "yyyy-MM-dd")
                               : el[2]
                           }
@@ -206,13 +200,8 @@ export default function FilterModal({
 
                   {/* Value */}
                   <input
-                    type={types.find((ty) => ty.label === activeType).input}
-                    step={
-                      types.find((ty) => ty.label === activeType).db ===
-                      "integer"
-                        ? 1
-                        : "any"
-                    }
+                    type={getInputType(activeType)}
+                    step={getDbType(activeType) === "integer" ? 1 : "any"}
                     name={"val-add"}
                     id={"val-add"}
                     className={`col-span-3 shadow-sm focus:ring-teal-500 focus:border-teal-500 block w-full sm:text-sm border-gray-300 h-10`}

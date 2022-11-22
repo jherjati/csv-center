@@ -77,6 +77,24 @@ export const types = [
   { label: "date [yyyy-MM-dd]", db: "integer", input: "date" },
 ];
 
+export const getInputType = (appType) => {
+  if (appType === "text") {
+    return "text";
+  } else if (appType.includes("date")) {
+    return "date";
+  } else if (["integer", "real"].includes(appType)) {
+    return "number";
+  }
+};
+
+export const getDbType = (appType) => {
+  if (["text", "real"].includes(appType)) {
+    return appType;
+  } else if (appType === "integer" || appType.includes("date")) {
+    return "integer";
+  }
+};
+
 export const chartForm = {
   line: [
     {
