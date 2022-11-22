@@ -56,7 +56,7 @@ function ConfigCard({
         <input
           type='text'
           name='options.scales.x.title.text'
-          className='w-full mt-1 shadow-sm focus:ring-teal-500 focus:border-teal-500 block sm:text-sm border-gray-300 rounded-md'
+          className='w-full mt-1 shadow-sm focus:ring-teal-500 focus:border-teal-500 block text-sm border-gray-300 rounded-md'
           value={
             localGeneralConfig.find(
               ([name]) => name === "options.scales.x.title.text"
@@ -145,7 +145,7 @@ function ConfigCard({
                 </label>
                 <select
                   name={key}
-                  className='mt-1 shadow-sm focus:ring-teal-500 focus:border-teal-500 block w-full sm:text-sm border-gray-300 rounded-md'
+                  className='mt-1 shadow-sm focus:ring-teal-500 focus:border-teal-500 block w-full text-sm border-gray-300 rounded-md'
                   value={localChartConfig[tabIdx][key]}
                   onChange={handleChange}
                 >
@@ -165,7 +165,7 @@ function ConfigCard({
                 </label>
                 <select
                   name={key}
-                  className='mt-1 shadow-sm focus:ring-teal-500 focus:border-teal-500 block w-full sm:text-sm border-gray-300 rounded-md'
+                  className='mt-1 shadow-sm focus:ring-teal-500 focus:border-teal-500 block w-full text-sm border-gray-300 rounded-md'
                   value={localChartConfig[tabIdx][key]}
                   onChange={handleChange}
                 >
@@ -190,7 +190,7 @@ function ConfigCard({
                   name={key}
                   className={`mt-1 shadow-sm focus:ring-teal-500 focus:border-teal-500 block w-full ${
                     configForm[key][0] === "color" ? "h-10 p-0 border-0" : ""
-                  } sm:text-sm border-gray-300 rounded-md`}
+                  } text-sm border-gray-300 rounded-md`}
                   value={localChartConfig[tabIdx][key]}
                   onChange={handleChange}
                 />

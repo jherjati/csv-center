@@ -59,17 +59,17 @@ export default function FilterModal({
         </Transition.Child>
 
         <div className='fixed inset-0 z-10 overflow-y-auto'>
-          <div className='flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0'>
+          <div className='flex min-h-full justify-center text-center items-center p-0'>
             <Transition.Child
               as={Fragment}
               enter='ease-out duration-300'
-              enterFrom='opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95'
-              enterTo='opacity-100 translate-y-0 sm:scale-100'
+              enterFrom='opacity-0 scale-95'
+              enterTo='opacity-100 scale-100'
               leave='ease-in duration-200'
-              leaveFrom='opacity-100 translate-y-0 sm:scale-100'
-              leaveTo='opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95'
+              leaveFrom='opacity-100 scale-100'
+              leaveTo='opacity-0 scale-95'
             >
-              <Dialog.Panel className='relative transform overflow-hidden rounded-lg bg-white px-4 pt-5 pb-4 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-xl sm:p-6'>
+              <Dialog.Panel className='relative transform overflow-hidden rounded-lg bg-white px-4 pt-5 pb-4 text-left shadow-xl transition-all my-8 w-full max-w-xl p-6'>
                 <div className='flex justify-between items-center'>
                   <h4 className='text-lg leading-6 font-medium text-gray-900 capitalize'>
                     {tableName}
@@ -84,7 +84,7 @@ export default function FilterModal({
                     <XMarkIcon className='h-4 w-4' aria-hidden='true' />
                   </button>
                 </div>
-                <div className='mt-3 grid grid-cols-1 gap-y-2 sm:grid-cols-10'>
+                <div className='mt-3 grid gap-y-2 grid-cols-10'>
                   <label className='block text-sm font-medium text-gray-700 col-span-3'>
                     Column
                   </label>
@@ -104,7 +104,7 @@ export default function FilterModal({
                         {/* Column */}
                         <select
                           disabled
-                          className='col-span-3 shadow-sm focus:ring-teal-500 focus:border-teal-500 block sm:text-sm border-gray-300 rounded-l-md'
+                          className='col-span-3 shadow-sm focus:ring-teal-500 focus:border-teal-500 block text-sm border-gray-300 rounded-l-md'
                           defaultValue={el[0]}
                         >
                           {columns.map((el) => (
@@ -117,7 +117,7 @@ export default function FilterModal({
                         {/* Operator */}
                         <select
                           disabled
-                          className='col-span-3 shadow-sm focus:ring-teal-500 focus:border-teal-500 block sm:text-sm border-gray-300'
+                          className='col-span-3 shadow-sm focus:ring-teal-500 focus:border-teal-500 block text-sm border-gray-300'
                           defaultValue={el[1]}
                         >
                           {Object.keys(operators)
@@ -134,7 +134,7 @@ export default function FilterModal({
                         <input
                           disabled
                           type={getInputType(thisType)}
-                          className={`col-span-3 text-gray-500 shadow-sm focus:ring-teal-500 focus:border-teal-500 block w-full sm:text-sm border-gray-300 h-10`}
+                          className={`col-span-3 text-gray-500 shadow-sm focus:ring-teal-500 focus:border-teal-500 block w-full text-sm border-gray-300 h-10`}
                           defaultValue={
                             thisType.includes("date")
                               ? format(new Date(el[2] * 1000), "yyyy-MM-dd")
@@ -164,7 +164,7 @@ export default function FilterModal({
                   <select
                     name={"col-add"}
                     id={"col-add"}
-                    className='cursor-pointer col-span-3 shadow-sm focus:ring-teal-500 focus:border-teal-500 block sm:text-sm border-gray-300 rounded-l-md'
+                    className='cursor-pointer col-span-3 shadow-sm focus:ring-teal-500 focus:border-teal-500 block text-sm border-gray-300 rounded-l-md'
                     onChange={(event) =>
                       setActiveType(
                         columns.find((el) => el.name === event.target.value)
@@ -183,7 +183,7 @@ export default function FilterModal({
                   <select
                     name={"opr-add"}
                     id={"opr-add"}
-                    className='cursor-pointer col-span-3 shadow-sm focus:ring-teal-500 focus:border-teal-500 block sm:text-sm border-gray-300'
+                    className='cursor-pointer col-span-3 shadow-sm focus:ring-teal-500 focus:border-teal-500 block text-sm border-gray-300'
                   >
                     {operators["base"].map((el) => (
                       <option key={el.sign} value={el.sign}>
@@ -204,7 +204,7 @@ export default function FilterModal({
                     step={getDbType(activeType) === "integer" ? 1 : "any"}
                     name={"val-add"}
                     id={"val-add"}
-                    className={`col-span-3 shadow-sm focus:ring-teal-500 focus:border-teal-500 block w-full sm:text-sm border-gray-300 h-10`}
+                    className={`col-span-3 shadow-sm focus:ring-teal-500 focus:border-teal-500 block w-full text-sm border-gray-300 h-10`}
                   />
 
                   {/* Action */}
