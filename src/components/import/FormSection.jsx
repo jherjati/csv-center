@@ -16,7 +16,7 @@ function FormSection({ tabName, fields, columns }) {
               <select
                 name={col}
                 id={col + "_mapping"}
-                className='mt-2 w-full shadow-sm focus:ring-teal-500 focus:border-teal-500 block sm:text-sm border-gray-300 rounded-md'
+                className='mt-2 w-full shadow-sm focus:ring-teal-500 focus:border-teal-500 block text-sm border-gray-300 rounded-md'
               >
                 {types.map(({ label }) => (
                   <option key={label} value={label}>
@@ -41,7 +41,7 @@ function FormSection({ tabName, fields, columns }) {
                 <select
                   name={col.name}
                   id={col.name + "_mapping"}
-                  className='mt-2 w-full shadow-sm focus:ring-teal-500 focus:border-teal-500 block sm:text-sm border-gray-300 rounded-md'
+                  className='mt-2 w-full shadow-sm focus:ring-teal-500 focus:border-teal-500 block text-sm border-gray-300 rounded-md'
                   defaultValue={fields.find((el) =>
                     candidates.includes(dbNameEscaper(el))
                   )}

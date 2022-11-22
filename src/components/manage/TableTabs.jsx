@@ -2,7 +2,7 @@ import { classNames } from "../../utils";
 
 export default function TableTabs({ dbTables, setActiveTable, activeTable }) {
   return (
-    <div className='hidden sm:block mt-6'>
+    <div className='mt-6'>
       <nav className='flex' aria-label='Tabs'>
         {dbTables.map((tab, idx) => (
           <button

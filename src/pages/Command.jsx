@@ -93,14 +93,14 @@ PRAGMA table_info('table_name');
                   style={{ animation: "forwards fadein1 1.6s" }}
                   className='mt-6 px-6 pb-6 pt-3 bg-white rounded-lg shadow'
                 >
-                  <div className='-mx-4 flex flex-col sm:-mx-6 md:mx-0 overflow-x-scroll'>
+                  <div className='flex flex-col mx-0 overflow-x-scroll'>
                     <table className='min-w-full divide-y divide-gray-300'>
                       <thead>
                         <tr>
                           {res.columns.map((el) => (
                             <th
                               scope='col'
-                              className='hidden py-3.5 px-3 text-right text-sm font-semibold text-gray-900 sm:table-cell'
+                              className='py-3.5 px-3 text-right text-sm font-semibold text-gray-900 table-cell'
                             >
                               {el}
                             </th>
@@ -111,7 +111,7 @@ PRAGMA table_info('table_name');
                         {res.values.map((row) => (
                           <tr className='border-b border-gray-200'>
                             {row.map((el) => (
-                              <td className='hidden py-4 px-3 text-right text-sm text-gray-500 sm:table-cell'>
+                              <td className='py-4 px-3 text-right text-sm text-gray-500 table-cell'>
                                 {el}
                               </td>
                             ))}

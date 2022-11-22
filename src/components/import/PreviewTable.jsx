@@ -20,14 +20,14 @@ export default function PreviewTable({ fields, rows, fileString }) {
         <Toggle />
       </div>
       {fileString && (
-        <div className='-mx-4 mt-3 flex flex-col sm:-mx-6 md:mx-0 overflow-x-scroll'>
+        <div className='mt-3 flex flex-col -mx-6 md:mx-0 overflow-x-scroll'>
           <table className='min-w-full divide-y divide-gray-300'>
             <thead>
               <tr>
                 {fields.map((el) => (
                   <th
                     scope='col'
-                    className='hidden py-3.5 px-3 text-right text-sm font-semibold text-gray-900 sm:table-cell'
+                    className='py-3.5 px-3 text-right text-sm font-semibold text-gray-900 table-cell'
                   >
                     {el}
                   </th>
@@ -38,7 +38,7 @@ export default function PreviewTable({ fields, rows, fileString }) {
               {rows.map((row, idx) => (
                 <tr key={idx} className='border-b border-gray-200'>
                   {fields.map((el) => (
-                    <td className='hidden py-4 px-3 text-right text-sm text-gray-500 sm:table-cell'>
+                    <td className='py-4 px-3 text-right text-sm text-gray-500 table-cell'>
                       {row[el]}
                     </td>
                   ))}

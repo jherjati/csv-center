@@ -30,10 +30,10 @@ function Insight() {
   } else {
     return (
       <main className='py-6'>
-        <div className='mx-auto max-w-7xl px-4 sm:px-6 lg:px-8'>
+        <div className='mx-auto max-w-7xl px-8'>
           <h1 className='text-2xl font-semibold text-gray-900'>Insight</h1>
         </div>
-        <div className='mx-auto max-w-7xl px-4 sm:px-6 md:px-8'>
+        <div className='mx-auto max-w-7xl px-8'>
           {(!dbTables || !dbTables.length) && <EmptyDb />}
           {dbTables && (
             <TableMetric
@@ -47,7 +47,7 @@ function Insight() {
               )}
             >
               <select
-                className='block w-56 rounded-md border-gray-300 py-2 pl-3 pr-10 text-base focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm'
+                className='block w-56 rounded-md border-gray-300 py-2 pl-3 pr-10 focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 text-sm'
                 value={activeTable}
                 onChange={(e) => {
                   setActiveTable(e.target.value);

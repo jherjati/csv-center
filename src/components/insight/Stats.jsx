@@ -30,7 +30,7 @@ export default function Stats({ column, values }) {
           <dt className='text-base font-normal text-gray-900'>
             {item.name} {column} value
           </dt>
-          <dd className='mt-1 flex items-baseline justify-between sm:block lg:flex'>
+          <dd className='mt-1 items-baseline justify-between block lg:flex'>
             <div className='flex items-baseline text-2xl font-semibold text-indigo-600'>
               {parseFloat(values[idx]).toFixed(2)}
               <span className='ml-2 text-sm font-medium text-gray-500'>
@@ -44,7 +44,7 @@ export default function Stats({ column, values }) {
                   item.changeType === "increase"
                     ? "bg-green-100 text-green-800"
                     : "bg-red-100 text-red-800",
-                  "inline-flex items-baseline px-2.5 py-0.5 rounded-full text-sm font-medium sm:mt-2 lg:mt-0"
+                  "inline-flex items-baseline px-2.5 py-0.5 rounded-full text-sm font-medium"
                 )}
               >
                 {item.changeType === "increase" ? (

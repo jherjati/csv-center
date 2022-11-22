@@ -83,7 +83,7 @@ export default function UserFeedback() {
           rows={9}
           name='description'
           id='description'
-          className='block w-full resize-none border-0 py-0 placeholder-gray-500 focus:ring-0 sm:text-sm'
+          className='block w-full resize-none border-0 py-0 placeholder-gray-500 focus:ring-0 text-sm'
           placeholder='Write a description...'
           defaultValue={""}
         />
@@ -106,20 +106,20 @@ export default function UserFeedback() {
             <>
               <Listbox.Label className='sr-only'> Add a label </Listbox.Label>
               <div className='relative'>
-                <Listbox.Button className='relative inline-flex items-center whitespace-nowrap rounded-full bg-gray-50 py-2 px-2 text-sm font-medium text-gray-500 hover:bg-gray-100 sm:px-3'>
+                <Listbox.Button className='relative inline-flex items-center whitespace-nowrap rounded-full bg-gray-50 py-2 text-sm font-medium text-gray-500 hover:bg-gray-100 px-3'>
                   <TagIcon
                     className={classNames(
                       labelled.value === null
                         ? "text-gray-300"
                         : "text-gray-500",
-                      "h-5 w-5 flex-shrink-0 sm:-ml-1"
+                      "h-5 w-5 flex-shrink-0 -ml-1"
                     )}
                     aria-hidden='true'
                   />
                   <span
                     className={classNames(
                       labelled.value === null ? "" : "text-gray-900",
-                      "hidden truncate sm:ml-2 sm:block"
+                      "truncate ml-2 block"
                     )}
                   >
                     {labelled.value === null ? "Label" : labelled.name}
@@ -133,7 +133,7 @@ export default function UserFeedback() {
                   leaveFrom='opacity-100'
                   leaveTo='opacity-0'
                 >
-                  <Listbox.Options className='absolute right-0 z-10 mt-1 max-h-56 w-52 overflow-auto rounded-lg bg-white py-3 text-base shadow ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm'>
+                  <Listbox.Options className='absolute right-0 z-10 mt-1 max-h-56 w-52 overflow-auto rounded-lg bg-white py-3 shadow ring-1 ring-black ring-opacity-5 focus:outline-none text-sm'>
                     {labels.map((label) => (
                       <Listbox.Option
                         key={label.value}
