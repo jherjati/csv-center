@@ -2878,7 +2878,7 @@ function onModuleReady(SQL) {
         buffer: buff,
       };
       try {
-        return Comlink.transfer(result, result);
+        return Comlink.transfer(result, [result]);
       } catch (error) {
         return result;
       }

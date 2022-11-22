@@ -4,10 +4,11 @@ import PageError from "../components/core/PageError";
 import Dropzone from "../components/import/Dropzone";
 import Mapping from "../components/import/Mapping";
 import PreviewTable from "../components/import/PreviewTable";
-import { dbWorker, formats, withHeader } from "../contexts";
+import { DBWorker, formats, withHeader } from "../contexts";
 import { setSnackContent } from "../utils";
 import { useLocation } from "wouter-preact";
 import { InboxArrowDownIcon } from "@heroicons/react/20/solid";
+import { transfer } from "comlink";
 
 function Import() {
   const [_, setLocation] = useLocation();
@@ -97,28 +98,20 @@ function Import() {
             className='hidden'
             onChange={(event) => {
               const reader = new FileReader();
-              dbWorker.value.onmessage = function ({ data }) {
-                if (data.id === "load_session") {
-                  setLocation("/manage");
-                }
-              };
               reader.onload = function () {
-                try {
-                  dbWorker.value.postMessage(
+                DBWorker.value
+                  .pleaseDo(
                     {
                       id: "load_session",
                       action: "open",
-                      buffer: reader.result,
+                      buffer: transfer(reader.result, [reader.result]),
                     },
                     [reader.result]
-                  );
-                } catch (error) {
-                  dbWorker.value.postMessage({
-                    id: "load_session",
-                    action: "open",
-                    buffer: reader.result,
+                  )
+                  .then((data) => {
+                    console.log(data);
+                    setLocation("/manage");
                   });
-                }
               };
               reader.readAsArrayBuffer(event.target.files[0]);
             }}
