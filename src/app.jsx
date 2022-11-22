@@ -12,50 +12,54 @@ import SWModal from "./components/core/SWModal";
 import SnackBar from "./components/core/Snackbar";
 import Sidebar from "./components/layout/Sidebar";
 import { useInitDB } from "./hooks";
+import Mobile from "./pages/Mobile";
 
 export default function App() {
   useInitDB();
 
   return (
     <>
-      <Sidebar />
+      <div className='hidden lg:block'>
+        <Sidebar />
 
-      <div className='flex flex-1 flex-col pl-56'>
-        <Switch className='flex-1'>
-          <Route path='/'>
-            <Suspense fallback={<></>}>
-              <Import />
-            </Suspense>
-          </Route>
-          <Route path='/manage'>
-            <Suspense fallback={<></>}>
-              <Manage />
-            </Suspense>
-          </Route>
-          <Route path='/compare'>
-            <Suspense fallback={<></>}>
-              <Compare />
-            </Suspense>
-          </Route>
-          <Route path='/command'>
-            <Suspense fallback={<></>}>
-              <Command />
-            </Suspense>
-          </Route>
-          <Route path='/insight'>
-            <Suspense fallback={<></>}>
-              <Insight />
-            </Suspense>
-          </Route>
-          <Route path='/guidance'>
-            <Suspense fallback={<></>}>
-              <Guidance />
-            </Suspense>
-          </Route>
-        </Switch>
+        <div className='flex flex-1 flex-col pl-56'>
+          <Switch className='flex-1'>
+            <Route path='/'>
+              <Suspense fallback={<></>}>
+                <Import />
+              </Suspense>
+            </Route>
+            <Route path='/manage'>
+              <Suspense fallback={<></>}>
+                <Manage />
+              </Suspense>
+            </Route>
+            <Route path='/compare'>
+              <Suspense fallback={<></>}>
+                <Compare />
+              </Suspense>
+            </Route>
+            <Route path='/command'>
+              <Suspense fallback={<></>}>
+                <Command />
+              </Suspense>
+            </Route>
+            <Route path='/insight'>
+              <Suspense fallback={<></>}>
+                <Insight />
+              </Suspense>
+            </Route>
+            <Route path='/guidance'>
+              <Suspense fallback={<></>}>
+                <Guidance />
+              </Suspense>
+            </Route>
+          </Switch>
+        </div>
+        <SWModal />
+        <SnackBar />
       </div>
-      <SWModal />
-      <SnackBar />
+      <Mobile />
     </>
   );
 }
