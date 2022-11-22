@@ -10,7 +10,7 @@ import { formats } from "../../contexts";
 export default function Tabs({ tabName, setTabName, setFocusFormat, setOpen }) {
   return (
     <div className='border-b border-gray-200'>
-      <nav className='-mb-px flex' aria-label='Tabs'>
+      <nav className='-mb-px flex overflow-x-scroll' aria-label='Tabs'>
         <button
           onClick={() => setTabName("Dynamic")}
           type={"button"}
@@ -19,7 +19,7 @@ export default function Tabs({ tabName, setTabName, setFocusFormat, setOpen }) {
             "Dynamic" === tabName
               ? "border-teal-500 text-teal-600"
               : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300",
-            "group inline-flex items-center px-4 py-3 border-b-2 font-medium text-sm flex-grow capitalize"
+            "group inline-flex items-center px-4 py-3 border-b-2 font-medium text-sm grow capitalize"
           )}
           aria-current={"Dynamic" === tabName ? "page" : undefined}
         >
@@ -43,7 +43,7 @@ export default function Tabs({ tabName, setTabName, setFocusFormat, setOpen }) {
               tab === tabName
                 ? "border-teal-500 text-teal-600"
                 : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300",
-              "group inline-flex items-center px-4 py-3 border-b-2 font-medium text-sm flex-grow capitalize"
+              "group inline-flex items-center px-4 py-3 border-b-2 font-medium text-sm grow capitalize"
             )}
             aria-current={tab === tabName ? "page" : undefined}
           >
@@ -58,7 +58,7 @@ export default function Tabs({ tabName, setTabName, setFocusFormat, setOpen }) {
             />
             <span className='grow text-left'>{tab}</span>
             <PencilSquareIcon
-              className='h-5 w-5'
+              className='h-5 w-5 ml-3'
               onClick={(event) => {
                 event.stopPropagation();
                 setFocusFormat(tab);
