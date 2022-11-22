@@ -1,4 +1,4 @@
-import { dbWorker, formats, withHeader } from "../../contexts";
+import { DBWorker, formats, withHeader } from "../../contexts";
 import { useLocation } from "wouter-preact";
 import { parse } from "papaparse";
 import { parse as dateParse } from "date-fns";
@@ -40,13 +40,6 @@ function Mapping({ fields, file, tabName, setTabName }) {
       const form = new FormData(event.target);
       let stepFunction,
         tableName = tabName;
-      let uniParser;
-
-      dbWorker.value.onmessage = ({ data }) => {
-        if (data.id === "insert row") {
-          uniParser.resume();
-        }
-      };
 
       if (tabName === "Dynamic") {
         tableName = file.name.split(".")[0];
@@ -80,7 +73,7 @@ function Mapping({ fields, file, tabName, setTabName }) {
         localStorage.setItem("predefined_tables", JSON.stringify(newFormats));
         formats.value = newFormats;
 
-        dbWorker.value.postMessage({
+        await DBWorker.value.pleaseDo({
           id: "create table",
           action: "exec",
           sql: `CREATE TABLE IF NOT EXISTS '${tableName}'( ${formatDynamic(
@@ -108,14 +101,15 @@ function Mapping({ fields, file, tabName, setTabName }) {
             .join(", ")} );
           `;
 
-          uniParser = parser;
-          dbWorker.value.postMessage({
-            id: "insert row",
-            action: "exec",
-            sql: statement,
-            params: Object.keys(formData).map((key) => row.data[key]),
-          });
           parser.pause();
+          DBWorker.value
+            .pleaseDo({
+              id: "insert row",
+              action: "exec",
+              sql: statement,
+              params: Object.keys(formData).map((key) => row.data[key]),
+            })
+            .then(() => parser.resume());
         };
       } else {
         const mapping = Object.fromEntries(form.entries());
@@ -137,7 +131,7 @@ function Mapping({ fields, file, tabName, setTabName }) {
           }
         });
 
-        dbWorker.value.postMessage({
+        await DBWorker.value.pleaseDo({
           id: "create table",
           action: "exec",
           sql: `CREATE TABLE IF NOT EXISTS '${tableName}'( ${formatColumns(
@@ -164,14 +158,15 @@ function Mapping({ fields, file, tabName, setTabName }) {
             .join(", ")} );
             `;
 
-          uniParser = parser;
-          dbWorker.value.postMessage({
-            id: "insert row",
-            action: "exec",
-            sql: statement,
-            params: columns.map((col) => row.data[mapping[col.name]]),
-          });
           parser.pause();
+          DBWorker.value
+            .pleaseDo({
+              id: "insert row",
+              action: "exec",
+              sql: statement,
+              params: columns.map((col) => row.data[mapping[col.name]]),
+            })
+            .then(() => parser.resume());
         };
       }
 
@@ -189,8 +184,13 @@ function Mapping({ fields, file, tabName, setTabName }) {
           ]);
         },
         complete: function () {
-          dbWorker.value.onmessage = ({ data }) => {
-            if (data.id === "check complete") {
+          DBWorker.value
+            .pleaseDo({
+              id: "check complete",
+              action: "exec",
+              sql: `PRAGMA main.quick_check('${tableName}')`,
+            })
+            .then((data) => {
               setSnackContent([
                 "success",
                 tableName + " Table Checked",
@@ -199,13 +199,7 @@ function Mapping({ fields, file, tabName, setTabName }) {
                   : "All is well, happy exploration!",
               ]);
               setLocation("/manage");
-            }
-          };
-          dbWorker.value.postMessage({
-            id: "check complete",
-            action: "exec",
-            sql: `PRAGMA main.quick_check('${tableName}')`,
-          });
+            });
         },
       });
     } catch (error) {

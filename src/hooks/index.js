@@ -1,6 +1,6 @@
 import { useCallback, useState, useMemo, useEffect } from "preact/hooks";
 import { onBefoleUnload } from "../constants";
-import { dbWorker } from "../contexts";
+import { DBWorker } from "../contexts";
 
 export const useSort = () => {
   const [sortAsc, setSortAsc] = useState({});
@@ -33,17 +33,14 @@ export const useSort = () => {
 
 export const useInitDB = () => {
   useEffect(() => {
-    try {
-      window.addEventListener("beforeunload", onBefoleUnload);
-      dbWorker.value.onerror = (error) => {
-        console.error(error);
-      };
-      dbWorker.value.postMessage({ action: "open" });
-    } catch (err) {
-      console.error(err);
-    }
+    window.addEventListener("beforeunload", onBefoleUnload);
+    DBWorker.value
+      .pleaseDo({
+        action: "open",
+      })
+      .catch(console.error);
     return () => {
-      dbWorker.value.postMessage({ action: "close" });
+      DBWorker.value.pleaseDo({ action: "close" });
     };
   }, []);
 };
@@ -51,15 +48,17 @@ export const useInitDB = () => {
 export const useTables = () => {
   const [dbTables, setDbTables] = useState();
   useEffect(() => {
-    dbWorker.value.onmessage = ({ data }) => {
-      if (data.results)
-        setDbTables(data.results[0]?.values?.map((el) => el[0]));
-    };
-    dbWorker.value.postMessage({
-      id: "browse table",
-      action: "exec",
-      sql: `SELECT name FROM sqlite_schema WHERE type ='table' AND name NOT LIKE 'sqlite_%';`,
-    });
+    DBWorker.value
+      .pleaseDo({
+        id: "browse table",
+        action: "exec",
+        sql: `SELECT name FROM sqlite_schema WHERE type ='table' AND name NOT LIKE 'sqlite_%';`,
+      })
+      .then((data) => {
+        if (data.results)
+          setDbTables(data.results[0]?.values?.map((el) => el[0]));
+      })
+      .catch(console.error);
   }, []);
 
   return { dbTables };

@@ -15,6 +15,7 @@ specifiers:
   chart.js: ^3.9.1
   chartjs-plugin-annotation: ^2.0.1
   codemirror: ^6.0.1
+  comlink: ^4.3.1
   date-fns: ^2.29.3
   papaparse: ^5.3.2
   postcss: ^8.4.16
@@ -39,6 +40,7 @@ dependencies:
   chart.js: 3.9.1
   chartjs-plugin-annotation: 2.0.1_chart.js@3.9.1
   codemirror: 6.0.1
+  comlink: 4.3.1
   date-fns: 2.29.3
   papaparse: 5.3.2
   preact: 10.11.1
@@ -1920,6 +1922,10 @@ packages:
   /color-name/1.1.4:
     resolution: {integrity: sha512-dOy+3AuW3a2wNbZHIuMZpTcgjGuLU/uBL/ubcZF9OXbDo8ff4O8yVp5Bf0efS8uEoYo5q4Fx7dY9OgQGXgAsQA==}
     dev: true
+
+  /comlink/4.3.1:
+    resolution: {integrity: sha512-+YbhUdNrpBZggBAHWcgQMLPLH1KDF3wJpeqrCKieWQ8RL7atmgsgTQko1XEBK6PsecfopWNntopJ+ByYG1lRaA==}
+    dev: false
 
   /commander/2.20.3:
     resolution: {integrity: sha512-GpVkmM8vF2vQUkj2LvZmD35JxeJOLCwJ9cUkugyk2nuhbv3+mJvpLYYt+0+USMxE+oj+ey/lJEnhZw75x/OMcQ==}
