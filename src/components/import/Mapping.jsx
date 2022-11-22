@@ -2,12 +2,17 @@ import { dbWorker, formats, withHeader } from "../../contexts";
 import { useLocation } from "wouter-preact";
 import { parse } from "papaparse";
 import { parse as dateParse } from "date-fns";
-import { useState, useMemo } from "preact/hooks";
-import { ArrowPathIcon, PlusIcon } from "@heroicons/react/20/solid";
+import { useState, useMemo, useCallback } from "preact/hooks";
+import {
+  ArrowDownCircleIcon,
+  ArrowPathIcon,
+  ArrowUpCircleIcon,
+  PlusCircleIcon,
+} from "@heroicons/react/20/solid";
 import Tabs from "./Tabs";
 import FormatModal from "./FormatModal";
 import FormSection from "./FormSection";
-import { types } from "../../constants";
+import { exportStringifiedJson, parseJsonFile, types } from "../../constants";
 import {
   dbNameEscaper,
   formatColumns,
@@ -16,6 +21,7 @@ import {
   setSnackContent,
   symbolReplacer,
 } from "../../utils";
+import Actions from "../core/Actions";
 
 function Mapping({ fields, file, tabName, setTabName }) {
   const [_, setLocation] = useLocation();
@@ -221,6 +227,33 @@ function Mapping({ fields, file, tabName, setTabName }) {
     setAddOpen(true);
   };
 
+  const importFormat = useCallback(() => {
+    try {
+      let input = document.createElement("input");
+      input.type = "file";
+      input.setAttribute("accept", "application/json");
+      input.onchange = async (event) => {
+        const importedFormats = await parseJsonFile(event.target.files[0]);
+        const newFormats = { ...formats.value };
+        Object.keys(importedFormats).forEach(
+          (key) => (newFormats[key] = importedFormats[key])
+        );
+        localStorage.setItem("predefined_tables", JSON.stringify(newFormats));
+        formats.value = newFormats;
+      };
+      input.click();
+    } catch (error) {}
+  }, [formats.value]);
+
+  const exportFormat = useCallback(() => {
+    try {
+      exportStringifiedJson(
+        "csv_formats.json",
+        localStorage.getItem("predefined_tables")
+      );
+    } catch (error) {}
+  }, []);
+
   return (
     <>
       <form
@@ -232,13 +265,12 @@ function Mapping({ fields, file, tabName, setTabName }) {
           <h4 className='text-xl font-semibold text-gray-900 capitalize'>
             Table Format
           </h4>
-          <button
-            onClick={openNewFormat}
-            className='inline-flex items-center py-2 px-4 space-x-2 rounded-md border border-gray-300 bg-white text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2'
-          >
-            <PlusIcon className='h-5 w-5' aria-hidden='true' />
-            <p>Add Format</p>
-          </button>
+
+          <Actions
+            icons={[PlusCircleIcon, ArrowDownCircleIcon, ArrowUpCircleIcon]}
+            labels={["Add", "Import", "Export"]}
+            handlers={[openNewFormat, importFormat, exportFormat]}
+          />
         </title>
         <div className='w-full mb-6'>
           <Tabs

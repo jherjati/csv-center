@@ -230,3 +230,32 @@ export const onBefoleUnload = (event) => {
   return (event.returnValue =
     "Are you sure you saved your work before leaving?");
 };
+
+export const exportStringifiedJson = (filename, string) => {
+  const blob = new Blob([string], {
+    type: "text/json",
+  });
+  const link = document.createElement("a");
+
+  link.download = filename;
+  link.href = window.URL.createObjectURL(blob);
+  link.dataset.downloadurl = ["text/json", link.download, link.href].join(":");
+
+  const evt = new MouseEvent("click", {
+    view: window,
+    bubbles: true,
+    cancelable: true,
+  });
+
+  link.dispatchEvent(evt);
+  link.remove();
+};
+
+export async function parseJsonFile(file) {
+  return new Promise((resolve, reject) => {
+    const fileReader = new FileReader();
+    fileReader.onload = (event) => resolve(JSON.parse(event.target.result));
+    fileReader.onerror = (error) => reject(error);
+    fileReader.readAsText(file);
+  });
+}
