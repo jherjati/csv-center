@@ -126,13 +126,13 @@ function Import() {
           <label
             htmlFor='load_session'
             role='button'
-            className='inline-flex items-center rounded-lg border border-gray-300 bg-white px-4 py-1.5 text-sm font-medium leading-5 text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2'
+            className='inline-flex items-center rounded-lg border border-gray-300 bg-white px-3 py-1.5 text-sm font-medium leading-5 text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2'
           >
             <InboxArrowDownIcon
-              className='-ml-1.5 mr-2 h-5 w-5 text-gray-400'
+              className='mr-2 h-5 w-5 text-gray-400'
               aria-hidden='true'
             />
-            <p>Load Previous Session</p>
+            <p>Load Session</p>
           </label>
         </div>
       </main>
