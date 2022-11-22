@@ -199,7 +199,7 @@ function DbTable({ name, isInFormats, children }) {
         <div className='flex space-x-3'>
           {children}
           <button
-            className='px-4 py-2 inline-flex items-center rounded-md border border-gray-300 bg-white text-sm font-medium leading-5 text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2'
+            className='px-3 py-2 inline-flex items-center rounded-md border border-gray-300 bg-white text-sm font-medium leading-5 text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2'
             onClick={() => {
               dbWorker.value.postMessage({
                 id: "save session",
@@ -208,7 +208,7 @@ function DbTable({ name, isInFormats, children }) {
             }}
           >
             <InboxIcon
-              className='-ml-1.5 mr-2 h-5 w-5 text-gray-400'
+              className='mr-2 h-5 w-5 text-gray-400'
               aria-hidden='true'
             />
             <p>Save Session</p>
