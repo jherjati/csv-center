@@ -47,7 +47,7 @@ function Insight() {
               )}
             >
               <select
-                className='block w-64 rounded-md border-gray-300 py-2 pl-3 pr-10 text-base focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm'
+                className='block w-56 rounded-md border-gray-300 py-2 pl-3 pr-10 text-base focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm'
                 value={activeTable}
                 onChange={(e) => {
                   setActiveTable(e.target.value);

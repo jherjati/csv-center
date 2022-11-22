@@ -211,7 +211,7 @@ function DbTable({ name, isInFormats, children }) {
               className='-ml-1.5 mr-2 h-5 w-5 text-gray-400'
               aria-hidden='true'
             />
-            <p>Save Current Session</p>
+            <p>Save Session</p>
           </button>
         </div>
         <Actions
