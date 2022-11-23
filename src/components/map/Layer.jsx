@@ -39,7 +39,7 @@ function Layer({
   useEffect(() => {
     DBWorker.pleaseDo({
       action: "exec",
-      sql: `SELECT ${longColumn}, ${latColumn} FROM ${tableName};`,
+      sql: `SELECT ${longColumn}, ${latColumn} FROM '${tableName}';`,
     }).then(({ results }) => {
       map.getSource(layerName).setData({
         type: "FeatureCollection",

@@ -88,7 +88,7 @@ function ResultCard({ chartConfig, dataConfigs }) {
     const sql = dataConfigs
       .map(
         ({ xColumn, yColumn, tableName, limit }) =>
-          `SELECT ${xColumn}, ${yColumn} FROM ${tableName} ORDER BY ${xColumn} LIMIT ${limit}`
+          `SELECT ${xColumn}, ${yColumn} FROM '${tableName}' ORDER BY ${xColumn} LIMIT ${limit}`
       )
       .join(" ; ");
     const params = [];
