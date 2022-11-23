@@ -141,9 +141,7 @@ export default function LayerModal({
                           >
                             <option></option>
                             {formats.value[localLayerConfig.tableName]
-                              ?.filter((col) =>
-                                ["real", "integer"].includes(col.type)
-                              )
+                              ?.filter((col) => ["real"].includes(col.type))
                               .map((col) => (
                                 <option value={col.name}>{col.name}</option>
                               ))}
