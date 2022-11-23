@@ -38,7 +38,7 @@ export default function FilterModal({
       setSnackContent([
         "error",
         "An Error Occured",
-        "Download process stuck due to some table configuration",
+        "Download has crashed due to an issue in the table configuration",
       ]);
     }
   };

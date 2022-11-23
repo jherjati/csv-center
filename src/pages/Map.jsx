@@ -7,6 +7,7 @@ import LayerLegend from "../components/map/LayerLegend";
 import LayerModal from "../components/map/LayerModal";
 import { useTables } from "../hooks";
 import EmptyDb from "../components/core/EmptyDb";
+import Layer from "../components/map/Layer";
 
 function Map() {
   const { dbTables } = useTables();
@@ -27,110 +28,34 @@ function Map() {
 
   useEffect(() => {
     if (mapContainer.current) {
-      try {
-        mapRef.current = new maplibregl.Map({
-          container: mapContainer.current,
-          style:
-            "https://api.maptiler.com/maps/streets/style.json?key=get_your_own_OpIi9ZULNHzrESv6T2vL",
-          center: [107.5, -6.8],
-          zoom: 8.5,
-        });
-        const map = mapRef.current;
+      mapRef.current = new maplibregl.Map({
+        container: mapContainer.current,
+        style:
+          "https://api.maptiler.com/maps/streets/style.json?key=get_your_own_OpIi9ZULNHzrESv6T2vL",
+        center: [107.5, -6.8],
+        zoom: 8.5,
+      });
+      const map = mapRef.current;
 
-        map.addControl(new maplibregl.NavigationControl());
-        map.addControl(
-          new maplibregl.GeolocateControl({
-            positionOptions: {
-              enableHighAccuracy: true,
-            },
-            trackUserLocation: true,
-          })
-        );
+      map.addControl(new maplibregl.NavigationControl());
+      map.addControl(
+        new maplibregl.GeolocateControl({
+          positionOptions: {
+            enableHighAccuracy: true,
+          },
+          trackUserLocation: true,
+        })
+      );
 
-        map.on("load", () => {
-          setMapLoad(true);
-        });
-      } catch (error) {
-        console.log(error);
-      }
+      map.on("load", () => {
+        setMapLoad(true);
+      });
     }
     return () => {
-      if (mapRef.current) {
-        setMapLoad(false);
-        mapRef.current.remove();
-      }
+      setMapLoad(false);
+      mapRef.current && mapRef.current.remove();
     };
-  }, []);
-
-  // useEffect(() => {
-  //   if (mapLoad) {
-  //     const map = mapRef.current;
-  //     map.addSource("test", {
-  //       type: "geojson",
-  //       data: {
-  //         type: "FeatureCollection",
-  //         features: [
-  //           {
-  //             type: "Feature",
-  //             properties: {},
-  //             geometry: {
-  //               coordinates: [107.60612158060724, -6.923485957200327],
-  //               type: "Point",
-  //             },
-  //           },
-  //           {
-  //             type: "Feature",
-  //             properties: {},
-  //             geometry: {
-  //               coordinates: [107.61581074052111, -6.8880480251471],
-  //               type: "Point",
-  //             },
-  //           },
-  //           {
-  //             type: "Feature",
-  //             properties: {},
-  //             geometry: {
-  //               coordinates: [107.57042467566686, -6.920954764440992],
-  //               type: "Point",
-  //             },
-  //           },
-  //           {
-  //             type: "Feature",
-  //             properties: {},
-  //             geometry: {
-  //               coordinates: [107.6479379549694, -6.910323606684699],
-  //               type: "Point",
-  //             },
-  //           },
-  //           {
-  //             type: "Feature",
-  //             properties: {},
-  //             geometry: {
-  //               coordinates: [107.61632069630656, -6.950821972774079],
-  //               type: "Point",
-  //             },
-  //           },
-  //         ],
-  //       },
-  //     });
-  //     map.addLayer({
-  //       id: "test",
-  //       source: "test",
-  //       type: "circle",
-  //       paint: {
-  //         "circle-radius": 3,
-  //         "circle-color": "#B42222",
-  //       },
-  //     });
-  //   }
-  //   return () => {
-  //     if (mapLoad) {
-  //       const map = mapRef.current;
-  //       map.removeLayer("test");
-  //       map.removeSource("test");
-  //     }
-  //   };
-  // }, [mapLoad]);
+  }, [dbTables]);
 
   const [open, setOpen] = useState(false);
   useEffect(() => {
@@ -143,7 +68,7 @@ function Map() {
     return !dbTables || !dbTables.length ? (
       <main className='py-6'>
         <div className='mx-auto max-w-7xl px-8'>
-          <h1 className='text-2xl font-semibold text-gray-900'>Compare</h1>
+          <h1 className='text-2xl font-semibold text-gray-900'>Map</h1>
         </div>
         <div className='mx-auto max-w-7xl px-8'>
           <EmptyDb />
@@ -168,12 +93,17 @@ function Map() {
         />
         <main className='relative w-full h-full' ref={mapContainer}>
           {mapLoad ? (
-            <LayerLegend
-              setOpen={setOpen}
-              configs={layerConfigs}
-              setFocusLayer={setFocusLayer}
-              setLayerConfigs={setLayerConfigs}
-            />
+            <>
+              <LayerLegend
+                setOpen={setOpen}
+                configs={layerConfigs}
+                setFocusLayer={setFocusLayer}
+                setLayerConfigs={setLayerConfigs}
+              />
+              {layerConfigs.map((conf) => (
+                <Layer key={conf.layerName} map={mapRef.current} {...conf} />
+              ))}
+            </>
           ) : (
             <LoadingCover />
           )}
