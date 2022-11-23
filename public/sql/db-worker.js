@@ -2836,15 +2836,13 @@ function onModuleReady(SQL) {
     return db;
   }
 
-  var buff;
-  var result;
   var data = this;
   var config = data["config"] ? data["config"] : {};
 
   switch (data && data["action"]) {
     case "open":
-      buff = data["buffer"];
-      createDb(buff && new Uint8Array(buff));
+      const dataBuffer = data["buffer"];
+      createDb(dataBuffer && new Uint8Array(dataBuffer));
       return {
         id: data["id"],
         ready: true,
@@ -2864,24 +2862,23 @@ function onModuleReady(SQL) {
       if (db === null) {
         createDb();
       }
-      return db.each(
-        data["sql"],
-        data["params"],
-        data["callback"],
-        data["done"],
-        config
-      );
-    case "export":
-      buff = db["export"]();
-      result = {
-        id: data["id"],
-        buffer: buff,
+      var callback = function callback(row) {
+        return postMessage({
+          id: data["id"],
+          row: row,
+          finished: false,
+        });
       };
-      try {
-        return Comlink.transfer(result, [result]);
-      } catch (error) {
-        return result;
-      }
+      var done = function done() {
+        return postMessage({
+          id: data["id"],
+          finished: true,
+        });
+      };
+      return db.each(data["sql"], data["params"], callback, done, config);
+    case "export":
+      const dbBuffer = db.export();
+      return Comlink.transfer(dbBuffer, [dbBuffer.buffer]);
     case "close":
       if (db) {
         db.close();
@@ -2901,9 +2898,15 @@ function onError(err) {
   };
 }
 
-var db = null;
+let db = null;
 ("use strict");
-var ModuleInstance = SQLModule();
+const ModuleInstance = SQLModule();
+
+self.onmessage = function onmessage(event) {
+  return ModuleInstance.then(onModuleReady.bind(event.data)).catch(
+    onError.bind(event.data)
+  );
+};
 
 Comlink.expose({
   pleaseDo(data) {

@@ -73,7 +73,7 @@ function Mapping({ fields, file, tabName, setTabName }) {
         localStorage.setItem("predefined_tables", JSON.stringify(newFormats));
         formats.value = newFormats;
 
-        await DBWorker.value.pleaseDo({
+        await DBWorker.pleaseDo({
           id: "create table",
           action: "exec",
           sql: `CREATE TABLE IF NOT EXISTS '${tableName}'( ${formatDynamic(
@@ -102,7 +102,7 @@ function Mapping({ fields, file, tabName, setTabName }) {
           `;
 
           parser.pause();
-          DBWorker.value
+          DBWorker
             .pleaseDo({
               id: "insert row",
               action: "exec",
@@ -131,7 +131,7 @@ function Mapping({ fields, file, tabName, setTabName }) {
           }
         });
 
-        await DBWorker.value.pleaseDo({
+        await DBWorker.pleaseDo({
           id: "create table",
           action: "exec",
           sql: `CREATE TABLE IF NOT EXISTS '${tableName}'( ${formatColumns(
@@ -159,7 +159,7 @@ function Mapping({ fields, file, tabName, setTabName }) {
             `;
 
           parser.pause();
-          DBWorker.value
+          DBWorker
             .pleaseDo({
               id: "insert row",
               action: "exec",
@@ -184,7 +184,7 @@ function Mapping({ fields, file, tabName, setTabName }) {
           ]);
         },
         complete: function () {
-          DBWorker.value
+          DBWorker
             .pleaseDo({
               id: "check complete",
               action: "exec",

@@ -99,19 +99,16 @@ function Import() {
             onChange={(event) => {
               const reader = new FileReader();
               reader.onload = function () {
-                DBWorker.value
-                  .pleaseDo(
-                    {
-                      id: "load_session",
-                      action: "open",
-                      buffer: transfer(reader.result, [reader.result]),
-                    },
-                    [reader.result]
-                  )
-                  .then((data) => {
-                    console.log(data);
-                    setLocation("/manage");
-                  });
+                DBWorker.pleaseDo(
+                  {
+                    id: "load_session",
+                    action: "open",
+                    buffer: transfer(reader.result, [reader.result]),
+                  },
+                  [reader.result]
+                ).then((_) => {
+                  setLocation("/manage");
+                });
               };
               reader.readAsArrayBuffer(event.target.files[0]);
             }}

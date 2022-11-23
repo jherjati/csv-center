@@ -1,7 +1,8 @@
 import { signal } from "@preact/signals";
 import { wrap } from "comlink";
 
-export const DBWorker = signal(wrap(new Worker("/sql/db-worker.js")));
+export const rawWorker = new Worker("/sql/db-worker.js");
+export const DBWorker = wrap(rawWorker);
 
 export const dbWorker = signal(new Worker("/sql/worker.sql-wasm.js"));
 

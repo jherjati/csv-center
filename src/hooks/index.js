@@ -34,13 +34,13 @@ export const useSort = () => {
 export const useInitDB = () => {
   useEffect(() => {
     window.addEventListener("beforeunload", onBefoleUnload);
-    DBWorker.value
+    DBWorker
       .pleaseDo({
         action: "open",
       })
       .catch(console.error);
     return () => {
-      DBWorker.value.pleaseDo({ action: "close" });
+      DBWorker.pleaseDo({ action: "close" });
     };
   }, []);
 };
@@ -48,7 +48,7 @@ export const useInitDB = () => {
 export const useTables = () => {
   const [dbTables, setDbTables] = useState();
   useEffect(() => {
-    DBWorker.value
+    DBWorker
       .pleaseDo({
         id: "browse table",
         action: "exec",

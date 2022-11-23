@@ -1,9 +1,9 @@
-import { useState, useCallback, useEffect, useRef } from "preact/hooks";
+import { useState, useCallback, useEffect } from "preact/hooks";
 import streamSaver from "streamsaver";
 import { unparse } from "papaparse";
 import { format as dateFormat } from "date-fns";
 
-import { dbWorker, formats } from "../../contexts";
+import { DBWorker, formats, rawWorker } from "../../contexts";
 import { useSort } from "../../hooks";
 import Actions from "../core/Actions";
 import Pagination from "./Pagination";
@@ -20,6 +20,7 @@ import {
 } from "@heroicons/react/20/solid";
 import { onBefoleUnload } from "../../constants";
 import { filterToString, filterToValues } from "../../utils";
+import { proxy } from "comlink";
 
 function DbTable({ name, isInFormats, children }) {
   const [detailOpen, setDetailOpen] = useState(false);
@@ -27,7 +28,6 @@ function DbTable({ name, isInFormats, children }) {
   const [filter, setFilter] = useState([]);
   const [focusId, setFocusId] = useState(undefined);
   const [page, setPage] = useState(1);
-  const writerRef = useRef();
 
   const { sortAsc, handleSortClick, sortString } = useSort();
 
@@ -37,105 +37,52 @@ function DbTable({ name, isInFormats, children }) {
   );
   useEffect(() => {
     if (!isInFormats) {
-      dbWorker.value.postMessage({
-        id: "browse column",
-        action: "exec",
-        sql: `PRAGMA table_info('${name}')`,
-      });
+      DBWorker
+        .pleaseDo({
+          id: "browse column",
+          action: "exec",
+          sql: `PRAGMA table_info('${name}')`,
+        })
+        .then((data) => {
+          setColumns(
+            data.results[0]?.values.map((val) => ({
+              name: val[1],
+              type: val[2].toLowerCase(),
+            }))
+          );
+        });
     } else {
       setColumns(formats.value[name]);
     }
   }, [name, isInFormats]);
 
   // Data
-  const dateIndeks = useRef([]);
   const [data, setData] = useState([]);
   useEffect(() => {
     if (columns.length) {
       const newDateIndeks = [];
-      dbWorker.value.postMessage({
-        id: "browse row",
-        action: "exec",
-        sql: `SELECT ${[{ name: "rowid" }, ...columns]
-          .map((el, idx) => {
-            if (el.type?.includes("date")) {
-              newDateIndeks.push(idx);
-            }
-            return el.name;
-          })
-          .join(", ")} FROM '${name}' ${filterToString(
-          filter
-        )} ${sortString} LIMIT 10 OFFSET ${(page - 1) * 10}`,
-        params: filterToValues(filter),
-      });
-      dateIndeks.current = newDateIndeks;
-    }
-  }, [name, sortString, page, detailOpen, filter, columns]);
-
-  // Count
-  const [count, setCount] = useState(0);
-  useEffect(() => {
-    dbWorker.value.postMessage({
-      id: "count row",
-      action: "exec",
-      sql: `SELECT COUNT(*) FROM '${name}' ${filterToString(filter)}`,
-      params: filterToValues(filter),
-    });
-  }, [name, filter, detailOpen]);
-
-  // Export
-  const handleExport = useCallback(() => {
-    window.removeEventListener("beforeunload", onBefoleUnload);
-    const fileStream = streamSaver.createWriteStream(name + ".csv");
-    const encoder = new TextEncoder();
-    writerRef.current = fileStream.getWriter();
-    writerRef.current.write(
-      encoder.encode(columns.map((col) => col.name).join(";") + "\r\n")
-    );
-    dbWorker.value.postMessage({
-      id: "export table",
-      action: "each",
-      sql: `SELECT * FROM '${name}' ${filterToString(filter)}`,
-      params: filterToValues(filter),
-    });
-  }, [name, filter]);
-
-  // Message receiver
-  useEffect(() => {
-    dbWorker.value.onmessage = ({ data }) => {
-      try {
-        if (data.id === "count row") {
-          setCount(data.results[0]?.values[0]);
-        } else if (data.id === "browse column") {
-          setColumns(
-            data.results[0]?.values.map((el) => ({
-              name: el[1],
-              type: el[2].toLowerCase(),
-            }))
-          );
-        } else if (data.id === "read row") {
-          const res = data.results[0];
-          setTimeout(() => {
-            const form = document.getElementById("detail-form");
-            res.columns.forEach((name, idx) => {
-              if (
-                columns.find((col) => col.name === name).type.includes("date")
-              ) {
-                form[name].value = dateFormat(
-                  new Date(res.values[0][idx] * 1000),
-                  "yyyy-MM-dd"
-                );
-              } else {
-                form[name].value = res.values[0][idx];
+      DBWorker
+        .pleaseDo({
+          id: "browse row",
+          action: "exec",
+          sql: `SELECT ${[{ name: "rowid" }, ...columns]
+            .map((el, idx) => {
+              if (el.type?.includes("date")) {
+                newDateIndeks.push(idx);
               }
-            });
-          }, 50);
-        } else if (data.id === "browse row") {
+              return el.name;
+            })
+            .join(", ")} FROM '${name}' ${filterToString(
+            filter
+          )} ${sortString} LIMIT 10 OFFSET ${(page - 1) * 10}`,
+          params: filterToValues(filter),
+        })
+        .then((data) => {
           let toReturn = data.results[0];
-          if (toReturn && dateIndeks.current.length) {
+          if (toReturn && newDateIndeks.length) {
             toReturn.values = toReturn.values.map((row) => {
               let newRow = [...row];
-              dateIndeks.current.forEach((indeks) => {
+              newDateIndeks.forEach((indeks) => {
                 newRow[indeks] = dateFormat(
                   new Date(newRow[indeks] * 1000),
                   /\[(.*?)\]/.exec(
@@ -148,50 +95,72 @@ function DbTable({ name, isInFormats, children }) {
             });
           }
           setData(toReturn);
-        } else if (data.id === "export table") {
-          const encoder = new TextEncoder();
-          if (!data.finished) {
-            writerRef.current.write(
-              encoder.encode(
-                unparse(
-                  [
-                    columns.map(({ name, type }) => {
-                      if (type.includes("date")) {
-                        return dateFormat(
-                          new Date(data.row[name] * 1000),
-                          /\[(.*?)\]/.exec(type)[1]
-                        );
-                      }
-                      return data.row[name];
-                    }),
-                  ],
-                  {
-                    delimiter: ";",
+        });
+    }
+  }, [name, sortString, page, detailOpen, filter, columns]);
+
+  // Count
+  const [count, setCount] = useState(0);
+  useEffect(() => {
+    DBWorker
+      .pleaseDo({
+        id: "count row",
+        action: "exec",
+        sql: `SELECT COUNT(*) FROM '${name}' ${filterToString(filter)}`,
+        params: filterToValues(filter),
+      })
+      .then((data) => {
+        setCount(data.results[0]?.values[0]);
+      });
+  }, [name, filter, detailOpen]);
+
+  // Export
+  const handleExport = useCallback(() => {
+    window.removeEventListener("beforeunload", onBefoleUnload);
+
+    const fileStream = streamSaver.createWriteStream(name + ".csv");
+    const encoder = new TextEncoder();
+
+    const writerRef = fileStream.getWriter();
+    writerRef.write(
+      encoder.encode(columns.map((col) => col.name).join(";") + "\r\n")
+    );
+
+    rawWorker.onmessage = ({ data }) => {
+      if (!data.finished) {
+        writerRef.write(
+          encoder.encode(
+            unparse(
+              [
+                columns.map(({ name, type }) => {
+                  if (type.includes("date")) {
+                    return dateFormat(
+                      new Date(data.row[name] * 1000),
+                      /\[(.*?)\]/.exec(type)[1]
+                    );
                   }
-                ) + "\r\n"
-              )
-            );
-            window.addEventListener("beforeunload", onBefoleUnload);
-          } else {
-            writerRef.current.close();
-          }
-        } else if (data.id === "save session") {
-          const arraybuff = data.buffer;
-          const blob = new Blob([arraybuff]);
-          const a = document.createElement("a");
-          document.body.appendChild(a);
-          a.href = window.URL.createObjectURL(blob);
-          a.download = "sql.db";
-          a.onclick = function () {
-            setTimeout(function () {
-              window.URL.revokeObjectURL(a.href);
-            }, 1500);
-          };
-          a.click();
-        }
-      } catch (error) {}
+                  return data.row[name];
+                }),
+              ],
+              {
+                delimiter: ";",
+              }
+            ) + "\r\n"
+          )
+        );
+      } else {
+        writerRef.close();
+        window.addEventListener("beforeunload", onBefoleUnload);
+      }
     };
-  }, [name]);
+
+    rawWorker.postMessage({
+      id: "export table",
+      action: "each",
+      sql: `SELECT * FROM '${name}' ${filterToString(filter)}`,
+      params: filterToValues(filter),
+    });
+  }, [name, filter]);
 
   return (
     <section className='my-6 w-full rounded-lg overflow-hidden shadow '>
@@ -201,10 +170,25 @@ function DbTable({ name, isInFormats, children }) {
           <button
             className='px-3 py-2 inline-flex items-center rounded-md border border-gray-300 bg-white text-sm font-medium leading-5 text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2'
             onClick={() => {
-              dbWorker.value.postMessage({
-                id: "save session",
-                action: "export",
-              });
+              DBWorker
+                .pleaseDo({
+                  id: "save session",
+                  action: "export",
+                })
+                .then((buffer) => {
+                  const arraybuff = buffer;
+                  const blob = new Blob([arraybuff]);
+                  const a = document.createElement("a");
+                  document.body.appendChild(a);
+                  a.href = window.URL.createObjectURL(blob);
+                  a.download = "sql.db";
+                  a.onclick = function () {
+                    setTimeout(function () {
+                      window.URL.revokeObjectURL(a.href);
+                    }, 1500);
+                  };
+                  a.click();
+                });
             }}
           >
             <InboxIcon

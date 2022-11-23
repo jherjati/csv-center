@@ -1,10 +1,11 @@
 import { Dialog, Transition } from "@headlessui/react";
 import { Fragment } from "preact";
 import { useCallback, useEffect } from "preact/hooks";
-import { dbWorker } from "../../contexts";
+import { DBWorker } from "../../contexts";
 import { TrashIcon } from "@heroicons/react/20/solid";
 import { types } from "../../constants";
 import { parse } from "date-fns";
+import { format as dateFormat } from "date-fns";
 
 export default function DetailModal({
   open,
@@ -15,17 +16,36 @@ export default function DetailModal({
 }) {
   useEffect(() => {
     if (open && focusId) {
-      dbWorker.value.postMessage({
-        id: "read row",
-        action: "exec",
-        sql: `SELECT * FROM '${tableName}' WHERE rowid = ? LIMIT 1`,
-        params: [focusId],
-      });
+      DBWorker
+        .pleaseDo({
+          id: "read row",
+          action: "exec",
+          sql: `SELECT * FROM '${tableName}' WHERE rowid = ? LIMIT 1`,
+          params: [focusId],
+        })
+        .then((data) => {
+          const res = data.results[0];
+          setTimeout(() => {
+            const form = document.getElementById("detail-form");
+            res.columns.forEach((name, idx) => {
+              if (
+                columns.find((col) => col.name === name).type.includes("date")
+              ) {
+                form[name].value = dateFormat(
+                  new Date(res.values[0][idx] * 1000),
+                  "yyyy-MM-dd"
+                );
+              } else {
+                form[name].value = res.values[0][idx];
+              }
+            });
+          }, 50);
+        });
     }
   }, [open, focusId]);
 
   const handleSubmit = useCallback(
-    (event) => {
+    async (event) => {
       event.preventDefault();
       const form = new FormData(event.target);
       const data = Object.fromEntries(form.entries());
@@ -38,7 +58,7 @@ export default function DetailModal({
             .map(() => "?")
             .join(", ")} );
         `;
-      dbWorker.value.postMessage({
+      await DBWorker.pleaseDo({
         id: "mutate row",
         action: "exec",
         sql: statement,
@@ -99,7 +119,7 @@ export default function DetailModal({
                       <button
                         onClick={(event) => {
                           event.preventDefault();
-                          dbWorker.value.postMessage({
+                          DBWorker.pleaseDo({
                             id: "delete row",
                             action: "exec",
                             sql: `DELETE FROM '${tableName}' WHERE rowid = ${focusId}`,
