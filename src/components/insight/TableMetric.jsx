@@ -1,5 +1,5 @@
 import { useEffect, useState } from "preact/hooks";
-import { dbWorker, formats, metricConfigs } from "../../contexts";
+import { DBWorker, formats, metricConfigs } from "../../contexts";
 import Actions from "../core/Actions";
 import Stats from "./Stats";
 import {
@@ -47,7 +47,11 @@ const TableMetric = forwardRef(
     );
     useEffect(() => {
       if (!isInFormats) {
-        dbWorker.value.onmessage = ({ data }) => {
+        DBWorker.pleaseDo({
+          id: "browse column",
+          action: "exec",
+          sql: `PRAGMA table_info('${name}')`,
+        }).then((data) => {
           if (data.id === "browse column") {
             setColumns(
               data.results[0]?.values.map((el) => ({
@@ -56,11 +60,6 @@ const TableMetric = forwardRef(
               }))
             );
           }
-        };
-        dbWorker.value.postMessage({
-          id: "browse column",
-          action: "exec",
-          sql: `PRAGMA table_info('${name}')`,
         });
       } else {
         setColumns(formats.value[name]);
@@ -139,7 +138,50 @@ const TableMetric = forwardRef(
       const config = metricConfigs.value[name];
 
       if (config?.stats.length || config?.charts.length) {
-        dbWorker.value.onmessage = ({ data }) => {
+        const params = filterToValues(filter);
+        const availableCharts = config.charts.filter(
+          (chart) => chart.xColumn && chart.yColumn.length
+        );
+        const sql = `${config.stats
+          .filter((stat) => Boolean(stat))
+          .map(
+            (stat) =>
+              `SELECT MAX(${stat}), AVG(${stat}), MIN(${stat}), COUNT(${stat}) FROM '${name}' ${filterToString(
+                filter
+              )};`
+          )
+          .join(" ")}
+          ${availableCharts
+            .map((chart) =>
+              chart.type === "bar"
+                ? `SELECT ${chart.xColumn}, ${chart.dataOperator[0]}(${
+                    chart.yColumn[0]
+                  }) FROM '${name}' ${filterToString(filter)} GROUP BY ${
+                    chart.xColumn
+                  } ORDER BY ${chart.dataOperator[0]}(${chart.yColumn[0]});`
+                : `SELECT ${chart.xColumn}, ${chart.yColumn.join(
+                    ", "
+                  )} FROM '${name}' ${filterToString(filter)} ORDER BY ${
+                    chart.xColumn
+                  } LIMIT ${chart.dataLimit};`
+            )
+            .join(" ")}
+        `;
+
+        if (!availableCharts.length) {
+          setSnackContent([
+            "error",
+            "Insufficient Data",
+            "Chart requires at least 2 real or integer columns",
+          ]);
+        }
+
+        DBWorker.pleaseDo({
+          id: "get metric",
+          action: "exec",
+          sql,
+          params,
+        }).then((data) => {
           if (data.id === "get metric") {
             const newStatsValues = [],
               newChartsValues = [];
@@ -181,51 +223,6 @@ const TableMetric = forwardRef(
               }))
             );
           }
-        };
-
-        const params = filterToValues(filter);
-        const availableCharts = config.charts.filter(
-          (chart) => chart.xColumn && chart.yColumn.length
-        );
-        const sql = `${config.stats
-          .filter((stat) => Boolean(stat))
-          .map(
-            (stat) =>
-              `SELECT MAX(${stat}), AVG(${stat}), MIN(${stat}), COUNT(${stat}) FROM '${name}' ${filterToString(
-                filter
-              )};`
-          )
-          .join(" ")}
-          ${availableCharts
-            .map((chart) =>
-              chart.type === "bar"
-                ? `SELECT ${chart.xColumn}, ${chart.dataOperator[0]}(${
-                    chart.yColumn[0]
-                  }) FROM '${name}' ${filterToString(filter)} GROUP BY ${
-                    chart.xColumn
-                  } ORDER BY ${chart.dataOperator[0]}(${chart.yColumn[0]});`
-                : `SELECT ${chart.xColumn}, ${chart.yColumn.join(
-                    ", "
-                  )} FROM '${name}' ${filterToString(filter)} ORDER BY ${
-                    chart.xColumn
-                  } LIMIT ${chart.dataLimit};`
-            )
-            .join(" ")}
-        `;
-
-        if (!availableCharts.length) {
-          setSnackContent([
-            "error",
-            "Insufficient Data",
-            "Chart requires at least 2 real or integer columns",
-          ]);
-        }
-
-        dbWorker.value.postMessage({
-          id: "get metric",
-          action: "exec",
-          sql,
-          params,
         });
       }
     }, [metricConfigs.value, filter]);

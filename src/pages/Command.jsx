@@ -1,7 +1,7 @@
 import { useCallback, useRef, useState } from "preact/hooks";
 import { EditorView, basicSetup } from "codemirror";
 import { sql } from "@codemirror/lang-sql";
-import { dbWorker } from "../contexts";
+import { DBWorker } from "../contexts";
 import { ArrowPathIcon, BoltSlashIcon } from "@heroicons/react/20/solid";
 import { setSnackContent } from "../utils";
 
@@ -27,8 +27,15 @@ PRAGMA table_info('table_name');
       parent: node,
     });
     editor.current = localEditor;
+  }, []);
 
-    dbWorker.value.onmessage = ({ data }) => {
+  const onExecute = () => {
+    setIsLoading(true);
+    DBWorker.pleaseDo({
+      id: "execute command",
+      action: "exec",
+      sql: editor.current.state.doc.toString(),
+    }).then((data) => {
       if (data.id === "execute command") {
         if (data.error) {
           setSnackContent(["error", "An Error Occured", data.error]);
@@ -36,15 +43,6 @@ PRAGMA table_info('table_name');
         setResults(data.results);
       }
       setIsLoading(false);
-    };
-  }, []);
-
-  const onExecute = () => {
-    setIsLoading(true);
-    dbWorker.value.postMessage({
-      id: "execute command",
-      action: "exec",
-      sql: editor.current.state.doc.toString(),
     });
   };
 

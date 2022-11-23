@@ -8,7 +8,7 @@ import {
   Tooltip,
   Legend,
 } from "chart.js";
-import { dbWorker } from "../../contexts";
+import { DBWorker } from "../../contexts";
 import { setPropByString } from "../../utils";
 Chart.register(
   LineController,
@@ -85,24 +85,6 @@ function ResultCard({ chartConfig, dataConfigs }) {
   }, []);
 
   useEffect(() => {
-    dbWorker.value.onmessage = ({ data }) => {
-      if (data.results?.length) {
-        const datasets = data.results.map(({ columns, values }, idx) => ({
-          label: `${dataConfigs[idx].tableName} (${columns[1]})`,
-          data: values.map((val) => ({ x: val[0], y: val[1] })),
-          parsing: false,
-          normalized: true,
-          backgroundColor: dataConfigs[idx].backgroundColor,
-          borderColor: dataConfigs[idx].borderColor,
-        }));
-        chartRef.current.data = { datasets };
-        chartConfig.forEach((conf) =>
-          setPropByString(chartRef.current, conf[0], conf[1])
-        );
-        chartRef.current.update();
-      }
-    };
-
     const sql = dataConfigs
       .map(
         ({ xColumn, yColumn, tableName, limit }) =>
@@ -110,7 +92,25 @@ function ResultCard({ chartConfig, dataConfigs }) {
       )
       .join(" ; ");
     const params = [];
-    dbWorker.value.postMessage({ id: "compare", action: "exec", params, sql });
+    DBWorker.pleaseDo({ id: "compare", action: "exec", params, sql }).then(
+      (data) => {
+        if (data.results?.length) {
+          const datasets = data.results.map(({ columns, values }, idx) => ({
+            label: `${dataConfigs[idx].tableName} (${columns[1]})`,
+            data: values.map((val) => ({ x: val[0], y: val[1] })),
+            parsing: false,
+            normalized: true,
+            backgroundColor: dataConfigs[idx].backgroundColor,
+            borderColor: dataConfigs[idx].borderColor,
+          }));
+          chartRef.current.data = { datasets };
+          chartConfig.forEach((conf) =>
+            setPropByString(chartRef.current, conf[0], conf[1])
+          );
+          chartRef.current.update();
+        }
+      }
+    );
   }, [chartConfig, dataConfigs]);
 
   return (

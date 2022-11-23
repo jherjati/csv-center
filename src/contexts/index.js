@@ -4,8 +4,6 @@ import { wrap } from "comlink";
 export const rawWorker = new Worker("/sql/db-worker.js");
 export const DBWorker = wrap(rawWorker);
 
-export const dbWorker = signal(new Worker("/sql/worker.sql-wasm.js"));
-
 export const formats = signal(
   localStorage.getItem("predefined_tables")
     ? JSON.parse(localStorage.getItem("predefined_tables"))
