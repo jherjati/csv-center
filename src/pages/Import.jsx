@@ -4,11 +4,12 @@ import PageError from "../components/core/PageError";
 import Dropzone from "../components/import/Dropzone";
 import Mapping from "../components/import/Mapping";
 import PreviewTable from "../components/import/PreviewTable";
-import { DBWorker, formats, withHeader } from "../contexts";
+import { formats, withHeader } from "../contexts";
 import { setSnackContent } from "../utils";
 import { useLocation } from "wouter-preact";
 import { InboxArrowDownIcon } from "@heroicons/react/20/solid";
 import { transfer } from "comlink";
+import { DBWorker } from "../constants";
 
 function Import() {
   const [_, setLocation] = useLocation();

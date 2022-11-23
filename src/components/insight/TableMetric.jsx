@@ -1,5 +1,5 @@
 import { useEffect, useState } from "preact/hooks";
-import { DBWorker, formats, metricConfigs } from "../../contexts";
+import { formats, metricConfigs } from "../../contexts";
 import Actions from "../core/Actions";
 import Stats from "./Stats";
 import {
@@ -25,6 +25,7 @@ import {
   FunnelIcon,
   PrinterIcon,
 } from "@heroicons/react/20/solid";
+import { DBWorker } from "../../constants";
 
 Chart.register(
   LineController,

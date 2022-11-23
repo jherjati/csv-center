@@ -1,4 +1,4 @@
-import { DBWorker, formats, withHeader } from "../../contexts";
+import { formats, withHeader } from "../../contexts";
 import { useLocation } from "wouter-preact";
 import { parse } from "papaparse";
 import { parse as dateParse } from "date-fns";
@@ -12,7 +12,7 @@ import {
 import Tabs from "./Tabs";
 import FormatModal from "./FormatModal";
 import FormSection from "./FormSection";
-import { exportStringifiedJson, parseJsonFile, types } from "../../constants";
+import { exportStringifiedJson, parseJsonFile, types, DBWorker } from "../../constants";
 import {
   dbNameEscaper,
   formatColumns,

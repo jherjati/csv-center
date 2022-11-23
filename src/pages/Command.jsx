@@ -1,7 +1,7 @@
 import { useCallback, useRef, useState } from "preact/hooks";
 import { EditorView, basicSetup } from "codemirror";
 import { sql } from "@codemirror/lang-sql";
-import { DBWorker } from "../contexts";
+import { DBWorker } from "../constants";
 import { ArrowPathIcon, BoltSlashIcon } from "@heroicons/react/20/solid";
 import { setSnackContent } from "../utils";
 

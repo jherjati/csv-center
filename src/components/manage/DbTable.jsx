@@ -3,7 +3,7 @@ import streamSaver from "streamsaver";
 import { unparse } from "papaparse";
 import { format as dateFormat } from "date-fns";
 
-import { DBWorker, formats, rawWorker } from "../../contexts";
+import { formats } from "../../contexts";
 import { useSort } from "../../hooks";
 import Actions from "../core/Actions";
 import Pagination from "./Pagination";
@@ -18,9 +18,8 @@ import {
   DocumentArrowUpIcon,
   InboxIcon,
 } from "@heroicons/react/20/solid";
-import { onBefoleUnload } from "../../constants";
+import { onBefoleUnload, DBWorker, rawWorker } from "../../constants";
 import { filterToString, filterToValues } from "../../utils";
-import { proxy } from "comlink";
 
 function DbTable({ name, isInFormats, children }) {
   const [detailOpen, setDetailOpen] = useState(false);
@@ -37,20 +36,18 @@ function DbTable({ name, isInFormats, children }) {
   );
   useEffect(() => {
     if (!isInFormats) {
-      DBWorker
-        .pleaseDo({
-          id: "browse column",
-          action: "exec",
-          sql: `PRAGMA table_info('${name}')`,
-        })
-        .then((data) => {
-          setColumns(
-            data.results[0]?.values.map((val) => ({
-              name: val[1],
-              type: val[2].toLowerCase(),
-            }))
-          );
-        });
+      DBWorker.pleaseDo({
+        id: "browse column",
+        action: "exec",
+        sql: `PRAGMA table_info('${name}')`,
+      }).then((data) => {
+        setColumns(
+          data.results[0]?.values.map((val) => ({
+            name: val[1],
+            type: val[2].toLowerCase(),
+          }))
+        );
+      });
     } else {
       setColumns(formats.value[name]);
     }
@@ -61,57 +58,53 @@ function DbTable({ name, isInFormats, children }) {
   useEffect(() => {
     if (columns.length) {
       const newDateIndeks = [];
-      DBWorker
-        .pleaseDo({
-          id: "browse row",
-          action: "exec",
-          sql: `SELECT ${[{ name: "rowid" }, ...columns]
-            .map((el, idx) => {
-              if (el.type?.includes("date")) {
-                newDateIndeks.push(idx);
-              }
-              return el.name;
-            })
-            .join(", ")} FROM '${name}' ${filterToString(
-            filter
-          )} ${sortString} LIMIT 10 OFFSET ${(page - 1) * 10}`,
-          params: filterToValues(filter),
-        })
-        .then((data) => {
-          let toReturn = data.results[0];
-          if (toReturn && newDateIndeks.length) {
-            toReturn.values = toReturn.values.map((row) => {
-              let newRow = [...row];
-              newDateIndeks.forEach((indeks) => {
-                newRow[indeks] = dateFormat(
-                  new Date(newRow[indeks] * 1000),
-                  /\[(.*?)\]/.exec(
-                    columns.find((col) => col.name === toReturn.columns[indeks])
-                      .type
-                  )[1]
-                );
-              });
-              return newRow;
+      DBWorker.pleaseDo({
+        id: "browse row",
+        action: "exec",
+        sql: `SELECT ${[{ name: "rowid" }, ...columns]
+          .map((el, idx) => {
+            if (el.type?.includes("date")) {
+              newDateIndeks.push(idx);
+            }
+            return el.name;
+          })
+          .join(", ")} FROM '${name}' ${filterToString(
+          filter
+        )} ${sortString} LIMIT 10 OFFSET ${(page - 1) * 10}`,
+        params: filterToValues(filter),
+      }).then((data) => {
+        let toReturn = data.results[0];
+        if (toReturn && newDateIndeks.length) {
+          toReturn.values = toReturn.values.map((row) => {
+            let newRow = [...row];
+            newDateIndeks.forEach((indeks) => {
+              newRow[indeks] = dateFormat(
+                new Date(newRow[indeks] * 1000),
+                /\[(.*?)\]/.exec(
+                  columns.find((col) => col.name === toReturn.columns[indeks])
+                    .type
+                )[1]
+              );
             });
-          }
-          setData(toReturn);
-        });
+            return newRow;
+          });
+        }
+        setData(toReturn);
+      });
     }
   }, [name, sortString, page, detailOpen, filter, columns]);
 
   // Count
   const [count, setCount] = useState(0);
   useEffect(() => {
-    DBWorker
-      .pleaseDo({
-        id: "count row",
-        action: "exec",
-        sql: `SELECT COUNT(*) FROM '${name}' ${filterToString(filter)}`,
-        params: filterToValues(filter),
-      })
-      .then((data) => {
-        setCount(data.results[0]?.values[0]);
-      });
+    DBWorker.pleaseDo({
+      id: "count row",
+      action: "exec",
+      sql: `SELECT COUNT(*) FROM '${name}' ${filterToString(filter)}`,
+      params: filterToValues(filter),
+    }).then((data) => {
+      setCount(data.results[0]?.values[0]);
+    });
   }, [name, filter, detailOpen]);
 
   // Export
@@ -170,25 +163,23 @@ function DbTable({ name, isInFormats, children }) {
           <button
             className='px-3 py-2 inline-flex items-center rounded-md border border-gray-300 bg-white text-sm font-medium leading-5 text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2'
             onClick={() => {
-              DBWorker
-                .pleaseDo({
-                  id: "save session",
-                  action: "export",
-                })
-                .then((buffer) => {
-                  const arraybuff = buffer;
-                  const blob = new Blob([arraybuff]);
-                  const a = document.createElement("a");
-                  document.body.appendChild(a);
-                  a.href = window.URL.createObjectURL(blob);
-                  a.download = "sql.db";
-                  a.onclick = function () {
-                    setTimeout(function () {
-                      window.URL.revokeObjectURL(a.href);
-                    }, 1500);
-                  };
-                  a.click();
-                });
+              DBWorker.pleaseDo({
+                id: "save session",
+                action: "export",
+              }).then((buffer) => {
+                const arraybuff = buffer;
+                const blob = new Blob([arraybuff]);
+                const a = document.createElement("a");
+                document.body.appendChild(a);
+                a.href = window.URL.createObjectURL(blob);
+                a.download = "sql.db";
+                a.onclick = function () {
+                  setTimeout(function () {
+                    window.URL.revokeObjectURL(a.href);
+                  }, 1500);
+                };
+                a.click();
+              });
             }}
           >
             <InboxIcon

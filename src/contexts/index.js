@@ -1,16 +1,12 @@
 import { signal } from "@preact/signals";
-import { wrap } from "comlink";
 
-export const rawWorker = new Worker("/sql/db-worker.js");
-export const DBWorker = wrap(rawWorker);
+export const withHeader = signal(true);
 
 export const formats = signal(
   localStorage.getItem("predefined_tables")
     ? JSON.parse(localStorage.getItem("predefined_tables"))
     : {}
 );
-
-export const withHeader = signal(true);
 
 export const snackbar = signal({
   visible: false,
@@ -24,6 +20,7 @@ export const snackbar = signal({
 export const metricConfigs = signal({});
 
 export const chartConfig = signal([["options.scales.x.title.text", null]]);
+
 export const dataConfigs = signal([
   {
     id: window.crypto.randomUUID(),

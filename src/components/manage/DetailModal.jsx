@@ -1,9 +1,8 @@
 import { Dialog, Transition } from "@headlessui/react";
 import { Fragment } from "preact";
 import { useCallback, useEffect } from "preact/hooks";
-import { DBWorker } from "../../contexts";
 import { TrashIcon } from "@heroicons/react/20/solid";
-import { types } from "../../constants";
+import { types, DBWorker } from "../../constants";
 import { parse } from "date-fns";
 import { format as dateFormat } from "date-fns";
 
@@ -16,31 +15,29 @@ export default function DetailModal({
 }) {
   useEffect(() => {
     if (open && focusId) {
-      DBWorker
-        .pleaseDo({
-          id: "read row",
-          action: "exec",
-          sql: `SELECT * FROM '${tableName}' WHERE rowid = ? LIMIT 1`,
-          params: [focusId],
-        })
-        .then((data) => {
-          const res = data.results[0];
-          setTimeout(() => {
-            const form = document.getElementById("detail-form");
-            res.columns.forEach((name, idx) => {
-              if (
-                columns.find((col) => col.name === name).type.includes("date")
-              ) {
-                form[name].value = dateFormat(
-                  new Date(res.values[0][idx] * 1000),
-                  "yyyy-MM-dd"
-                );
-              } else {
-                form[name].value = res.values[0][idx];
-              }
-            });
-          }, 50);
-        });
+      DBWorker.pleaseDo({
+        id: "read row",
+        action: "exec",
+        sql: `SELECT * FROM '${tableName}' WHERE rowid = ? LIMIT 1`,
+        params: [focusId],
+      }).then((data) => {
+        const res = data.results[0];
+        setTimeout(() => {
+          const form = document.getElementById("detail-form");
+          res.columns.forEach((name, idx) => {
+            if (
+              columns.find((col) => col.name === name).type.includes("date")
+            ) {
+              form[name].value = dateFormat(
+                new Date(res.values[0][idx] * 1000),
+                "yyyy-MM-dd"
+              );
+            } else {
+              form[name].value = res.values[0][idx];
+            }
+          });
+        }, 50);
+      });
     }
   }, [open, focusId]);
 

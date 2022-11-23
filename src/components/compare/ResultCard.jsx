@@ -8,7 +8,7 @@ import {
   Tooltip,
   Legend,
 } from "chart.js";
-import { DBWorker } from "../../contexts";
+import { DBWorker } from "../../constants";
 import { setPropByString } from "../../utils";
 Chart.register(
   LineController,
