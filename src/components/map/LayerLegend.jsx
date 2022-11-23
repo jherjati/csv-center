@@ -2,7 +2,7 @@ import { PlusIcon, TrashIcon } from "@heroicons/react/24/solid";
 
 function LayerLegend({ setOpen, configs, setFocusLayer, setLayerConfigs }) {
   return (
-    <div className='absolute bottom-9 right-4 w-1/3 p-2 z-10 space-y-1'>
+    <div className='absolute bottom-6 right-2 w-72 z-10 space-y-1'>
       {configs.map(({ layerName, circleColor }) => (
         <button
           key={layerName}
