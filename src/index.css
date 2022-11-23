@@ -3,7 +3,8 @@
 @tailwind utilities;
 
 body {
-  font-family: "Rubik";
+  font-family: Rubik, ui-sans-serif, system-ui, -apple-system,
+    BlinkMacSystemFont;
 }
 
 @keyframes run {
