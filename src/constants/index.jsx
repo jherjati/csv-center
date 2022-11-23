@@ -4,6 +4,7 @@ import {
   ArrowDownOnSquareIcon,
   ArrowPathRoundedSquareIcon,
   CommandLineIcon,
+  MapIcon,
 } from "@heroicons/react/24/outline";
 import { wrap } from "comlink";
 
@@ -13,6 +14,7 @@ export const DBWorker = wrap(rawWorker);
 export const navigation = [
   { name: "Import", href: "/", icon: ArrowDownOnSquareIcon },
   { name: "Manage", href: "/manage", icon: FolderIcon },
+  { name: "Map", href: "/map", icon: MapIcon },
   {
     name: "Insight",
     href: "/insight",

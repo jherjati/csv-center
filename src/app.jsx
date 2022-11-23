@@ -7,6 +7,7 @@ const Manage = lazy(() => import("./pages/Manage"));
 const Compare = lazy(() => import("./pages/Compare"));
 const Command = lazy(() => import("./pages/Command"));
 const Guidance = lazy(() => import("./pages/Guidance"));
+const Map = lazy(() => import("./pages/Map"));
 
 import SWModal from "./components/core/SWModal";
 import SnackBar from "./components/core/Snackbar";
@@ -19,10 +20,10 @@ export default function App() {
 
   return (
     <>
-      <div className='hidden lg:block'>
+      <div className='hidden lg:block h-full'>
         <Sidebar />
 
-        <div className='flex flex-1 flex-col pl-56'>
+        <div className='flex flex-1 flex-col pl-56 h-full'>
           <Switch className='flex-1'>
             <Route path='/'>
               <Suspense fallback={<></>}>
@@ -52,6 +53,11 @@ export default function App() {
             <Route path='/guidance'>
               <Suspense fallback={<></>}>
                 <Guidance />
+              </Suspense>
+            </Route>
+            <Route path='/map'>
+              <Suspense fallback={<></>}>
+                <Map />
               </Suspense>
             </Route>
           </Switch>
