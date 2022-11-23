@@ -2,6 +2,10 @@
 @tailwind components;
 @tailwind utilities;
 
+body {
+  font-family: "Rubik";
+}
+
 @keyframes run {
   to {
     transform: translate(0%);

@@ -4,11 +4,17 @@ import alias from "@rollup/plugin-alias";
 import preact from "@preact/preset-vite";
 import { VitePWA } from "vite-plugin-pwa";
 import { partytownVite } from "@builder.io/partytown/utils";
+import { VitePluginFonts } from "vite-plugin-fonts";
 
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [
     preact(),
+    VitePluginFonts({
+      google: {
+        families: ["Rubik"],
+      },
+    }),
     partytownVite({
       dest: path.join(__dirname, "dist", "~partytown"),
     }),

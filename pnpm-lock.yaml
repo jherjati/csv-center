@@ -27,6 +27,7 @@ specifiers:
   streamsaver: ^2.0.6
   tailwindcss: ^3.1.8
   vite: ^3.1.0
+  vite-plugin-fonts: ^0.6.0
   vite-plugin-pwa: ^0.13.1
   workbox-window: ^6.5.4
   wouter-preact: ^2.8.0-alpha.2
@@ -61,6 +62,7 @@ devDependencies:
   postcss: 8.4.17
   tailwindcss: 3.1.8
   vite: 3.1.7
+  vite-plugin-fonts: 0.6.0_vite@3.1.7
   vite-plugin-pwa: 0.13.1_vite@3.1.7
   workbox-window: 6.5.4
 
@@ -3450,6 +3452,15 @@ packages:
 
   /util-deprecate/1.0.2:
     resolution: {integrity: sha512-EPD5q1uXyFxJpCrLnCc1nHnq3gOa6DZBocAIiI2TaSCA7VCJ1UJDMagCzIkXNsUYfD1daK//LTEQ8xiIbrHtcw==}
+    dev: true
+
+  /vite-plugin-fonts/0.6.0_vite@3.1.7:
+    resolution: {integrity: sha512-dV6nnLEju8k5EmvlBH6egxkVZ+rgc5zWsJr9+cNRXBMEDnpRGHcZPI260UEDNg2yB99wSTNER2eduEvZFbMIGw==}
+    peerDependencies:
+      vite: ^2.0.0 || ^3.0.0
+    dependencies:
+      fast-glob: 3.2.12
+      vite: 3.1.7
     dev: true
 
   /vite-plugin-pwa/0.13.1_vite@3.1.7:
