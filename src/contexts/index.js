@@ -32,3 +32,15 @@ export const dataConfigs = signal([
     borderColor: null,
   },
 ]);
+
+export const commandText = signal(`
+SELECT 
+  * 
+FROM 
+  sqlite_schema 
+WHERE 
+  type = 'table' 
+  AND name NOT LIKE 'sqlite_%';
+
+PRAGMA table_info('table_name');
+`);

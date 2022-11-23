@@ -4,6 +4,7 @@ import { sql } from "@codemirror/lang-sql";
 import { DBWorker } from "../constants";
 import { ArrowPathIcon, BoltSlashIcon } from "@heroicons/react/20/solid";
 import { setSnackContent } from "../utils";
+import { commandText } from "../contexts";
 
 function Command() {
   const editor = useRef();
@@ -12,17 +13,7 @@ function Command() {
 
   const ref = useCallback((node) => {
     const localEditor = new EditorView({
-      doc: `
-SELECT 
-  * 
-FROM 
-  sqlite_schema 
-WHERE 
-  type = 'table' 
-  AND name NOT LIKE 'sqlite_%';
-
-PRAGMA table_info('table_name');
-`,
+      doc: commandText.value,
       extensions: [basicSetup, sql()],
       parent: node,
     });
@@ -31,10 +22,12 @@ PRAGMA table_info('table_name');
 
   const onExecute = () => {
     setIsLoading(true);
+    const sql = editor.current.state.doc.toString();
+    commandText.value = sql;
     DBWorker.pleaseDo({
       id: "execute command",
       action: "exec",
-      sql: editor.current.state.doc.toString(),
+      sql,
     }).then((data) => {
       if (data.id === "execute command") {
         if (data.error) {
