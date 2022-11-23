@@ -8,7 +8,7 @@ function Guidance() {
       </div>
       <div className='w-full px-6 mt-4 flex'>
         <article className='prose bg-white rounded-lg p-6 shadow'>
-          <h3>User Guide</h3>
+          <h3>User Guide (Alpha Release)</h3>
           <p>
             Hey folks, welcome to CSV center! We are in a mission to make
             working with CSV file such a breeze. Under the hood, we leverage
@@ -16,10 +16,10 @@ function Guidance() {
             as a progressive web application, CSV center is supposed to be
             offline first app so you don’t need to worry about internet
             connection after the very first visit. Currently only{" "}
-            <strong>bug report</strong> and <strong>feature request</strong>{" "}
-            need internet connection. Apart from that, our main workflow is
-            fully offline, those are import, manage, pull insight, and in some
-            case write custom command.
+            <strong>map page</strong>, <strong>bug report</strong> and{" "}
+            <strong>feature request</strong> need internet connection. Apart
+            from that, our main workflow is fully offline, those including
+            import, manage, pull insight, and in some case write custom command.
           </p>
           <ol>
             <li>
@@ -67,7 +67,7 @@ function Guidance() {
             <li>Managing</li>
 
             <p>
-              On manage page you can do BREAD operations. BREAD stand for
+              On manage page you can do BREAD operations. BREAD stands for
               Browse, Read, Edit, Add, and Delete. Browse is facilitated via
               table view. Read, Edit, and Delete can be accomplished after you
               click the row and prompted with detailed view. Add is accommodated
@@ -78,6 +78,18 @@ function Guidance() {
               filter criteria will be joined by AND logical operator. We are
               working on advance filter where you can customize “AND block” and
               “OR block” as needed.
+            </p>
+
+            <li>Map Viewing</li>
+
+            <p>
+              On map page you can observe your (spatial) data on the map. If you
+              have data with longitude and latitude columns, congratulations!
+              all you have to do is click the add layer button and make the
+              necessary configurations. You will see your data will be displayed
+              as points on the map. As usual, you can do BREAD operation to your
+              layer configuration, we try our best to optimize the visualisation
+              process.
             </p>
 
             <li>Pulling Insight</li>
@@ -109,7 +121,31 @@ function Guidance() {
               addition, you can also add annotation to your chart if needed.
             </p>
 
-            <li>Run SQL Command</li>
+            <li>Comparing</li>
+
+            <p>
+              On the comparison page, you can compare values from two or more
+              data sets. You just have to choose which data will be used as the
+              first graphical visualization. You can also specify where the X
+              and Y values come from by selecting via the Column X and Column Y
+              dropdowns. The color of the chart can also be changed so that you
+              can easily distinguish it from other data graph visualizations.
+              When it meets your need, just press the apply button and the data
+              graph visualization will be drawn according to the settings you
+              have made.
+            </p>
+
+            <p>
+              If you want to add data to be compared, you only need to click the
+              plus button and a new data section will be created. Same as
+              before, you only need to select which data you are going to
+              compare, then set the X and Y values, and don't forget set the
+              chart colors. When you click the apply button, a graphical
+              visualization of the data will appear along with the graphical
+              visualization of the previous data.
+            </p>
+
+            <li>Running SQLite Command</li>
 
             <p>
               On command page, you can run your raw sql query, do with your own
@@ -118,6 +154,7 @@ function Guidance() {
               you can save query result as new db table.
             </p>
           </ol>
+          <p>Enjoy diving into your data and discovering new insights !</p>
         </article>
         <UserFeedback />
       </div>
