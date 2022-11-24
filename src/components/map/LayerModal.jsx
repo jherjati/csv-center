@@ -118,6 +118,7 @@ export default function LayerModal({
                             className='mt-1 shadow-sm focus:ring-teal-500 focus:border-teal-500 block w-full text-sm border-gray-300 rounded-md'
                             value={localLayerConfig[key]}
                             onChange={handleChange}
+                            required
                           >
                             <option></option>
                             {dbTables.map((opt) => (
@@ -138,6 +139,7 @@ export default function LayerModal({
                             className='mt-1 shadow-sm focus:ring-teal-500 focus:border-teal-500 block w-full text-sm border-gray-300 rounded-md'
                             value={localLayerConfig[key]}
                             onChange={handleChange}
+                            required
                           >
                             <option></option>
                             {formats.value[localLayerConfig.tableName]
@@ -165,6 +167,7 @@ export default function LayerModal({
                             } text-sm border-gray-300 rounded-md`}
                             value={localLayerConfig[key]}
                             onChange={handleChange}
+                            required
                           />
                         </div>
                       )

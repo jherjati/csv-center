@@ -148,6 +148,7 @@ function ConfigCard({
                   className='mt-1 shadow-sm focus:ring-teal-500 focus:border-teal-500 block w-full text-sm border-gray-300 rounded-md'
                   value={localChartConfig[tabIdx][key]}
                   onChange={handleChange}
+                  required
                 >
                   <option></option>
                   {dbTables.map((opt) => (
@@ -168,6 +169,7 @@ function ConfigCard({
                   className='mt-1 shadow-sm focus:ring-teal-500 focus:border-teal-500 block w-full text-sm border-gray-300 rounded-md'
                   value={localChartConfig[tabIdx][key]}
                   onChange={handleChange}
+                  required
                 >
                   <option></option>
                   {formats.value[localChartConfig[tabIdx].tableName]
@@ -193,6 +195,7 @@ function ConfigCard({
                   } text-sm border-gray-300 rounded-md`}
                   value={localChartConfig[tabIdx][key]}
                   onChange={handleChange}
+                  required
                 />
               </div>
             )
