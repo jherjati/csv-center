@@ -6,6 +6,7 @@ import { setSnackContent } from "../utils";
 import ConfigCard from "../components/compare/ConfigCard";
 import ResultCard from "../components/compare/ResultCard";
 import { chartConfig, dataConfigs } from "../contexts";
+import SampleLoader from "../components/core/SampleLoader";
 
 function Compare() {
   const { dbTables } = useTables();
@@ -27,7 +28,12 @@ function Compare() {
           <h1 className='text-2xl font-semibold text-gray-900'>Compare</h1>
         </div>
         <div className='mx-auto max-w-7xl px-8'>
-          {(!dbTables || !dbTables.length) && <EmptyDb />}
+          {(!dbTables || !dbTables.length) && (
+            <>
+              <EmptyDb />
+              <SampleLoader />
+            </>
+          )}
           {dbTables && (
             <>
               <ResultCard

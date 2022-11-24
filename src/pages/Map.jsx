@@ -9,6 +9,7 @@ import { useTables } from "../hooks";
 import EmptyDb from "../components/core/EmptyDb";
 import Layer from "../components/map/Layer";
 import Popup from "../components/map/Popup";
+import SampleLoader from "../components/core/SampleLoader";
 
 function Map() {
   const { dbTables } = useTables();
@@ -73,6 +74,7 @@ function Map() {
         </div>
         <div className='mx-auto max-w-7xl px-8'>
           <EmptyDb />
+          <SampleLoader />
         </div>
       </main>
     ) : (

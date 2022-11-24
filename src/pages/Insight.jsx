@@ -6,6 +6,7 @@ import EmptyDb from "../components/core/EmptyDb";
 import { formats } from "../contexts";
 import { useTables } from "../hooks";
 import { setSnackContent } from "../utils";
+import SampleLoader from "../components/core/SampleLoader";
 
 function Insight() {
   const { dbTables } = useTables();
@@ -34,7 +35,12 @@ function Insight() {
           <h1 className='text-2xl font-semibold text-gray-900'>Insight</h1>
         </div>
         <div className='mx-auto max-w-7xl px-8'>
-          {(!dbTables || !dbTables.length) && <EmptyDb />}
+          {(!dbTables || !dbTables.length) && (
+            <>
+              <EmptyDb />
+              <SampleLoader />
+            </>
+          )}
           {dbTables && (
             <TableMetric
               key={activeTable}
