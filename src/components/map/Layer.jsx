@@ -39,13 +39,13 @@ function Layer({
   useEffect(() => {
     DBWorker.pleaseDo({
       action: "exec",
-      sql: `SELECT ${longColumn}, ${latColumn} FROM '${tableName}';`,
+      sql: `SELECT ${longColumn}, ${latColumn}, rowid FROM '${tableName}';`,
     }).then(({ results }) => {
       map.getSource(layerName).setData({
         type: "FeatureCollection",
         features: results[0].values.map((coord) => ({
           type: "Feature",
-          properties: {},
+          properties: { id: coord[2] },
           geometry: {
             coordinates: [coord[0], coord[1]],
             type: "Point",
