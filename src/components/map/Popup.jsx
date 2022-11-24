@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "preact/hooks";
+import { useCallback, useEffect, useRef, useState } from "preact/hooks";
 import maplibregl from "maplibre-gl";
 import { DBWorker } from "../../constants";
 
@@ -10,14 +10,20 @@ const Popup = ({ configs, map }) => {
   const [item, setItem] = useState({});
   const [isLoading, setIsLoading] = useState(false);
 
-  useEffect(() => {
-    let onEnter = function () {
+  const onEnter = useCallback(
+    function () {
       map.getCanvas().style.cursor = "pointer";
-    };
-    let onLeave = function () {
+    },
+    [map]
+  );
+  const onLeave = useCallback(
+    function () {
       map.getCanvas().style.cursor = "";
-    };
+    },
+    [map]
+  );
 
+  useEffect(() => {
     try {
       configs.forEach(({ layerName, tableName }) => {
         map.on("click", layerName, function (e) {
