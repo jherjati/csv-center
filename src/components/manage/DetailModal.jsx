@@ -26,7 +26,7 @@ export default function DetailModal({
           const form = document.getElementById("detail-form");
           res.columns.forEach((name, idx) => {
             if (
-              columns.find((col) => col.name === name).type.includes("date")
+              columns.find((col) => col.name === name).type.includes("date ")
             ) {
               form[name].value = dateFormat(
                 new Date(res.values[0][idx] * 1000),
@@ -61,7 +61,7 @@ export default function DetailModal({
         sql: statement,
         params: columns.map((col) => {
           if (
-            types.find((type) => type.label === col.type).label.includes("date")
+            types.find((type) => type.label === col.type).label.includes("date ")
           ) {
             return parse(data[col.name], "yyyy-MM-dd", new Date()) / 1000;
           }
@@ -134,31 +134,29 @@ export default function DetailModal({
                     )}
                   </div>
                   <div className='mt-6 grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6'>
-                    {columns.map(({ name, type }) => (
-                      <div key={name} className='sm:col-span-3'>
-                        <label
-                          htmlFor={name}
-                          className='block text-sm font-medium text-gray-700'
-                        >
-                          {name}
-                        </label>
-                        <div className='mt-1'>
-                          <input
-                            type={types.find((ty) => ty.label === type).input}
-                            step={
-                              types.find((ty) => ty.label === type).db ===
-                              "integer"
-                                ? 1
-                                : "any"
-                            }
-                            name={name}
-                            id={name}
-                            autoComplete={name}
-                            className='shadow-sm focus:ring-teal-500 focus:border-teal-500 block w-full sm:text-sm border-gray-300 rounded-md'
-                          />
+                    {columns.map(({ name, type }) => {
+                      const ty = types.find((ty) => ty.label === type);
+                      return (
+                        <div key={name} className='sm:col-span-3'>
+                          <label
+                            htmlFor={name}
+                            className='block text-sm font-medium text-gray-700'
+                          >
+                            {name}
+                          </label>
+                          <div className='mt-1'>
+                            <input
+                              type={ty?.input ?? "text"}
+                              step={ty?.db === "integer" ? 1 : "any"}
+                              name={name}
+                              id={name}
+                              autoComplete={name}
+                              className='shadow-sm focus:ring-teal-500 focus:border-teal-500 block w-full sm:text-sm border-gray-300 rounded-md'
+                            />
+                          </div>
                         </div>
-                      </div>
-                    ))}
+                      );
+                    })}
                   </div>
                   <div className='flex justify-center border-t mt-3 pt-3 border-teal-100'>
                     <button

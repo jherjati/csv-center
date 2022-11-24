@@ -14,6 +14,8 @@ import SnackBar from "./components/core/Snackbar";
 import Sidebar from "./components/layout/Sidebar";
 import { useInitDB } from "./hooks";
 import Mobile from "./pages/Mobile";
+import { useEffect } from "react";
+import { isSampleData } from "./contexts";
 
 export default function App() {
   useInitDB();
@@ -32,12 +34,22 @@ export default function App() {
             </Route>
             <Route path='/manage'>
               <Suspense fallback={<></>}>
-                <Manage />
+                <Manage key={isSampleData.value} />
+              </Suspense>
+            </Route>
+            <Route path='/map'>
+              <Suspense fallback={<></>}>
+                <Map key={isSampleData.value} />
+              </Suspense>
+            </Route>
+            <Route path='/insight'>
+              <Suspense fallback={<></>}>
+                <Insight key={isSampleData.value} />
               </Suspense>
             </Route>
             <Route path='/compare'>
               <Suspense fallback={<></>}>
-                <Compare />
+                <Compare key={isSampleData.value} />
               </Suspense>
             </Route>
             <Route path='/command'>
@@ -45,19 +57,9 @@ export default function App() {
                 <Command />
               </Suspense>
             </Route>
-            <Route path='/insight'>
-              <Suspense fallback={<></>}>
-                <Insight />
-              </Suspense>
-            </Route>
             <Route path='/guidance'>
               <Suspense fallback={<></>}>
                 <Guidance />
-              </Suspense>
-            </Route>
-            <Route path='/map'>
-              <Suspense fallback={<></>}>
-                <Map />
               </Suspense>
             </Route>
           </Switch>

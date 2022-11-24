@@ -40,9 +40,9 @@ function DbTable({ name, isInFormats, children }) {
         id: "browse column",
         action: "exec",
         sql: `PRAGMA table_info('${name}')`,
-      }).then((data) => {
+      }).then(({ results }) => {
         setColumns(
-          data.results[0]?.values.map((val) => ({
+          results[0]?.values.map((val) => ({
             name: val[1],
             type: val[2].toLowerCase(),
           }))
@@ -63,7 +63,7 @@ function DbTable({ name, isInFormats, children }) {
         action: "exec",
         sql: `SELECT ${[{ name: "rowid" }, ...columns]
           .map((el, idx) => {
-            if (el.type?.includes("date")) {
+            if (el.type?.includes("date ")) {
               newDateIndeks.push(idx);
             }
             return el.name;
@@ -74,6 +74,7 @@ function DbTable({ name, isInFormats, children }) {
         params: filterToValues(filter),
       }).then((data) => {
         let toReturn = data.results[0];
+        toReturn.columns[0] = "rowid";
         if (toReturn && newDateIndeks.length) {
           toReturn.values = toReturn.values.map((row) => {
             let newRow = [...row];
@@ -126,7 +127,7 @@ function DbTable({ name, isInFormats, children }) {
             unparse(
               [
                 columns.map(({ name, type }) => {
-                  if (type.includes("date")) {
+                  if (type.includes("date ")) {
                     return dateFormat(
                       new Date(data.row[name] * 1000),
                       /\[(.*?)\]/.exec(type)[1]

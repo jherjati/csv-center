@@ -86,7 +86,7 @@ export const types = [
 export const getInputType = (appType) => {
   if (appType === "text") {
     return "text";
-  } else if (appType.includes("date")) {
+  } else if (appType.includes("date ")) {
     return "date";
   } else if (["integer", "real"].includes(appType)) {
     return "number";
@@ -96,7 +96,7 @@ export const getInputType = (appType) => {
 export const getDbType = (appType) => {
   if (["text", "real"].includes(appType)) {
     return appType;
-  } else if (appType === "integer" || appType.includes("date")) {
+  } else if (appType === "integer" || appType.includes("date ")) {
     return "integer";
   }
 };

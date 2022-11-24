@@ -28,7 +28,7 @@ export default function FilterModal({
           ? ""
           : columns
               .find((col) => col.name === data["col-add"])
-              .type.includes("date")
+              .type.includes("date ")
           ? parse(data["val-add"], "yyyy-MM-dd", new Date()) / 1000
           : data["val-add"],
       ];
@@ -136,7 +136,7 @@ export default function FilterModal({
                           type={getInputType(thisType)}
                           className={`col-span-3 text-gray-500 shadow-sm focus:ring-teal-500 focus:border-teal-500 block w-full text-sm border-gray-300 h-10`}
                           defaultValue={
-                            thisType.includes("date")
+                            thisType.includes("date ")
                               ? format(new Date(el[2] * 1000), "yyyy-MM-dd")
                               : el[2]
                           }

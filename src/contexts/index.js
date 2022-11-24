@@ -44,3 +44,5 @@ WHERE
 
 PRAGMA table_info('table_name');
 `);
+
+export const isSampleData = signal(false);

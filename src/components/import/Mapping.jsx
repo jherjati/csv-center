@@ -58,7 +58,7 @@ function Mapping({ fields, file, tabName, setTabName }) {
             realKeys.push(key);
           } else if (
             types
-              .filter((ty) => ty.label.includes("date"))
+              .filter((ty) => ty.label.includes("date "))
               .map((ty) => ty.label)
               .includes(formData[key])
           ) {
@@ -120,7 +120,7 @@ function Mapping({ fields, file, tabName, setTabName }) {
             realKeys.push(mapping[col.name]);
           } else if (
             types
-              .filter((ty) => ty.label.includes("date"))
+              .filter((ty) => ty.label.includes("date "))
               .map((ty) => ty.label)
               .includes(col.type)
           ) {
