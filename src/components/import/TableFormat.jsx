@@ -34,8 +34,8 @@ function TableFormat({ fields, file, tabName, setTabName }) {
         Object.keys(importedFormats).forEach(
           (key) => (newFormats[key] = importedFormats[key])
         );
-        localStorage.setItem("predefined_tables", JSON.stringify(newFormats));
         formats.value = newFormats;
+        localStorage.setItem("predefined_tables", JSON.stringify(newFormats));
       };
       input.click();
     } catch (error) {}

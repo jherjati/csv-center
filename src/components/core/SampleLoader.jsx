@@ -1,7 +1,8 @@
 import { InboxArrowDownIcon } from "@heroicons/react/20/solid";
 import { transfer } from "comlink";
 import { DBWorker } from "../../constants";
-import { isSampleData } from "../../contexts";
+import { formats, isSampleData } from "../../contexts";
+import { instrospectDB } from "../../utils";
 
 function SampleLoader() {
   return (
@@ -17,18 +18,16 @@ function SampleLoader() {
           let res = await fetch("/sql/chinook.db");
           res = await res.arrayBuffer();
           res = new Uint8Array(res);
-          DBWorker.pleaseDo(
+          await DBWorker.pleaseDo(
             {
               id: "load_session",
               action: "open",
               buffer: transfer(res, [res]),
             },
             [res]
-          ).then(({ ready }) => {
-            if (ready) {
-              isSampleData.value = true;
-            }
-          });
+          );
+          await instrospectDB();
+          isSampleData.value = true;
         }}
         role='button'
         className='inline-flex items-center rounded-lg border border-gray-300 bg-white px-3 py-1.5 text-sm font-medium leading-5 text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2'

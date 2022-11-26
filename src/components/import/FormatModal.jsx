@@ -96,11 +96,11 @@ export default function FormatModal({
         ]);
       } else {
         newFormats[tableName] = newFormat;
-        localStorage.setItem("predefined_tables", JSON.stringify(newFormats));
         if (focusFormat !== tableName) {
           setTabName(tableName);
         }
         formats.value = newFormats;
+        localStorage.setItem("predefined_tables", JSON.stringify(newFormats));
         setOpen(false);
       }
     }

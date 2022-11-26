@@ -12,7 +12,7 @@ import PreviewTable from "../components/import/PreviewTable";
 import TableFormat from "../components/import/TableFormat";
 import PageError from "../components/core/PageError";
 import Dropzone from "../components/import/Dropzone";
-import { setSnackContent } from "../utils";
+import { instrospectDB, setSnackContent } from "../utils";
 import { DBWorker } from "../constants";
 import { formats } from "../contexts";
 
@@ -41,41 +41,7 @@ function Import() {
         },
         [reader.result]
       );
-      const { results } = await DBWorker.pleaseDo({
-        id: "browse table",
-        action: "exec",
-        sql: `SELECT name FROM sqlite_schema WHERE type ='table' AND name NOT LIKE 'sqlite_%';`,
-      });
-      const newTables = results[0]?.values?.map((el) => el[0]);
-      const data = await DBWorker.pleaseDo({
-        id: "browse column",
-        action: "exec",
-        sql: newTables.map((name) => `PRAGMA table_info('${name}')`).join(";"),
-      });
-
-      const newFormats = { ...formats.value };
-      data.results.forEach((res, idx) => {
-        const oldFormat = newFormats[newTables[idx]];
-        let newFormat = res.values.map((val) => ({
-          name: val[1],
-          type: ["integer", "real"].includes(val[2].toLowerCase())
-            ? val[2].toLowerCase()
-            : "text",
-          aliases: [],
-        }));
-
-        if (oldFormat) {
-          newFormat = newFormat.map((col) => {
-            const oldCol = oldFormat.find((c) => c.name === col.name);
-            if (oldCol) {
-              col.alises = oldCol.aliases;
-            }
-            return col;
-          });
-        }
-        newFormats[newTables[idx]] = newFormat;
-      });
-      formats.value = newFormats;
+      await instrospectDB();
       setLocation("/manage");
     };
     reader.readAsArrayBuffer(event.target.files[0]);

@@ -1,5 +1,5 @@
-import { types } from "../constants";
-import { snackbar } from "../contexts";
+import { DBWorker, types } from "../constants";
+import { formats, snackbar } from "../contexts";
 
 export function paginate(page, maxPage) {
   if (maxPage <= 7) {
@@ -108,3 +108,42 @@ export const formatDynamic = (data, withHeader) =>
       );
     })
     .join(", ");
+
+export const instrospectDB = async () => {
+  const { results } = await DBWorker.pleaseDo({
+    id: "browse table",
+    action: "exec",
+    sql: `SELECT name FROM sqlite_schema WHERE type ='table' AND name NOT LIKE 'sqlite_%';`,
+  });
+  const newTables = results[0]?.values?.map((el) => el[0]);
+  const data = await DBWorker.pleaseDo({
+    id: "browse column",
+    action: "exec",
+    sql: newTables.map((name) => `PRAGMA table_info('${name}')`).join(";"),
+  });
+
+  const newFormats = { ...formats.value };
+  data.results.forEach((res, idx) => {
+    const oldFormat = newFormats[newTables[idx]];
+    let newFormat = res.values.map((val) => ({
+      name: val[1],
+      type: ["integer", "real"].includes(val[2].toLowerCase())
+        ? val[2].toLowerCase()
+        : "text",
+      aliases: [],
+    }));
+
+    if (oldFormat) {
+      newFormat = newFormat.map((col) => {
+        const oldCol = oldFormat.find((c) => c.name === col.name);
+        if (oldCol) {
+          col.alises = oldCol.aliases;
+        }
+        return col;
+      });
+    }
+    newFormats[newTables[idx]] = newFormat;
+  });
+  formats.value = newFormats;
+  localStorage.setItem("predefined_tables", JSON.stringify(newFormats));
+};
