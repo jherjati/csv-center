@@ -14,7 +14,7 @@ export default function FormatTabs({
   setOpen,
 }) {
   return (
-    <div className='border-b border-gray-200'>
+    <div className='border-b border-gray-200 w-full mb-6'>
       <div className='-mb-px flex overflow-x-scroll' aria-label='Format Tabs'>
         <button
           onClick={() => setTabName("Dynamic")}
