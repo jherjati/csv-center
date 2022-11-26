@@ -61,7 +61,9 @@ export default function DetailModal({
         sql: statement,
         params: columns.map((col) => {
           if (
-            types.find((type) => type.label === col.type).label.includes("date ")
+            types
+              .find((type) => type.label === col.type)
+              .label.includes("date ")
           ) {
             return parse(data[col.name], "yyyy-MM-dd", new Date()) / 1000;
           }

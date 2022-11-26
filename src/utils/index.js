@@ -26,9 +26,7 @@ export const symbolReplacer = (inputString) =>
   inputString.trim().replaceAll(/[^a-zA-Z0-9]/g, "_");
 
 export const dbNameEscaper = (inputString) => {
-  let toReturn = symbolReplacer(inputString)
-    .toLowerCase()
-    .replaceAll("__", "_");
+  let toReturn = symbolReplacer(inputString).replaceAll("__", "_");
   return toReturn.slice(-1) === "_" ? toReturn.slice(0, -1) : toReturn;
 };
 

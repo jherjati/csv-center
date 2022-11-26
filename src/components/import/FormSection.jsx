@@ -29,7 +29,7 @@ function FormSection({ tabName, fields, columns }) {
         : columns.map((col, id) => {
             const candidates = col.aliases
               .concat([col.name])
-              .map((el) => dbNameEscaper(el));
+              .map((el) => dbNameEscaper(el).toLowerCase());
             return (
               <div key={id}>
                 <label
@@ -43,7 +43,7 @@ function FormSection({ tabName, fields, columns }) {
                   id={col.name + "_mapping"}
                   className='mt-2 w-full shadow-sm focus:ring-teal-500 focus:border-teal-500 block text-sm border-gray-300 rounded-md'
                   defaultValue={fields.find((el) =>
-                    candidates.includes(dbNameEscaper(el))
+                    candidates.includes(dbNameEscaper(el).toLowerCase())
                   )}
                 >
                   {fields.map((el) => (
