@@ -1,20 +1,20 @@
 import { Suspense, lazy } from "preact/compat";
 import { Route, Switch } from "wouter-preact";
 
-const Insight = lazy(() => import("./pages/Insight"));
+const Map = lazy(() => import("./pages/Map"));
 const Import = lazy(() => import("./pages/Import"));
 const Manage = lazy(() => import("./pages/Manage"));
+const Insight = lazy(() => import("./pages/Insight"));
 const Compare = lazy(() => import("./pages/Compare"));
 const Command = lazy(() => import("./pages/Command"));
 const Guidance = lazy(() => import("./pages/Guidance"));
-const Map = lazy(() => import("./pages/Map"));
 
+import Mobile from "./pages/Mobile";
 import SWModal from "./components/core/SWModal";
 import SnackBar from "./components/core/Snackbar";
 import Sidebar from "./components/layout/Sidebar";
+
 import { useInitDB } from "./hooks";
-import Mobile from "./pages/Mobile";
-import { useEffect } from "react";
 import { isSampleData } from "./contexts";
 
 export default function App() {
