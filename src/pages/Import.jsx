@@ -1,51 +1,27 @@
-import { parse } from "papaparse";
-import { useEffect, useErrorBoundary, useState } from "preact/hooks";
+import {
+  useCallback,
+  useEffect,
+  useErrorBoundary,
+  useState,
+} from "preact/hooks";
+import { InboxArrowDownIcon } from "@heroicons/react/20/solid";
+import { useLocation } from "wouter-preact";
+import { transfer } from "comlink";
+
+import PreviewTable from "../components/import/PreviewTable";
+import TableFormat from "../components/import/TableFormat";
 import PageError from "../components/core/PageError";
 import Dropzone from "../components/import/Dropzone";
-import Mapping from "../components/import/Mapping";
-import PreviewTable from "../components/import/PreviewTable";
-import { formats, withHeader } from "../contexts";
 import { setSnackContent } from "../utils";
-import { useLocation } from "wouter-preact";
-import { InboxArrowDownIcon } from "@heroicons/react/20/solid";
-import { transfer } from "comlink";
 import { DBWorker } from "../constants";
+import { formats } from "../contexts";
 
 function Import() {
   const [_, setLocation] = useLocation();
   const [fields, setFields] = useState([]);
   const [file, setFile] = useState();
-  const [error, resetError] = useErrorBoundary((error) => {
-    console.error(error);
-    setSnackContent([
-      "error",
-      "Unexpected Thing Happened",
-      "Don't worry, refresh button is your friend",
-    ]);
-  });
 
-  const [prevData, setPrevData] = useState([]);
-  useEffect(() => {
-    if (file)
-      try {
-        parse(file, {
-          header: withHeader.value,
-          preview: 5,
-          complete: function (res) {
-            setFields(Object.keys(res.data[0]));
-            setPrevData(res.data);
-          },
-        });
-      } catch (error) {
-        console.error(error);
-        setSnackContent([
-          "error",
-          "An Error Occured",
-          "You might miss something on your csv file",
-        ]);
-      }
-  }, [file, withHeader.value]);
-
+  // Auto detect format candidate
   const [tabName, setTabName] = useState("Dynamic");
   useEffect(() => {
     if (file) {
@@ -54,6 +30,31 @@ function Import() {
     }
   }, [file]);
 
+  const loadSession = useCallback((event) => {
+    const reader = new FileReader();
+    reader.onload = function () {
+      DBWorker.pleaseDo(
+        {
+          id: "load_session",
+          action: "open",
+          buffer: transfer(reader.result, [reader.result]),
+        },
+        [reader.result]
+      ).then((_) => {
+        setLocation("/manage");
+      });
+    };
+    reader.readAsArrayBuffer(event.target.files[0]);
+  }, []);
+
+  const [error, resetError] = useErrorBoundary((error) => {
+    console.error(error);
+    setSnackContent([
+      "error",
+      "Unexpected Thing Happened",
+      "Don't worry, refresh button is your friend",
+    ]);
+  });
   if (error) {
     return <PageError resetError={resetError} />;
   } else {
@@ -65,20 +66,9 @@ function Import() {
         <div className='mx-auto max-w-7xl px-8 mb-6'>
           <Dropzone setFile={setFile} />
           {file && (
-            <PreviewTable
-              fields={fields}
-              rows={prevData}
-              fileString={
-                file
-                  ? file.name +
-                    " - " +
-                    parseInt(file.size / 1000) +
-                    " kilobytes"
-                  : ""
-              }
-            />
+            <PreviewTable fields={fields} setFields={setFields} file={file} />
           )}
-          <Mapping
+          <TableFormat
             fields={fields}
             file={file}
             tabName={tabName}
@@ -97,22 +87,7 @@ function Import() {
             name='load_session'
             id='load_session'
             className='hidden'
-            onChange={(event) => {
-              const reader = new FileReader();
-              reader.onload = function () {
-                DBWorker.pleaseDo(
-                  {
-                    id: "load_session",
-                    action: "open",
-                    buffer: transfer(reader.result, [reader.result]),
-                  },
-                  [reader.result]
-                ).then((_) => {
-                  setLocation("/manage");
-                });
-              };
-              reader.readAsArrayBuffer(event.target.files[0]);
-            }}
+            onChange={loadSession}
           />
           <label
             htmlFor='load_session'

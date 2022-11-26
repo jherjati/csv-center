@@ -3,7 +3,7 @@ import { classNames } from "../../utils";
 export default function TableTabs({ dbTables, setActiveTable, activeTable }) {
   return (
     <div className='mt-6'>
-      <nav className='flex' aria-label='Tabs'>
+      <div className='flex' aria-label='Tabs'>
         {dbTables.map((tab, idx) => (
           <button
             onClick={() => setActiveTable(idx)}
@@ -19,7 +19,7 @@ export default function TableTabs({ dbTables, setActiveTable, activeTable }) {
             {tab}
           </button>
         ))}
-      </nav>
+      </div>
     </div>
   );
 }

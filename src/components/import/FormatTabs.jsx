@@ -7,10 +7,15 @@ import { PencilSquareIcon } from "@heroicons/react/24/outline";
 
 import { formats } from "../../contexts";
 
-export default function Tabs({ tabName, setTabName, setFocusFormat, setOpen }) {
+export default function FormatTabs({
+  tabName,
+  setTabName,
+  setFocusFormat,
+  setOpen,
+}) {
   return (
     <div className='border-b border-gray-200'>
-      <nav className='-mb-px flex overflow-x-scroll' aria-label='Tabs'>
+      <div className='-mb-px flex overflow-x-scroll' aria-label='Format Tabs'>
         <button
           onClick={() => setTabName("Dynamic")}
           type={"button"}
@@ -67,7 +72,7 @@ export default function Tabs({ tabName, setTabName, setFocusFormat, setOpen }) {
             />
           </button>
         ))}
-      </nav>
+      </div>
     </div>
   );
 }

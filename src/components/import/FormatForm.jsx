@@ -1,7 +1,7 @@
 import { types } from "../../constants";
 import { dbNameEscaper } from "../../utils";
 
-function FormSection({ tabName, fields, columns }) {
+function FormatForm({ tabName, fields, columns }) {
   return (
     <section className='grid grid-cols-2 gap-4'>
       {tabName === "Dynamic"
@@ -59,4 +59,4 @@ function FormSection({ tabName, fields, columns }) {
   );
 }
 
-export default FormSection;
+export default FormatForm;

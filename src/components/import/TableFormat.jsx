@@ -1,4 +1,3 @@
-import { formats, withHeader } from "../../contexts";
 import { useLocation } from "wouter-preact";
 import { parse } from "papaparse";
 import { parse as dateParse } from "date-fns";
@@ -9,10 +8,19 @@ import {
   ArrowUpCircleIcon,
   PlusCircleIcon,
 } from "@heroicons/react/20/solid";
-import Tabs from "./Tabs";
+
+import FormatTabs from "./FormatTabs";
+import Actions from "../core/Actions";
 import FormatModal from "./FormatModal";
-import FormSection from "./FormSection";
-import { exportStringifiedJson, parseJsonFile, types, DBWorker } from "../../constants";
+import FormatForm from "./FormatForm";
+
+import { formats, withHeader } from "../../contexts";
+import {
+  exportStringifiedJson,
+  parseJsonFile,
+  types,
+  DBWorker,
+} from "../../constants";
 import {
   dbNameEscaper,
   formatColumns,
@@ -21,22 +29,21 @@ import {
   setSnackContent,
   symbolReplacer,
 } from "../../utils";
-import Actions from "../core/Actions";
 
-function Mapping({ fields, file, tabName, setTabName }) {
+function TableFormat({ fields, file, tabName, setTabName }) {
   const [_, setLocation] = useLocation();
-
   const columns = useMemo(
     () => (tabName === "Dynamic" ? [] : formats.value[tabName]),
     [tabName, formats.value]
   );
-  const [addOpen, setAddOpen] = useState(false);
-  const [isImporting, setIsImporting] = useState(false);
+  const [isModal, setIsModal] = useState(false);
+  const [isImport, setIsImport] = useState(false);
+  const [focusFormat, setFocusFormat] = useState();
 
   const handleImport = async (event) => {
     event.preventDefault();
     try {
-      setIsImporting(true);
+      setIsImport(true);
       const form = new FormData(event.target);
       let stepFunction,
         tableName = tabName;
@@ -102,14 +109,12 @@ function Mapping({ fields, file, tabName, setTabName }) {
           `;
 
           parser.pause();
-          DBWorker
-            .pleaseDo({
-              id: "insert row",
-              action: "exec",
-              sql: statement,
-              params: Object.keys(formData).map((key) => row.data[key]),
-            })
-            .then(() => parser.resume());
+          DBWorker.pleaseDo({
+            id: "insert row",
+            action: "exec",
+            sql: statement,
+            params: Object.keys(formData).map((key) => row.data[key]),
+          }).then(() => parser.resume());
         };
       } else {
         const mapping = Object.fromEntries(form.entries());
@@ -159,14 +164,12 @@ function Mapping({ fields, file, tabName, setTabName }) {
             `;
 
           parser.pause();
-          DBWorker
-            .pleaseDo({
-              id: "insert row",
-              action: "exec",
-              sql: statement,
-              params: columns.map((col) => row.data[mapping[col.name]]),
-            })
-            .then(() => parser.resume());
+          DBWorker.pleaseDo({
+            id: "insert row",
+            action: "exec",
+            sql: statement,
+            params: columns.map((col) => row.data[mapping[col.name]]),
+          }).then(() => parser.resume());
         };
       }
 
@@ -176,7 +179,7 @@ function Mapping({ fields, file, tabName, setTabName }) {
         step: stepFunction,
         error: function (error) {
           console.error(error);
-          setIsImporting(false);
+          setIsImport(false);
           setSnackContent([
             "error",
             "An Error Occured",
@@ -184,27 +187,25 @@ function Mapping({ fields, file, tabName, setTabName }) {
           ]);
         },
         complete: function () {
-          DBWorker
-            .pleaseDo({
-              id: "check complete",
-              action: "exec",
-              sql: `PRAGMA main.quick_check('${tableName}')`,
-            })
-            .then((data) => {
-              setSnackContent([
-                "success",
-                tableName + " Table Checked",
-                data.error
-                  ? "Something missed, maybe not needed, keep going!"
-                  : "All is well, happy exploration!",
-              ]);
-              setLocation("/manage");
-            });
+          DBWorker.pleaseDo({
+            id: "check complete",
+            action: "exec",
+            sql: `PRAGMA main.quick_check('${tableName}')`,
+          }).then((data) => {
+            setSnackContent([
+              "success",
+              tableName + " Table Checked",
+              data.error
+                ? "Something missed, maybe not needed, keep going!"
+                : "All is well, happy exploration!",
+            ]);
+            setLocation("/manage");
+          });
         },
       });
     } catch (error) {
       console.error(error);
-      setIsImporting(false);
+      setIsImport(false);
       setSnackContent([
         "error",
         "An Error Occured",
@@ -213,13 +214,11 @@ function Mapping({ fields, file, tabName, setTabName }) {
     }
   };
 
-  const [focusFormat, setFocusFormat] = useState();
-
-  const openNewFormat = (event) => {
+  const openNewFormat = useCallback((event) => {
     event.preventDefault();
     setFocusFormat(null);
-    setAddOpen(true);
-  };
+    setIsModal(true);
+  }, []);
 
   const importFormat = useCallback(() => {
     try {
@@ -267,16 +266,16 @@ function Mapping({ fields, file, tabName, setTabName }) {
           />
         </title>
         <div className='w-full mb-6'>
-          <Tabs
+          <FormatTabs
             tabName={tabName}
             setTabName={setTabName}
             setFocusFormat={setFocusFormat}
-            setOpen={setAddOpen}
+            setOpen={setIsModal}
           />
         </div>
-        <FormSection tabName={tabName} fields={fields} columns={columns} />
+        <FormatForm tabName={tabName} fields={fields} columns={columns} />
         <button className='py-3 px-6 mt-6 rounded-lg block mx-auto bg-teal-600 text-white'>
-          {isImporting ? (
+          {isImport ? (
             <ArrowPathIcon className='w-6 h-6 animate-spin mx-3' />
           ) : (
             "Import"
@@ -284,8 +283,8 @@ function Mapping({ fields, file, tabName, setTabName }) {
         </button>
       </form>
       <FormatModal
-        open={addOpen}
-        setOpen={setAddOpen}
+        open={isModal}
+        setOpen={setIsModal}
         focusFormat={focusFormat}
         tabName={tabName}
         setTabName={setTabName}
@@ -294,4 +293,4 @@ function Mapping({ fields, file, tabName, setTabName }) {
   );
 }
 
-export default Mapping;
+export default TableFormat;

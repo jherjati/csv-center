@@ -42,7 +42,7 @@ const Pagination = ({ page, maxPage, setPage, count }) => {
           </p>
         </div>
         <div>
-          <nav
+          <div
             className='relative z-0 inline-flex -space-x-px rounded-md shadow-sm'
             aria-label='Pagination'
           >
@@ -89,7 +89,7 @@ const Pagination = ({ page, maxPage, setPage, count }) => {
               <span className='sr-only'>Next</span>
               <ChevronRightIcon className='w-5 h-5' aria-hidden='true' />
             </button>
-          </nav>
+          </div>
         </div>
       </div>
     </div>

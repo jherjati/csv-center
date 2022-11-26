@@ -1,6 +1,38 @@
-import Toggle from "./Toggle";
+import { parse } from "papaparse";
+import { useEffect, useMemo, useState } from "preact/hooks";
 
-export default function PreviewTable({ fields, rows, fileString }) {
+import Toggle from "./Toggle";
+import { withHeader } from "../../contexts";
+import { setSnackContent } from "../../utils";
+
+export default function PreviewTable({ fields, setFields, file }) {
+  const fileString = useMemo(
+    () => file.name + " - " + parseInt(file.size / 1000) + " kilobytes",
+    [file]
+  );
+
+  const [rows, setRows] = useState([]);
+  useEffect(() => {
+    if (file)
+      try {
+        parse(file, {
+          header: withHeader.value,
+          preview: 5,
+          complete: function (res) {
+            setFields(Object.keys(res.data[0]));
+            setRows(res.data);
+          },
+        });
+      } catch (error) {
+        console.error(error);
+        setSnackContent([
+          "error",
+          "An Error Occured",
+          "You might miss something on your csv file",
+        ]);
+      }
+  }, [file, withHeader.value]);
+
   return (
     <section
       style={{ animation: "forwards fadein1 1.6s" }}
