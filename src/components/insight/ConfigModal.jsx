@@ -4,6 +4,12 @@ import {
   PlusSmallIcon,
   TrashIcon,
 } from "@heroicons/react/20/solid";
+import {
+  AiOutlineLineChart,
+  AiOutlineBarChart,
+  AiOutlineDotChart,
+  AiOutlinePieChart,
+} from "react-icons/ai";
 import { Fragment } from "preact";
 import { useEffect, useState } from "preact/hooks";
 import { metricConfigs } from "../../contexts";
@@ -187,25 +193,115 @@ export default function ConfigModal({ open, setOpen, tableName, columns }) {
 
                   {charts.map((chart, chartIdx) => (
                     <div className='grid gap-y-6 gap-x-4 grid-cols-12'>
-                      <div className='sm:col-span-12'>
-                        <label
-                          htmlFor={`chart_${chartIdx}_type`}
-                          className='block text-sm font-medium text-gray-700'
-                        >
+                      <div className='col-span-12 grid grid-cols-12 gap-x-3 gap-y-1'>
+                        <label className='col-span-12 block text-sm font-medium text-gray-700'>
                           Chart Type
                         </label>
-                        <select
-                          name={`chart_${chartIdx}_type`}
-                          className='mt-1 shadow-sm focus:ring-teal-500 focus:border-teal-500 block w-full sm:text-sm border-gray-300 rounded-md'
-                          defaultValue={chart["type"]}
-                          onChange={(event) => {
-                            setType(event.target.value);
-                            setDatasetLength(1);
-                          }}
-                        >
-                          <option value='line'>line</option>
-                          <option value='bar'>bar</option>
-                        </select>
+                        <div className='col-span-3'>
+                          <input
+                            onChange={(event) => setType(event.target.value)}
+                            type='radio'
+                            id='line-chart'
+                            name={`chart_${chartIdx}_type`}
+                            value='line'
+                            class='hidden peer'
+                            checked={type === "line"}
+                          />
+                          <label
+                            for='line-chart'
+                            class='inline-flex justify-center items-center space-x-3 p-2 w-full text-gray-700 bg-white rounded-lg border border-gray-200 cursor-pointer  peer-checked:border-teal-600 peer-checked:text-teal-600 peer-checked:bg-gray-100 hover:text-gray-600 hover:bg-gray-100'
+                          >
+                            <AiOutlineLineChart className='h-8 w-8' />
+                            <div>
+                              <h6 class='w-full text-sm font-semibold'>
+                                Line Chart
+                              </h6>
+                              <p class='w-full text-xs'>Good for data series</p>
+                            </div>
+                          </label>
+                        </div>
+                        <div className='col-span-3'>
+                          <input
+                            onChange={(event) => {
+                              setType(event.target.value);
+                              setDatasetLength(1);
+                            }}
+                            type='radio'
+                            id='bar-chart'
+                            name={`chart_${chartIdx}_type`}
+                            value='bar'
+                            class='hidden peer'
+                            checked={type === "bar"}
+                          />
+                          <label
+                            for='bar-chart'
+                            class='inline-flex justify-center items-center space-x-3 p-2 w-full text-gray-700 bg-white rounded-lg border border-gray-200 cursor-pointer  peer-checked:border-teal-600 peer-checked:text-teal-600 peer-checked:bg-gray-100 hover:text-gray-600 hover:bg-gray-100'
+                          >
+                            <AiOutlineBarChart className='h-8 w-8' />
+                            <div>
+                              <h6 class='w-full text-sm font-semibold'>
+                                Bar Chart
+                              </h6>
+                              <p class='w-full text-xs'>
+                                Good for aggregate data
+                              </p>
+                            </div>
+                          </label>
+                        </div>
+                        <div className='col-span-3 relative'>
+                          <input
+                            onChange={(event) => setType(event.target.value)}
+                            type='radio'
+                            id='scatter-chart'
+                            name={`chart_${chartIdx}_type`}
+                            value='scatter'
+                            class='hidden peer'
+                            disabled
+                          />
+                          <label
+                            for='scatter-chart'
+                            class='inline-flex justify-center items-center space-x-3 p-2 w-full text-gray-700 bg-white rounded-lg border border-gray-200 peer-disabled:opacity-50'
+                          >
+                            <AiOutlineDotChart className='h-8 w-8' />
+                            <div>
+                              <h6 class='w-full text-sm font-semibold'>
+                                Scatter Plot
+                              </h6>
+                              <p class='w-full text-xs'>Good for point data</p>
+                            </div>
+                          </label>
+                          <span className='absolute top-0 right-0 -mr-2 -mt-4 py-1 px-3 text-xs flex justify-center items-center bg-teal-400 text-white rounded-xl shadow'>
+                            Upcoming
+                          </span>
+                        </div>
+                        <div className='col-span-3 relative'>
+                          <input
+                            onChange={(event) => setType(event.target.value)}
+                            type='radio'
+                            id='pie-chart'
+                            name={`chart_${chartIdx}_type`}
+                            value='pie'
+                            class='hidden peer'
+                            disabled
+                          />
+                          <label
+                            for='pie-chart'
+                            class='inline-flex justify-center items-center space-x-3 p-2 w-full text-gray-700 bg-white rounded-lg border border-gray-200 peer-disabled:opacity-50'
+                          >
+                            <AiOutlinePieChart className='h-8 w-8' />
+                            <div>
+                              <h6 class='w-full text-sm font-semibold'>
+                                Pie Chart
+                              </h6>
+                              <p class='w-full text-xs'>
+                                Good for aggregate data
+                              </p>
+                            </div>
+                          </label>
+                          <span className='absolute top-0 right-0 -mr-2 -mt-4 py-1 px-3 text-xs flex justify-center items-center bg-teal-400 text-white rounded-xl shadow'>
+                            Upcoming
+                          </span>
+                        </div>
                       </div>
 
                       {chartForm[type]
@@ -256,7 +352,7 @@ export default function ConfigModal({ open, setOpen, tableName, columns }) {
 
                       <div className='relative border rounded-lg px-3 pt-6 pb-3 col-span-12 grid grid-cols-12 gap-y-6 gap-x-4'>
                         <h6 className='absolute top-0 left-0 -mt-3 ml-4 bg-white px-3 text-sm font-medium text-gray-900'>
-                          Dataset
+                          {type === "line" ? "Datasets" : "Dataset"}
                         </h6>
                         {type === "line" && (
                           <div className='absolute top-0 right-0 -mt-3 mr-4 bg-white text-sm font-medium text-gray-900 flex rounded-md shadow-sm'>
@@ -269,7 +365,7 @@ export default function ConfigModal({ open, setOpen, tableName, columns }) {
                               }}
                             >
                               <MinusSmallIcon
-                                className='h-5 w-5 text-gray-400'
+                                className='h-5 w-5 text-gray-700'
                                 aria-hidden='true'
                               />
                             </button>
@@ -281,7 +377,7 @@ export default function ConfigModal({ open, setOpen, tableName, columns }) {
                               }}
                             >
                               <PlusSmallIcon
-                                className='h-5 w-5 text-gray-400'
+                                className='h-5 w-5 text-gray-700'
                                 aria-hidden='true'
                               />
                             </button>
@@ -293,7 +389,13 @@ export default function ConfigModal({ open, setOpen, tableName, columns }) {
                               .filter((input) => input.section === "data")
                               .map((input) =>
                                 input.type === "select" ? (
-                                  <div className='sm:col-span-4'>
+                                  <div
+                                    className={
+                                      type === "line"
+                                        ? "col-span-4"
+                                        : "col-span-3"
+                                    }
+                                  >
                                     <label
                                       htmlFor={`chart_${chartIdx}_${input.name}.${dataIdx}`}
                                       className='block text-sm font-medium text-gray-700'
@@ -302,7 +404,7 @@ export default function ConfigModal({ open, setOpen, tableName, columns }) {
                                     </label>
                                     <select
                                       name={`chart_${chartIdx}_${input.name}.${dataIdx}`}
-                                      className='mt-1 shadow-sm focus:ring-teal-500 focus:border-teal-500 block w-full sm:text-sm border-gray-300 rounded-md'
+                                      className='mt-1 shadow-sm focus:ring-teal-500 focus:border-teal-500 block w-full text-sm border-gray-300 rounded-md'
                                       defaultValue={
                                         getPropByString(
                                           chart,
@@ -316,7 +418,13 @@ export default function ConfigModal({ open, setOpen, tableName, columns }) {
                                     </select>
                                   </div>
                                 ) : (
-                                  <div className='sm:col-span-4'>
+                                  <div
+                                    className={
+                                      type === "line"
+                                        ? "col-span-4"
+                                        : "col-span-3"
+                                    }
+                                  >
                                     <label
                                       htmlFor={`chart_${chartIdx}_${input.name}.${dataIdx}`}
                                       className='block text-sm font-medium text-gray-700'
@@ -331,7 +439,7 @@ export default function ConfigModal({ open, setOpen, tableName, columns }) {
                                         input.type === "color"
                                           ? "h-10 p-0 border-0"
                                           : ""
-                                      } sm:text-sm border-gray-300 rounded-md`}
+                                      } text-sm border-gray-300 rounded-md`}
                                       defaultValue={
                                         getPropByString(
                                           chart,

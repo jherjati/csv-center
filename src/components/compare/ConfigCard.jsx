@@ -90,7 +90,7 @@ function ConfigCard({
                     : "text-gray-300 hover:text-gray-700"
                 }`}
               >
-                {"Table " + (configIdx + 1)}
+                {"Dataset " + (configIdx + 1)}
               </h6>
               {Boolean(configIdx) && (
                 <XCircleIcon
