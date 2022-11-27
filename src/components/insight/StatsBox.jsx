@@ -1,28 +1,52 @@
 import { ArrowDownIcon, ArrowUpIcon } from "@heroicons/react/20/solid";
-import { classNames } from "../../utils";
+import { useEffect, useMemo, useState } from "preact/hooks";
+import { DBWorker } from "../../constants";
+import { classNames, filterToString, filterToValues } from "../../utils";
 
-export default function Stats({ column, values }) {
-  const stats = [
-    {
-      name: "Maximum",
-      change:
-        parseFloat(((values[0] - values[1]) / values[1]) * 100).toFixed(2) +
-        "%",
-      changeType: "increase",
-    },
-    {
-      name: "Average",
-      change: "0%",
-      changeType: "increase",
-    },
-    {
-      name: "Minimum",
-      change:
-        parseFloat(((values[2] - values[1]) / values[1]) * 100).toFixed(2) +
-        "%",
-      changeType: "decrease",
-    },
-  ];
+export default function StatsBox({ column, tableName, filter }) {
+  const [values, setValues] = useState([0, 0, 0]);
+
+  useEffect(() => {
+    const sql = `SELECT MAX(${column}), AVG(${column}), MIN(${column}), COUNT(${column}) FROM '${tableName}' ${filterToString(
+      filter
+    )};`;
+    const params = filterToValues(filter);
+
+    DBWorker.pleaseDo({
+      id: "get metric",
+      action: "exec",
+      sql,
+      params,
+    }).then(({ results }) => {
+      setValues(results[0].values[0]);
+    });
+  }, [column, filter]);
+
+  const stats = useMemo(
+    () => [
+      {
+        name: "Maximum",
+        change:
+          parseFloat(((values[0] - values[1]) / values[1]) * 100).toFixed(2) +
+          "%",
+        changeType: "increase",
+      },
+      {
+        name: "Average",
+        change: "0%",
+        changeType: "increase",
+      },
+      {
+        name: "Minimum",
+        change:
+          parseFloat(((values[2] - values[1]) / values[1]) * 100).toFixed(2) +
+          "%",
+        changeType: "decrease",
+      },
+    ],
+    [values]
+  );
+
   return (
     <dl className='grid divide-gray-200 overflow-hidden grid-cols-3 divide-x border-b border-gray-200'>
       {stats.map((item, idx) => (

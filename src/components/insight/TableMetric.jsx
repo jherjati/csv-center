@@ -1,7 +1,7 @@
 import { useEffect, useState } from "preact/hooks";
 import { formats, metricConfigs } from "../../contexts";
 import Actions from "../core/Actions";
-import Stats from "./Stats";
+import StatsBox from "./StatsBox";
 import {
   Chart,
   LineController,
@@ -16,7 +16,6 @@ import {
 } from "chart.js";
 import ChartBox from "./ChartBox";
 import FilterModal from "../core/FilterModal";
-import { filterToString, filterToValues } from "../../utils";
 import ConfigModal from "./ConfigModal";
 import annotationPlugin from "chartjs-plugin-annotation";
 import { forwardRef } from "react";
@@ -52,22 +51,19 @@ const TableMetric = forwardRef(
           id: "browse column",
           action: "exec",
           sql: `PRAGMA table_info('${name}')`,
-        }).then((data) => {
-          if (data.id === "browse column") {
-            setColumns(
-              data.results[0]?.values.map((el) => ({
-                name: el[1],
-                type: el[2].toLowerCase(),
-              }))
-            );
-          }
+        }).then(({ results }) => {
+          setColumns(
+            results[0]?.values.map((el) => ({
+              name: el[1],
+              type: el[2].toLowerCase(),
+            }))
+          );
         });
       } else {
         setColumns(formats.value[name]);
       }
     }, [name, isInFormats]);
 
-    const [statsValues, setStatsValues] = useState([]);
     const [filter, setFilter] = useState([]);
 
     // Fill Config Placeholder
@@ -135,37 +131,6 @@ const TableMetric = forwardRef(
         };
     }, [columns]);
 
-    // Stats Data
-    useEffect(() => {
-      const config = metricConfigs.value[name];
-      if (config?.stats.length || config?.charts.length) {
-        const sql = `${config.stats
-          .filter((stat) => Boolean(stat))
-          .map(
-            (stat) =>
-              `SELECT MAX(${stat}), AVG(${stat}), MIN(${stat}), COUNT(${stat}) FROM '${name}' ${filterToString(
-                filter
-              )}`
-          )
-          .join("; ")}
-        `;
-        const params = filterToValues(filter);
-
-        DBWorker.pleaseDo({
-          id: "get metric",
-          action: "exec",
-          sql,
-          params,
-        }).then(({ results }) => {
-          setStatsValues(
-            results.map((result) => {
-              return result.values[0];
-            })
-          );
-        });
-      }
-    }, [metricConfigs.value, filter]);
-
     const [filterOpen, setFilterOpen] = useState(false);
     const [configOpen, setConfigOpen] = useState(false);
 
@@ -185,23 +150,18 @@ const TableMetric = forwardRef(
           />
         </div>
         <div ref={ref} className='border-y border-gray-200'>
-          {statsValues.map((stat, idx) => (
-            <Stats
-              column={metricConfigs.value[name].stats[idx]}
-              values={stat}
-            />
+          {metricConfigs.value[name]?.stats.map((col) => (
+            <StatsBox column={col} tableName={name} filter={filter} />
           ))}
           <div className='w-full grid grid-cols-6'>
-            {metricConfigs.value[name]?.charts.map((config) => {
-              return (
-                <ChartBox
-                  key={config.type}
-                  config={config}
-                  name={name}
-                  filter={filter}
-                />
-              );
-            })}
+            {metricConfigs.value[name]?.charts.map((config) => (
+              <ChartBox
+                key={config.type}
+                config={config}
+                name={name}
+                filter={filter}
+              />
+            ))}
           </div>
         </div>
         {columns.length ? (

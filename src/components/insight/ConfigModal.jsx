@@ -40,37 +40,36 @@ export default function ConfigModal({ open, setOpen, tableName, columns }) {
         stats[key.split("_")[1]] = data[key];
       } else {
         const [_, idx, name] = key.split("_");
-        const newChart = charts[idx];
-        setPropByString(newChart, name, data[key]);
+        setPropByString(charts[idx], name, data[key]);
         // side effect below
         if (name.includes("annotation")) {
           setPropByString(
-            newChart,
+            charts[idx],
             "options.plugins.annotation.annotations.box1.display",
             Boolean(data[key])
           );
         } else if (name.includes("xColumn")) {
-          setPropByString(newChart, "options.scales.x.title", {
+          setPropByString(charts[idx], "options.scales.x.title", {
             display: true,
             text: data[key],
           });
         } else if (name === "type") {
           switch (data[key]) {
             case "bar":
-              newChart.options.scales.x.type = "category";
-              newChart.options.scales.x.offset = true;
-              newChart.options.scales.x.grid.offset = true;
-              newChart.options.scales.x.ticks.callback =
+              charts[idx].options.scales.x.type = "category";
+              charts[idx].options.scales.x.offset = true;
+              charts[idx].options.scales.x.grid.offset = true;
+              charts[idx].options.scales.x.ticks.callback =
                 CategoryScale.prototype.getLabelForValue;
-              newChart.options.scales.y.beginAtZero = true;
+              charts[idx].options.scales.y.beginAtZero = true;
               break;
             case "line":
-              newChart.options.scales.x.type = "linear";
-              newChart.options.scales.x.offset = false;
-              newChart.options.scales.x.grid.offset = false;
-              newChart.options.scales.x.ticks.callback =
+              charts[idx].options.scales.x.type = "linear";
+              charts[idx].options.scales.x.offset = false;
+              charts[idx].options.scales.x.grid.offset = false;
+              charts[idx].options.scales.x.ticks.callback =
                 Ticks.formatters.numeric;
-              newChart.options.scales.y.beginAtZero = false;
+              charts[idx].options.scales.y.beginAtZero = false;
               break;
             default:
               break;
