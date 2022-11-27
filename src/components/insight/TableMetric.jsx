@@ -16,7 +16,7 @@ import {
 } from "chart.js";
 import ChartBox from "./ChartBox";
 import FilterModal from "../core/FilterModal";
-import { filterToString, filterToValues, setSnackContent } from "../../utils";
+import { filterToString, filterToValues } from "../../utils";
 import ConfigModal from "./ConfigModal";
 import annotationPlugin from "chartjs-plugin-annotation";
 import { forwardRef } from "react";
@@ -68,9 +68,9 @@ const TableMetric = forwardRef(
     }, [name, isInFormats]);
 
     const [statsValues, setStatsValues] = useState([]);
-    const [chartsValues, setChartsValues] = useState([]);
     const [filter, setFilter] = useState([]);
 
+    // Fill Config Placeholder
     useEffect(() => {
       if (columns.length && !metricConfigs.value[name])
         metricConfigs.value = {
@@ -135,95 +135,33 @@ const TableMetric = forwardRef(
         };
     }, [columns]);
 
+    // Stats Data
     useEffect(() => {
       const config = metricConfigs.value[name];
-
       if (config?.stats.length || config?.charts.length) {
-        const params = filterToValues(filter);
-        const availableCharts = config.charts.filter(
-          (chart) => chart.xColumn && chart.yColumn.length
-        );
         const sql = `${config.stats
           .filter((stat) => Boolean(stat))
           .map(
             (stat) =>
               `SELECT MAX(${stat}), AVG(${stat}), MIN(${stat}), COUNT(${stat}) FROM '${name}' ${filterToString(
                 filter
-              )};`
+              )}`
           )
-          .join(" ")}
-          ${availableCharts
-            .map((chart) =>
-              chart.type === "bar"
-                ? `SELECT ${chart.xColumn}, ${chart.dataOperator[0]}(${
-                    chart.yColumn[0]
-                  }) FROM '${name}' ${filterToString(filter)} GROUP BY ${
-                    chart.xColumn
-                  } ORDER BY ${chart.dataOperator[0]}(${chart.yColumn[0]});`
-                : `SELECT ${chart.xColumn}, ${chart.yColumn.join(
-                    ", "
-                  )} FROM '${name}' ${filterToString(filter)} ORDER BY ${
-                    chart.xColumn
-                  } LIMIT ${chart.dataLimit};`
-            )
-            .join(" ")}
+          .join("; ")}
         `;
-
-        if (!availableCharts.length) {
-          setSnackContent([
-            "error",
-            "Insufficient Data",
-            "Chart requires at least 2 real or integer columns",
-          ]);
-        }
+        const params = filterToValues(filter);
 
         DBWorker.pleaseDo({
           id: "get metric",
           action: "exec",
           sql,
           params,
-        }).then((data) => {
-          if (data.id === "get metric") {
-            const newStatsValues = [],
-              newChartsValues = [];
-            data.results.map((result, idx) => {
-              if (idx < config.stats.length)
-                newStatsValues.push(result.values[0]);
-              else {
-                newChartsValues.push({
-                  labels:
-                    config.charts[idx - config.stats.length].type === "line"
-                      ? []
-                      : result.values.map((value) => value[0]),
-                  datasets: config.charts[
-                    idx - config.stats.length
-                  ].borderColor.map((col, colIdx) => ({
-                    label: result.columns[colIdx + 1],
-                    normalized: true,
-                    parsing: result.columns[colIdx + 1].includes("("), //bar chart need parsing, bar chart use operator
-                    borderColor: col,
-                    backgroundColor:
-                      config.charts[idx - config.stats.length].backgroundColor[
-                        colIdx
-                      ],
-                    data: result.values.map((value) => ({
-                      x: value[0],
-                      y: value[colIdx + 1],
-                    })),
-                  })),
-                });
-              }
-            });
-            setStatsValues(newStatsValues);
-            setChartsValues(newChartsValues);
-          } else if (data.id === "browse column") {
-            setColumns(
-              data.results[0]?.values.map((el) => ({
-                name: el[1],
-                type: el[2].toLowerCase(),
-              }))
-            );
-          }
+        }).then(({ results }) => {
+          setStatsValues(
+            results.map((result) => {
+              return result.values[0];
+            })
+          );
         });
       }
     }, [metricConfigs.value, filter]);
@@ -254,13 +192,16 @@ const TableMetric = forwardRef(
             />
           ))}
           <div className='w-full grid grid-cols-6'>
-            {chartsValues.map((dataset, idx) => (
-              <ChartBox
-                key={idx}
-                data={dataset}
-                config={metricConfigs.value[name].charts[idx]}
-              />
-            ))}
+            {metricConfigs.value[name]?.charts.map((config) => {
+              return (
+                <ChartBox
+                  key={config.type}
+                  config={config}
+                  name={name}
+                  filter={filter}
+                />
+              );
+            })}
           </div>
         </div>
         {columns.length ? (

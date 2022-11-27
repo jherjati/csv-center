@@ -33,13 +33,7 @@ export default function ConfigModal({ open, setOpen, tableName, columns }) {
     const data = Object.fromEntries(form.entries());
     const stats = [];
     const charts = [...metricConfigs.value[tableName].charts];
-
-    charts[0].yColumn = charts[0].yColumn.slice(0, datasetLength);
-    charts[0].borderColor = charts[0].borderColor.slice(0, datasetLength);
-    charts[0].backgroundColor = charts[0].backgroundColor.slice(
-      0,
-      datasetLength
-    );
+    Object.keys(charts).forEach((key) => (charts[key] = { ...charts[key] }));
 
     Object.keys(data).forEach((key) => {
       if (key.includes("stat")) {
@@ -56,11 +50,10 @@ export default function ConfigModal({ open, setOpen, tableName, columns }) {
             Boolean(data[key])
           );
         } else if (name.includes("xColumn")) {
-          const axis = name.split("Column")[0];
-          newChart.options.scales[axis].title = {
+          setPropByString(newChart, "options.scales.x.title", {
             display: true,
             text: data[key],
-          };
+          });
         } else if (name === "type") {
           switch (data[key]) {
             case "bar":
