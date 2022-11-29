@@ -1,10 +1,13 @@
-import { InboxArrowDownIcon } from "@heroicons/react/20/solid";
+import { ArrowPathIcon, InboxArrowDownIcon } from "@heroicons/react/20/solid";
 import { transfer } from "comlink";
+import { useState } from "preact/hooks";
 import { DBWorker } from "../../constants";
-import { formats, isSampleData } from "../../contexts";
+import { isSampleData } from "../../contexts";
 import { instrospectDB } from "../../utils";
 
 function SampleLoader() {
+  const [isImport, setIsImport] = useState(false);
+
   return (
     <div
       style={{ animation: "forwards fadein2 1.6s" }}
@@ -15,28 +18,41 @@ function SampleLoader() {
 
       <button
         onClick={async () => {
-          let res = await fetch("/sample/sample.db");
-          res = await res.arrayBuffer();
-          res = new Uint8Array(res);
-          await DBWorker.pleaseDo(
-            {
-              id: "load_session",
-              action: "open",
-              buffer: transfer(res, [res]),
-            },
-            [res]
-          );
-          await instrospectDB();
-          isSampleData.value = true;
+          setIsImport(true);
+          try {
+            let res = await fetch("/sample.db");
+            res = await res.arrayBuffer();
+            res = new Uint8Array(res);
+            await DBWorker.pleaseDo(
+              {
+                id: "load_session",
+                action: "open",
+                buffer: transfer(res, [res]),
+              },
+              [res]
+            );
+            await instrospectDB();
+            isSampleData.value = true;
+          } catch (error) {
+            console.error(error);
+          } finally {
+            setIsImport(false);
+          }
         }}
         role='button'
-        className='inline-flex items-center rounded-lg border border-gray-300 bg-white px-3 py-1.5 text-sm font-medium leading-5 text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2'
+        className='w-48 inline-flex items-center justify-evenly rounded-lg border border-gray-300 bg-white px-3 py-1.5 text-sm font-medium leading-5 text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2'
       >
-        <InboxArrowDownIcon
-          className='mr-2 h-5 w-5 text-gray-400'
-          aria-hidden='true'
-        />
-        <p>Load Sample Data</p>
+        {isImport ? (
+          <ArrowPathIcon className='w-5 h-5 animate-spin' />
+        ) : (
+          <>
+            <InboxArrowDownIcon
+              className='mr-2 h-5 w-5 text-gray-400'
+              aria-hidden='true'
+            />
+            <p>Load Sample Data</p>
+          </>
+        )}
       </button>
     </div>
   );
