@@ -1,4 +1,4 @@
-importScripts("/comlink.js");
+importScripts("/scripts/comlink.js");
 
 var initSqlJsPromise = undefined;
 

@@ -20,11 +20,11 @@ export default defineConfig({
     }),
     VitePWA({
       includeAssets: [
-        "favicon.svg",
-        "favicon.ico",
+        "icons/favicon.svg",
+        "icons/favicon.ico",
         "robots.txt",
         "browserconfig.xml",
-        "safari-pinned-tab.svg",
+        "icons/safari-pinned-tab.svg",
       ],
       manifest: {
         name: "CSV Center",
@@ -36,17 +36,17 @@ export default defineConfig({
         display: "standalone",
         icons: [
           {
-            src: "android-chrome-192x192.png",
+            src: "icons/android-chrome-192x192.png",
             sizes: "192x192",
             type: "image/png",
           },
           {
-            src: "android-chrome-512x512.png",
+            src: "icons/android-chrome-512x512.png",
             sizes: "512x512",
             type: "image/png",
           },
           {
-            src: "android-chrome-512x512.png",
+            src: "icons/android-chrome-512x512.png",
             sizes: "512x512",
             type: "image/png",
             purpose: "any maskable",

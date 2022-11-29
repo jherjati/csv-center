@@ -12,7 +12,7 @@ function Sidebar() {
         <div className='flex flex-1 flex-col overflow-y-auto pb-4'>
           <img
             className='w-56 h-[70px] bg-white'
-            src='long_icon.webp'
+            src='icons/long_icon.webp'
             alt='CSV Center'
           />
           <nav className='mt-2 flex-1 space-y-1 px-2'>

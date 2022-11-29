@@ -6,7 +6,7 @@ export default function Mobile() {
           <span className='sr-only'>Your Company</span>
           <img
             className='h-24 w-auto'
-            src='/android-chrome-512x512.png'
+            src='/icons/android-chrome-512x512.png'
             alt=''
           />
         </a>
