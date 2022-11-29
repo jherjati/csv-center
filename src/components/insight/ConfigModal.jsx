@@ -39,7 +39,15 @@ export default function ConfigModal({ open, setOpen, tableName, columns }) {
     const data = Object.fromEntries(form.entries());
     const stats = [];
     const charts = [...metricConfigs.value[tableName].charts];
-    Object.keys(charts).forEach((key) => (charts[key] = { ...charts[key] }));
+    Object.keys(charts).forEach(
+      (key) =>
+        (charts[key] = {
+          ...charts[key],
+          yColumn: charts[key].yColumn.slice(0, datasetLength),
+          borderColor: charts[key].borderColor.slice(0, datasetLength),
+          backgroundColor: charts[key].backgroundColor.slice(0, datasetLength),
+        })
+    );
 
     Object.keys(data).forEach((key) => {
       if (key.includes("stat")) {
