@@ -58,7 +58,7 @@ jobs:
         uses: chetan/invalidate-cloudfront-action@v2
         env:
           DISTRIBUTION: E2291X0UOHT6RN
-          PATHS: "/~partytown/* /assets/* /icons/* /others/* /scripts/* /sql/* browserconfig.xml index.html manifest.json robots.txt sw.js workbox-e0782b83.js"
+          PATHS: "/*"
           AWS_REGION: "ap-southeast-1"
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
