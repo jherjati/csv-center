@@ -1,9 +1,10 @@
 import { PlusIcon, TrashIcon } from "@heroicons/react/24/solid";
+import { layerConfigs } from "../../contexts";
 
-function LayerLegend({ setOpen, configs, setFocusLayer, setLayerConfigs }) {
+function LayerLegend({ setOpen, setFocusLayer }) {
   return (
     <div className='absolute bottom-6 right-2 w-72 z-10 space-y-1'>
-      {configs.map(({ layerName, circleColor }) => (
+      {layerConfigs.value.map(({ layerName, circleColor }) => (
         <button
           key={layerName}
           className='flex items-center space-x-2 border p-2 rounded-lg w-full border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500'
@@ -21,8 +22,8 @@ function LayerLegend({ setOpen, configs, setFocusLayer, setLayerConfigs }) {
             onClick={(event) => {
               event.preventDefault();
               event.stopPropagation();
-              setLayerConfigs((prev) =>
-                prev.filter((conf) => conf.layerName !== layerName)
+              layerConfigs.value = layerConfigs.value.filter(
+                (conf) => conf.layerName !== layerName
               );
             }}
             type='button'

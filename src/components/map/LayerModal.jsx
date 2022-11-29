@@ -1,7 +1,7 @@
 import { Dialog, Transition } from "@headlessui/react";
 import { Fragment } from "preact";
-import { useCallback, useState } from "preact/hooks";
-import { formats } from "../../contexts";
+import { useCallback, useEffect, useState } from "preact/hooks";
+import { formats, layerConfigs } from "../../contexts";
 
 const configForm = {
   layerName: ["text", "Layer Name"],
@@ -18,27 +18,26 @@ export default function LayerModal({
   dbTables,
   isEditing,
   layerConfig,
-  setLayerConfigs,
 }) {
-  const [localLayerConfig, setLocalLayerConfig] = useState(
-    isEditing
-      ? layerConfig
-      : {
-          layerName: null,
-          tableName: null,
-          longColumn: null,
-          latColumn: null,
-          circleColor: null,
-          circleSize: 3,
-        }
-  );
+  const [localLayerConfig, setLocalLayerConfig] = useState({
+    layerName: null,
+    tableName: null,
+    longColumn: null,
+    latColumn: null,
+    circleColor: null,
+    circleSize: 3,
+  });
+
+  useEffect(() => {
+    if (open && isEditing) setLocalLayerConfig(layerConfig);
+  }, [open]);
 
   const handleSubmit = useCallback(
     async (event) => {
       event.preventDefault();
       const form = new FormData(event.target);
       const data = Object.fromEntries(form.entries());
-      setLayerConfigs((prev) => {
+      const newConfigs = ((prev) => {
         if (isEditing) {
           const newConfigs = [...prev];
           const oldIdx = newConfigs.findIndex(
@@ -49,7 +48,8 @@ export default function LayerModal({
         } else {
           return [...prev, data];
         }
-      });
+      })(layerConfigs.value);
+      layerConfigs.value = newConfigs;
       setOpen(false);
     },
     [layerConfig]

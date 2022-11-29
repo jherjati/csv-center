@@ -10,13 +10,13 @@ import EmptyDb from "../components/core/EmptyDb";
 import Layer from "../components/map/Layer";
 import Popup from "../components/map/Popup";
 import SampleLoader from "../components/core/SampleLoader";
+import { layerConfigs } from "../contexts";
 
 function Map() {
   const { dbTables } = useTables();
   const mapRef = useRef();
   const mapContainer = useRef();
   const [mapLoad, setMapLoad] = useState(false);
-  const [layerConfigs, setLayerConfigs] = useState([]);
   const [focusLayer, setFocusLayer] = useState();
 
   const [error, resetError] = useErrorBoundary((error) => {
@@ -61,7 +61,7 @@ function Map() {
 
   const [open, setOpen] = useState(false);
   useEffect(() => {
-    if (!open) setFocusLayer();
+    if (!open) setFocusLayer(null);
   }, [open]);
 
   if (error) {
@@ -89,24 +89,21 @@ function Map() {
           setOpen={setOpen}
           dbTables={dbTables}
           isEditing={Boolean(focusLayer)}
-          layerConfig={layerConfigs.find(
+          layerConfig={layerConfigs.value.find(
             (conf) => conf.layerName === focusLayer
           )}
-          setLayerConfigs={setLayerConfigs}
+          setLayerConfigs={(newConf) => {
+            layerConfigs.value = newConf;
+          }}
         />
         <main className='relative w-full h-full' ref={mapContainer}>
           {mapLoad ? (
             <>
-              <LayerLegend
-                setOpen={setOpen}
-                configs={layerConfigs}
-                setFocusLayer={setFocusLayer}
-                setLayerConfigs={setLayerConfigs}
-              />
-              {layerConfigs.map((conf) => (
+              <LayerLegend setOpen={setOpen} setFocusLayer={setFocusLayer} />
+              {layerConfigs.value.map((conf) => (
                 <Layer key={conf.layerName} map={mapRef.current} {...conf} />
               ))}
-              <Popup map={mapRef.current} configs={layerConfigs} />
+              <Popup map={mapRef.current} configs={layerConfigs.value} />
             </>
           ) : (
             <LoadingCover />
