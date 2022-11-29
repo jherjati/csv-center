@@ -15,7 +15,7 @@ function SampleLoader() {
 
       <button
         onClick={async () => {
-          let res = await fetch("/sql/chinook.db");
+          let res = await fetch("/sql/sample.db");
           res = await res.arrayBuffer();
           res = new Uint8Array(res);
           await DBWorker.pleaseDo(
