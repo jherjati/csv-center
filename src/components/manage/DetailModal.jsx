@@ -22,21 +22,17 @@ export default function DetailModal({
         params: [focusId],
       }).then((data) => {
         const res = data.results[0];
-        setTimeout(() => {
-          const form = document.getElementById("detail-form");
-          res.columns.forEach((name, idx) => {
-            if (
-              columns.find((col) => col.name === name).type.includes("date ")
-            ) {
-              form[name].value = dateFormat(
-                new Date(res.values[0][idx] * 1000),
-                "yyyy-MM-dd"
-              );
-            } else {
-              form[name].value = res.values[0][idx];
-            }
-          });
-        }, 50);
+        const form = document.getElementById("detail-form");
+        res.columns.forEach((name, idx) => {
+          if (columns.find((col) => col.name === name).type.includes("date ")) {
+            form[name].value = dateFormat(
+              new Date(res.values[0][idx] * 1000),
+              "yyyy-MM-dd"
+            );
+          } else {
+            form[name].value = res.values[0][idx];
+          }
+        });
       });
     }
   }, [open, focusId]);
