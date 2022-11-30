@@ -4,7 +4,7 @@ import { classNames } from "../../utils";
 import { QuestionMarkCircleIcon } from "@heroicons/react/24/solid";
 
 function Sidebar() {
-  const [location, setLocation] = useLocation();
+  const [location] = useLocation();
 
   return (
     <div className='fixed inset-y-0 flex w-56 flex-col'>
@@ -41,29 +41,28 @@ function Sidebar() {
             ))}
           </nav>
         </div>
-        <div className='flex flex-shrink-0 bg-gray-700'>
+
+        <Link href='/guidance'>
           <button
-            onClick={() => {
-              setLocation("/guidance");
-            }}
-            className='p-4 group block w-full flex-shrink-0 hover:bg-gray-700'
+            className={
+              "flex items-center p-4 group w-full flex-shrink-0 " +
+              (location === "/guidance" ? "bg-gray-900" : "hover:bg-gray-700")
+            }
           >
-            <div className='flex items-center'>
-              <QuestionMarkCircleIcon
-                className='mr-3 flex-shrink-0 h-6 w-6 text-gray-400 group-hover:text-gray-300 scale-150'
-                aria-hidden='true'
-              />
-              <div className='ml-3 text-left'>
-                <p className='text-sm font-medium text-gray-300 group-hover:text-white'>
-                  Guidance
-                </p>
-                <p className='text-xs font-medium text-gray-400 group-hover:text-gray-300'>
-                  Simply get started
-                </p>
-              </div>
+            <QuestionMarkCircleIcon
+              className='mr-3 flex-shrink-0 h-6 w-6 text-gray-300 group-hover:text-gray-100 scale-150'
+              aria-hidden='true'
+            />
+            <div className='ml-3 text-left'>
+              <p className='text-sm font-medium text-gray-200 group-hover:text-gray-50'>
+                Guidance
+              </p>
+              <p className='text-xs font-medium text-gray-300 group-hover:text-gray-100'>
+                Simply get started
+              </p>
             </div>
           </button>
-        </div>
+        </Link>
       </div>
     </div>
   );
