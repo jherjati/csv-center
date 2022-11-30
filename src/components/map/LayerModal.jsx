@@ -29,7 +29,18 @@ export default function LayerModal({
   });
 
   useEffect(() => {
-    if (open && isEditing) setLocalLayerConfig(layerConfig);
+    if (open) {
+      isEditing
+        ? setLocalLayerConfig(layerConfig)
+        : setLocalLayerConfig({
+            layerName: null,
+            tableName: null,
+            longColumn: null,
+            latColumn: null,
+            circleColor: null,
+            circleSize: 3,
+          });
+    }
   }, [open]);
 
   const handleSubmit = useCallback(

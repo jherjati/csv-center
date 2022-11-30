@@ -56,9 +56,9 @@ function TableFormat({ fields, file, tabName, setTabName }) {
       className='mt-6 px-6 pb-6 bg-white rounded-lg shadow'
     >
       <title className='py-3 flex justify-between items-center'>
-        <h4 className='text-xl font-semibold text-gray-900 capitalize'>
+        <h2 className='text-xl font-semibold text-gray-900 capitalize'>
           Table Format
-        </h4>
+        </h2>
         <Actions
           icons={[PlusCircleIcon, ArrowDownCircleIcon, ArrowUpCircleIcon]}
           labels={["Add", "Import", "Export"]}

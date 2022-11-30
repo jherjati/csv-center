@@ -40,13 +40,13 @@ export default function PreviewTable({ fields, setFields, file }) {
     >
       <div className='flex justify-between items-center'>
         <span>
-          <h1 className='text-xl font-semibold text-gray-900 inline mr-3'>
+          <h2 className='text-xl font-semibold text-gray-900 inline mr-3'>
             Preview
-          </h1>
+          </h2>
           {fileString && (
-            <h2 className='text-lg font-medium text-gray-900 inline'>
+            <h3 className='text-lg font-medium text-gray-900 inline'>
               {fileString}
-            </h2>
+            </h3>
           )}
         </span>
         <Toggle />
