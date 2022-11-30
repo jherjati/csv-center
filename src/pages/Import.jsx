@@ -1,23 +1,15 @@
-import {
-  useCallback,
-  useEffect,
-  useErrorBoundary,
-  useState,
-} from "preact/hooks";
-import { InboxArrowDownIcon } from "@heroicons/react/20/solid";
-import { useLocation } from "wouter-preact";
-import { transfer } from "comlink";
+import { useEffect, useErrorBoundary, useState } from "preact/hooks";
 
 import PreviewTable from "../components/import/PreviewTable";
 import TableFormat from "../components/import/TableFormat";
 import PageError from "../components/core/PageError";
 import Dropzone from "../components/import/Dropzone";
-import { instrospectDB, setSnackContent } from "../utils";
-import { DBWorker } from "../constants";
+import { setSnackContent } from "../utils";
+
 import { formats } from "../contexts";
+import DBLoader from "../components/import/DBLoader";
 
 function Import() {
-  const [_, setLocation] = useLocation();
   const [fields, setFields] = useState([]);
   const [file, setFile] = useState();
 
@@ -29,23 +21,6 @@ function Import() {
       if (Object.keys(formats.value).includes(tableName)) setTabName(tableName);
     }
   }, [file]);
-
-  const loadSession = useCallback((event) => {
-    const reader = new FileReader();
-    reader.onload = async function () {
-      await DBWorker.pleaseDo(
-        {
-          id: "load_session",
-          action: "open",
-          buffer: transfer(reader.result, [reader.result]),
-        },
-        [reader.result]
-      );
-      await instrospectDB();
-      setLocation("/manage");
-    };
-    reader.readAsArrayBuffer(event.target.files[0]);
-  }, []);
 
   const [error, resetError] = useErrorBoundary((error) => {
     console.error(error);
@@ -75,32 +50,7 @@ function Import() {
             setTabName={setTabName}
           />
         </div>
-        <div
-          style={{ animation: "forwards fadein3 1.6s" }}
-          className='flex items-center px-9'
-        >
-          <span className='pr-3 text-lg font-medium text-gray-900'>Or</span>
-          <div className='border-t border-gray-300 grow' />
-          <input
-            accept='.db'
-            type='file'
-            name='load_session'
-            id='load_session'
-            className='hidden'
-            onChange={loadSession}
-          />
-          <label
-            htmlFor='load_session'
-            role='button'
-            className='inline-flex items-center rounded-lg border border-gray-300 bg-white px-3 py-1.5 text-sm font-medium leading-5 text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2'
-          >
-            <InboxArrowDownIcon
-              className='mr-2 h-5 w-5 text-gray-400'
-              aria-hidden='true'
-            />
-            <p>Load Session</p>
-          </label>
-        </div>
+        <DBLoader />
       </main>
     );
   }

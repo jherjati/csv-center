@@ -1,12 +1,34 @@
 import { ArrowPathIcon, InboxArrowDownIcon } from "@heroicons/react/20/solid";
 import { transfer } from "comlink";
-import { useState } from "preact/hooks";
+import { useCallback, useState } from "preact/hooks";
 import { DBWorker } from "../../constants";
 import { isSampleData } from "../../contexts";
 import { instrospectDB } from "../../utils";
 
 function SampleLoader() {
   const [isImport, setIsImport] = useState(false);
+  const handleLoad = useCallback(async () => {
+    setIsImport(true);
+    try {
+      let res = await fetch("/sample.db");
+      res = await res.arrayBuffer();
+      res = new Uint8Array(res);
+      await DBWorker.pleaseDo(
+        {
+          id: "load_session",
+          action: "open",
+          buffer: transfer(res, [res]),
+        },
+        [res]
+      );
+      await instrospectDB();
+      isSampleData.value = true;
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setIsImport(false);
+    }
+  }, []);
 
   return (
     <div
@@ -17,28 +39,7 @@ function SampleLoader() {
       <div className='border-t border-gray-300 grow' />
 
       <button
-        onClick={async () => {
-          setIsImport(true);
-          try {
-            let res = await fetch("/sample.db");
-            res = await res.arrayBuffer();
-            res = new Uint8Array(res);
-            await DBWorker.pleaseDo(
-              {
-                id: "load_session",
-                action: "open",
-                buffer: transfer(res, [res]),
-              },
-              [res]
-            );
-            await instrospectDB();
-            isSampleData.value = true;
-          } catch (error) {
-            console.error(error);
-          } finally {
-            setIsImport(false);
-          }
-        }}
+        onClick={handleLoad}
         role='button'
         className='w-48 inline-flex items-center justify-evenly rounded-lg border border-gray-300 bg-white px-3 py-1.5 text-sm font-medium leading-5 text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2'
       >
