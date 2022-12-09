@@ -7,7 +7,7 @@ const Manage = lazy(() => import("./pages/Manage"));
 const Insight = lazy(() => import("./pages/Insight"));
 const Compare = lazy(() => import("./pages/Compare"));
 const Command = lazy(() => import("./pages/Command"));
-const Guidance = lazy(() => import("./pages/Guidance"));
+const Guide = lazy(() => import("./pages/Guide"));
 
 import Mobile from "./pages/Mobile";
 import SWModal from "./components/core/SWModal";
@@ -57,9 +57,9 @@ export default function App() {
                 <Command />
               </Suspense>
             </Route>
-            <Route path='/guidance'>
+            <Route path='/guide'>
               <Suspense fallback={<></>}>
-                <Guidance />
+                <Guide />
               </Suspense>
             </Route>
           </Switch>

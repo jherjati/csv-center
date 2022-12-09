@@ -1,25 +1,26 @@
-import UserFeedback from "../components/guidance/UserFeedback";
+import UserFeedback from "../components/guide/UserFeedback";
 
-function Guidance() {
+function Guide() {
   return (
     <main className='py-6'>
       <div className='mx-auto max-w-7xl px-8'>
-        <h1 className='text-2xl font-semibold text-gray-900'>Guidance</h1>
+        <h1 className='text-2xl font-semibold text-gray-900'>Guide</h1>
       </div>
       <div className='w-full px-6 mt-4 flex'>
         <article className='prose bg-white rounded-lg p-6 shadow'>
           <h3>User Guide (Alpha Release)</h3>
           <p>
-            Hey folks, welcome to CSV center! We are in a mission to make
-            working with CSV file such a breeze. Under the hood, we leverage
-            SQLite as in-browser database via web assembly. Built from ground up
-            as a progressive web application, CSV center is supposed to be
-            offline first app so you don’t need to worry about internet
-            connection after the very first visit. Currently only{" "}
-            <strong>map page</strong>, <strong>bug report</strong> and{" "}
-            <strong>feature request</strong> need internet connection. Apart
-            from that, our main workflow is fully offline, those including
-            import, manage, pull insight, and in some case write custom command.
+            Hi there! Welcome to the CSV center. Our mission is to make working
+            with CSV files a breeze. We use SQLite and web assembly to create an
+            in-browser database, your data privacy and security is our number 1
+            priority. CSV center is built as a progressive web app and is
+            designed to be an offline-first app, so you don't need to worry
+            about an internet connection after your first visit. Currently, only
+            the <strong>map page</strong>, <strong>bug report</strong> , and{" "}
+            <strong>feature request</strong> require an internet connection. All
+            other features, such as importing, managing, and pulling insights,
+            are fully offline, as well as the ability to write custom SQL
+            commands. We hope you enjoy using CSV center!
           </p>
           <ol>
             <li>
@@ -125,24 +126,14 @@ function Guidance() {
 
             <p>
               On the comparison page, you can compare values from two or more
-              data sets. You just have to choose which data will be used as the
-              first graphical visualization. You can also specify where the X
-              and Y values come from by selecting via the Column X and Column Y
-              dropdowns. The color of the chart can also be changed so that you
-              can easily distinguish it from other data graph visualizations.
-              When it meets your need, just press the apply button and the data
+              datasets. You just have to choose which data will be used as the
+              graphical visualization data source. You need to specify where the
+              X and Y values come from via Column X and Column Y dropdowns. The
+              color of the graphs can also be changed so that you can easily
+              differentiate data graph visualizations from one another. When all
+              config meet your need, just press the apply button and the data
               graph visualization will be drawn according to the settings you
               have made.
-            </p>
-
-            <p>
-              If you want to add data to be compared, you only need to click the
-              plus button and a new data section will be created. Same as
-              before, you only need to select which data you are going to
-              compare, then set the X and Y values, and don't forget set the
-              chart colors. When you click the apply button, a graphical
-              visualization of the data will appear along with the graphical
-              visualization of the previous data.
             </p>
 
             <li>Running SQLite Command</li>
@@ -162,4 +153,4 @@ function Guidance() {
   );
 }
 
-export default Guidance;
+export default Guide;

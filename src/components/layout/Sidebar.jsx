@@ -42,11 +42,11 @@ function Sidebar() {
           </nav>
         </div>
 
-        <Link href='/guidance'>
+        <Link href='/guide'>
           <button
             className={
               "flex items-center p-4 group w-full flex-shrink-0 " +
-              (location === "/guidance" ? "bg-gray-900" : "hover:bg-gray-700")
+              (location === "/guide" ? "bg-gray-900" : "hover:bg-gray-700")
             }
           >
             <QuestionMarkCircleIcon
@@ -55,7 +55,7 @@ function Sidebar() {
             />
             <div className='ml-3 text-left'>
               <p className='text-sm font-medium text-gray-200 group-hover:text-gray-50'>
-                Guidance
+                Guide 'n Feedback
               </p>
               <p className='text-xs font-medium text-gray-300 group-hover:text-gray-100'>
                 Simply get started
