@@ -10,7 +10,9 @@ const configForm = {
     tableName: ["select", "Table Name"],
     longColumn: ["select", "Longitude Column"],
     latColumn: ["select", "Latitude Column"],
+    circleBlur: ["number", "Blur", 0],
     circleColor: ["color", "Color"],
+    circleOpacity: ["number", "Opacity", 0],
     circleRadius: ["number", "Radius", 0],
   },
   heatmap: {
@@ -40,8 +42,10 @@ export default function LayerModal({
     tableName: null,
     longColumn: null,
     latColumn: null,
+    circleBlur: 0,
     circleColor: null,
-    circleRadius: 3,
+    circleOpacity: 1,
+    circleRadius: 5,
   });
 
   useEffect(() => {
@@ -55,8 +59,10 @@ export default function LayerModal({
           tableName: null,
           longColumn: null,
           latColumn: null,
+          circleBlur: 0,
           circleColor: null,
-          circleRadius: 3,
+          circleOpacity: 1,
+          circleRadius: 5,
         });
       }
     }

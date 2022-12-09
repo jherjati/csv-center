@@ -7,7 +7,9 @@ function CircleLayer({
   tableName,
   longColumn,
   latColumn,
+  circleBlur,
   circleColor,
+  circleOpacity,
   circleRadius,
 }) {
   useEffect(() => {
@@ -23,8 +25,10 @@ function CircleLayer({
       source: layerName,
       type: "circle",
       paint: {
-        "circle-radius": parseFloat(circleRadius),
+        "circle-blur": parseFloat(circleBlur),
         "circle-color": circleColor,
+        "circle-opacity": parseFloat(circleOpacity),
+        "circle-radius": parseFloat(circleRadius),
       },
     });
     return () => {
@@ -58,9 +62,15 @@ function CircleLayer({
   }, [longColumn, latColumn, tableName]);
 
   useEffect(() => {
-    map.setPaintProperty(layerName, "circle-radius", parseFloat(circleRadius));
+    map.setPaintProperty(layerName, "circle-blur", parseFloat(circleBlur));
     map.setPaintProperty(layerName, "circle-color", circleColor);
-  }, [circleColor, circleRadius]);
+    map.setPaintProperty(
+      layerName,
+      "circle-opacity",
+      parseFloat(circleOpacity)
+    );
+    map.setPaintProperty(layerName, "circle-radius", parseFloat(circleRadius));
+  }, [circleBlur, circleColor, circleOpacity, circleRadius]);
 
   return <></>;
 }
