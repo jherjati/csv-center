@@ -1,15 +1,28 @@
 import { Dialog, Transition } from "@headlessui/react";
 import { Fragment } from "preact";
-import { useCallback, useEffect, useState } from "preact/hooks";
+import { useCallback, useEffect, useMemo, useState } from "preact/hooks";
+import { TbCircle, TbCircles, TbCircle2 } from "react-icons/tb";
 import { formats, layerConfigs } from "../../contexts";
 
 const configForm = {
-  layerName: ["text", "Layer Name"],
-  tableName: ["select", "Table Name"],
-  longColumn: ["select", "Longitude Column"],
-  latColumn: ["select", "Latitude Column"],
-  circleColor: ["color", "Circle Color"],
-  circleSize: ["number", "Circle Size"],
+  circle: {
+    layerName: ["text", "Layer Name"],
+    tableName: ["select", "Table Name"],
+    longColumn: ["select", "Longitude Column"],
+    latColumn: ["select", "Latitude Column"],
+    circleColor: ["color", "Circle Color"],
+    circleSize: ["number", "Circle Size", 0],
+  },
+  heatmap: {
+    layerName: ["text", "Layer Name"],
+    tableName: ["select", "Table Name"],
+    longColumn: ["select", "Longitude Column"],
+    latColumn: ["select", "Latitude Column"],
+    heatmapIntensity: ["number", "Intensity", 0],
+    heatmapOpacity: ["number", "Opacity", 0],
+    heatmapRadius: ["number", "Radius", 1],
+    heatmapWeight: ["number", "Weight", 0],
+  },
 };
 
 export default function LayerModal({
@@ -19,6 +32,9 @@ export default function LayerModal({
   isEditing,
   layerConfig,
 }) {
+  const [type, setType] = useState("circle");
+  const layerForm = useMemo(() => configForm[type], [type]);
+
   const [localLayerConfig, setLocalLayerConfig] = useState({
     layerName: null,
     tableName: null,
@@ -30,16 +46,19 @@ export default function LayerModal({
 
   useEffect(() => {
     if (open) {
-      isEditing
-        ? setLocalLayerConfig(layerConfig)
-        : setLocalLayerConfig({
-            layerName: null,
-            tableName: null,
-            longColumn: null,
-            latColumn: null,
-            circleColor: null,
-            circleSize: 3,
-          });
+      if (isEditing) {
+        setLocalLayerConfig(layerConfig);
+        setType(layerConfig.type);
+      } else {
+        setLocalLayerConfig({
+          layerName: null,
+          tableName: null,
+          longColumn: null,
+          latColumn: null,
+          circleColor: null,
+          circleSize: 3,
+        });
+      }
     }
   }, [open]);
 
@@ -114,15 +133,90 @@ export default function LayerModal({
                       : "New Layer"}
                   </h4>
                   {/* Inputs */}
-                  <div className='mt-6 grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6'>
-                    {Object.keys(configForm).map((key) =>
+                  <div className='mt-6 grid gap-y-6 gap-x-4 grid-cols-6'>
+                    <div className='col-span-6 grid grid-cols-6 gap-x-3 gap-y-1'>
+                      <label className='col-span-6 block text-sm font-medium text-gray-700'>
+                        Layer Type
+                      </label>
+                      <div className='col-span-2'>
+                        <input
+                          onChange={(event) => setType(event.target.value)}
+                          type='radio'
+                          id='circle-layer'
+                          name='type'
+                          value='circle'
+                          class='hidden peer'
+                          checked={type === "circle"}
+                        />
+                        <label
+                          for='circle-layer'
+                          class='inline-flex justify-center items-center space-x-3 p-2 w-full text-gray-700 bg-white rounded-lg border border-gray-200 cursor-pointer  peer-checked:border-teal-600 peer-checked:text-teal-600 peer-checked:bg-gray-100 hover:text-gray-600 hover:bg-gray-100'
+                        >
+                          <TbCircle className='h-4 w-4' />
+                          <h6 class='text-sm font-semibold'>Circle Layer</h6>
+                        </label>
+                      </div>
+                      <div className='col-span-2'>
+                        <input
+                          onChange={(event) => {
+                            setType(event.target.value);
+                            if (!isEditing)
+                              setLocalLayerConfig({
+                                layerName: null,
+                                tableName: null,
+                                longColumn: null,
+                                latColumn: null,
+                                heatmapIntensity: 1,
+                                heatmapOpacity: 1,
+                                heatmapRadius: 30,
+                                heatmapWeight: 1,
+                              });
+                          }}
+                          type='radio'
+                          id='heatmap-layer'
+                          name='type'
+                          value='heatmap'
+                          class='hidden peer'
+                          checked={type === "heatmap"}
+                        />
+                        <label
+                          for='heatmap-layer'
+                          class='inline-flex justify-center items-center space-x-3 p-2 w-full text-gray-700 bg-white rounded-lg border border-gray-200 cursor-pointer  peer-checked:border-teal-600 peer-checked:text-teal-600 peer-checked:bg-gray-100 hover:text-gray-600 hover:bg-gray-100'
+                        >
+                          <TbCircles className='h-4 w-4' />
+                          <h6 class='text-sm font-semibold'>Heatmap Layer</h6>
+                        </label>
+                      </div>
+                      <div className='col-span-2 relative'>
+                        <input
+                          type='radio'
+                          id='cluster-layer'
+                          name='type'
+                          value='cluster'
+                          class='hidden peer'
+                          disabled
+                        />
+                        <label
+                          for='cluster-layer'
+                          class='inline-flex justify-center items-center space-x-3 p-2 w-full text-gray-700 bg-white rounded-lg border border-gray-200 peer-disabled:opacity-50'
+                        >
+                          <TbCircle2 className='h-4 w-4' />
+                          <h6 class='text-sm font-semibold'>Cluster Layer</h6>
+                        </label>
+                        <span className='absolute top-0 right-0 -mr-2 -mt-4 py-1 px-3 text-xs flex justify-center items-center bg-teal-400 text-white rounded-xl shadow'>
+                          Upcoming
+                        </span>
+                      </div>
+                    </div>
+
+                    {Object.keys(layerForm).map((key) =>
                       key === "tableName" ? (
-                        <div className='col-span-3'>
+                        <div key={key} className='col-span-3'>
                           <label
                             htmlFor={key}
                             className='block text-sm font-medium text-gray-700'
                           >
-                            {configForm[key][1]}
+                            {layerForm[key][1]}
                           </label>
                           <select
                             name={key}
@@ -138,12 +232,12 @@ export default function LayerModal({
                           </select>
                         </div>
                       ) : key.includes("Column") ? (
-                        <div className='col-span-3'>
+                        <div key={key} className='col-span-3'>
                           <label
                             htmlFor={key}
                             className='block text-sm font-medium text-gray-700'
                           >
-                            {configForm[key][1]}
+                            {layerForm[key][1]}
                           </label>
                           <select
                             name={key}
@@ -161,18 +255,21 @@ export default function LayerModal({
                           </select>
                         </div>
                       ) : (
-                        <div className='col-span-3'>
+                        <div key={key} className='col-span-3'>
                           <label
                             htmlFor={key}
                             className='block text-sm font-medium text-gray-700'
                           >
-                            {configForm[key][1]}
+                            {layerForm[key][1]}
                           </label>
                           <input
-                            type={configForm[key][0]}
+                            type={layerForm[key][0]}
+                            step='any'
+                            min={layerForm[key][2]}
+                            max={layerForm[key][1] === "Opacity" ? 1 : null}
                             name={key}
                             className={`mt-1 shadow-sm focus:ring-teal-500 focus:border-teal-500 block w-full ${
-                              configForm[key][0] === "color"
+                              layerForm[key][0] === "color"
                                 ? "h-10 p-0 border-0"
                                 : ""
                             } text-sm border-gray-300 rounded-md`}

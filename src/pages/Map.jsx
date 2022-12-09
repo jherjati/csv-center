@@ -11,6 +11,7 @@ import Layer from "../components/map/Layer";
 import Popup from "../components/map/Popup";
 import SampleLoader from "../components/core/SampleLoader";
 import { layerConfigs } from "../contexts";
+import HeatmapLayer from "../components/map/HeatmapLayer";
 
 function Map() {
   const { dbTables } = useTables();
@@ -100,9 +101,17 @@ function Map() {
           {mapLoad ? (
             <>
               <LayerLegend setOpen={setOpen} setFocusLayer={setFocusLayer} />
-              {layerConfigs.value.map((conf) => (
-                <Layer key={conf.layerName} map={mapRef.current} {...conf} />
-              ))}
+              {layerConfigs.value.map((conf) =>
+                conf.type === "heatmap" ? (
+                  <HeatmapLayer
+                    key={conf.layerName}
+                    map={mapRef.current}
+                    {...conf}
+                  />
+                ) : (
+                  <Layer key={conf.layerName} map={mapRef.current} {...conf} />
+                )
+              )}
               <Popup map={mapRef.current} configs={layerConfigs.value} />
             </>
           ) : (
