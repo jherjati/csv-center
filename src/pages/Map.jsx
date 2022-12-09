@@ -7,7 +7,7 @@ import LayerLegend from "../components/map/LayerLegend";
 import LayerModal from "../components/map/LayerModal";
 import { useTables } from "../hooks";
 import EmptyDb from "../components/core/EmptyDb";
-import Layer from "../components/map/Layer";
+import CircleLayer from "../components/map/CircleLayer";
 import Popup from "../components/map/Popup";
 import SampleLoader from "../components/core/SampleLoader";
 import { layerConfigs } from "../contexts";
@@ -109,7 +109,11 @@ function Map() {
                     {...conf}
                   />
                 ) : (
-                  <Layer key={conf.layerName} map={mapRef.current} {...conf} />
+                  <CircleLayer
+                    key={conf.layerName}
+                    map={mapRef.current}
+                    {...conf}
+                  />
                 )
               )}
               <Popup map={mapRef.current} configs={layerConfigs.value} />

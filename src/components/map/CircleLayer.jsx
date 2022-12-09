@@ -1,14 +1,14 @@
 import { useEffect } from "preact/hooks";
 import { DBWorker } from "../../constants";
 
-function Layer({
+function CircleLayer({
   map,
   layerName,
   tableName,
   longColumn,
   latColumn,
   circleColor,
-  circleSize,
+  circleRadius,
 }) {
   useEffect(() => {
     map.addSource(layerName, {
@@ -23,7 +23,7 @@ function Layer({
       source: layerName,
       type: "circle",
       paint: {
-        "circle-radius": parseInt(circleSize),
+        "circle-radius": parseFloat(circleRadius),
         "circle-color": circleColor,
       },
     });
@@ -58,11 +58,11 @@ function Layer({
   }, [longColumn, latColumn, tableName]);
 
   useEffect(() => {
-    map.setPaintProperty(layerName, "circle-radius", parseInt(circleSize));
+    map.setPaintProperty(layerName, "circle-radius", parseFloat(circleRadius));
     map.setPaintProperty(layerName, "circle-color", circleColor);
-  }, [circleColor, circleSize]);
+  }, [circleColor, circleRadius]);
 
   return <></>;
 }
 
-export default Layer;
+export default CircleLayer;
