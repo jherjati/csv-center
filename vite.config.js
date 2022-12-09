@@ -1,6 +1,5 @@
 import path from "path";
 import { defineConfig } from "vite";
-import alias from "@rollup/plugin-alias";
 import preact from "@preact/preset-vite";
 import { VitePWA } from "vite-plugin-pwa";
 import { partytownVite } from "@builder.io/partytown/utils";
@@ -54,12 +53,6 @@ export default defineConfig({
         ],
       },
       manifestFilename: "manifest.json",
-    }),
-    alias({
-      entries: [
-        { find: "react", replacement: "preact/compat" },
-        { find: "react-dom", replacement: "preact/compat" },
-      ],
     }),
   ],
 });
