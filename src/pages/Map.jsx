@@ -12,6 +12,7 @@ import Popup from "../components/map/Popup";
 import SampleLoader from "../components/core/SampleLoader";
 import { layerConfigs } from "../contexts";
 import HeatmapLayer from "../components/map/HeatmapLayer";
+import ClusterLayer from "../components/map/ClusterLayer";
 
 function Map() {
   const { dbTables } = useTables();
@@ -104,6 +105,12 @@ function Map() {
               {layerConfigs.value.map((conf) =>
                 conf.type === "heatmap" ? (
                   <HeatmapLayer
+                    key={conf.layerName}
+                    map={mapRef.current}
+                    {...conf}
+                  />
+                ) : conf.type === "cluster" ? (
+                  <ClusterLayer
                     key={conf.layerName}
                     map={mapRef.current}
                     {...conf}

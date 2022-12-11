@@ -25,6 +25,12 @@ const configForm = {
     heatmapRadius: ["number", "Radius", 1],
     heatmapWeight: ["number", "Weight", 0],
   },
+  cluster: {
+    layerName: ["text", "Layer Name"],
+    tableName: ["select", "Table Name"],
+    longColumn: ["select", "Longitude Column"],
+    latColumn: ["select", "Latitude Column"],
+  },
 };
 
 export default function LayerModal({
@@ -193,25 +199,25 @@ export default function LayerModal({
                           <h6 class='text-sm font-semibold'>Heatmap Layer</h6>
                         </label>
                       </div>
-                      <div className='col-span-2 relative'>
+                      <div className='col-span-2'>
                         <input
+                          onChange={(event) => {
+                            setType(event.target.value);
+                          }}
                           type='radio'
                           id='cluster-layer'
                           name='type'
                           value='cluster'
                           class='hidden peer'
-                          disabled
+                          checked={type === "cluster"}
                         />
                         <label
                           for='cluster-layer'
-                          class='inline-flex justify-center items-center space-x-3 p-2 w-full text-gray-700 bg-white rounded-lg border border-gray-200 peer-disabled:opacity-50'
+                          class='inline-flex justify-center items-center space-x-3 p-2 w-full text-gray-700 bg-white rounded-lg border border-gray-200 cursor-pointer  peer-checked:border-teal-600 peer-checked:text-teal-600 peer-checked:bg-gray-100 hover:text-gray-600 hover:bg-gray-100'
                         >
                           <TbCircle2 className='h-4 w-4' />
                           <h6 class='text-sm font-semibold'>Cluster Layer</h6>
                         </label>
-                        <span className='absolute top-0 right-0 -mr-2 -mt-4 py-1 px-3 text-xs flex justify-center items-center bg-teal-400 text-white rounded-xl shadow'>
-                          Upcoming
-                        </span>
                       </div>
                     </div>
 

@@ -1,4 +1,5 @@
 import { PlusIcon, TrashIcon } from "@heroicons/react/24/solid";
+import { TbCircles, TbCircle2 } from "react-icons/tb";
 import { layerConfigs } from "../../contexts";
 
 function LayerLegend({ setOpen, setFocusLayer }) {
@@ -13,12 +14,18 @@ function LayerLegend({ setOpen, setFocusLayer }) {
             setOpen(true);
           }}
         >
-          <span
-            className='h-4 w-4 p-1 rounded-full'
-            style={{
-              backgroundColor: type === "heatmap" ? "red" : circleColor,
-            }}
-          />
+          {type === "heatmap" ? (
+            <TbCircles className='h-4 w-4' />
+          ) : type === "cluster" ? (
+            <TbCircle2 className='h-4 w-4' />
+          ) : (
+            <span
+              className='h-4 w-4 p-1 rounded-full'
+              style={{
+                backgroundColor: circleColor,
+              }}
+            />
+          )}
           <h6 className='grow overflow-x-scroll text-left'>{layerName}</h6>
           <TrashIcon
             onClick={(event) => {
