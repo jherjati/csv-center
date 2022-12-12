@@ -1,4 +1,5 @@
 import { Dialog, Transition } from "@headlessui/react";
+import { MinusSmallIcon, PlusSmallIcon } from "@heroicons/react/20/solid";
 import { Fragment } from "preact";
 import { useCallback, useEffect, useMemo, useState } from "preact/hooks";
 import { TbCircle, TbCircles, TbCircle2 } from "react-icons/tb";
@@ -53,12 +54,20 @@ export default function LayerModal({
     circleOpacity: 1,
     circleRadius: 5,
   });
+  const [stepsLength, setStepsLength] = useState(1);
+  const [starts, setStarts] = useState(["0"]);
 
   useEffect(() => {
     if (open) {
       if (isEditing) {
         setLocalLayerConfig(layerConfig);
         setType(layerConfig.type);
+        const ends = Object.keys(layerConfig)
+          .filter((key) => key.includes(".end"))
+          .sort()
+          .map((key) => parseFloat(layerConfig[key]));
+        setStepsLength(ends.length + 1);
+        setStarts(["0", ...ends]);
       } else {
         setLocalLayerConfig({
           layerName: null,
@@ -94,7 +103,7 @@ export default function LayerModal({
       layerConfigs.value = newConfigs;
       setOpen(false);
     },
-    [layerConfig]
+    [layerConfig, type]
   );
 
   const handleChange = (event) => {
@@ -145,7 +154,8 @@ export default function LayerModal({
                       : "New Layer"}
                   </h4>
                   {/* Inputs */}
-                  <div className='mt-6 grid gap-y-6 gap-x-4 grid-cols-6'>
+                  <div className='mt-6 grid gap-y-6 gap-x-4 grid-cols-6 max-h-[36rem] overflow-scroll'>
+                    {/* Type */}
                     <div className='col-span-6 grid grid-cols-6 gap-x-3 gap-y-1'>
                       <label className='col-span-6 block text-sm font-medium text-gray-700'>
                         Layer Type
@@ -171,18 +181,15 @@ export default function LayerModal({
                       <div className='col-span-2'>
                         <input
                           onChange={(event) => {
-                            setType(event.target.value);
                             if (!isEditing)
-                              setLocalLayerConfig({
-                                layerName: null,
-                                tableName: null,
-                                longColumn: null,
-                                latColumn: null,
+                              setLocalLayerConfig((prev) => ({
+                                ...prev,
                                 heatmapIntensity: 1,
                                 heatmapOpacity: 1,
                                 heatmapRadius: 30,
                                 heatmapWeight: 1,
-                              });
+                              }));
+                            setType(event.target.value);
                           }}
                           type='radio'
                           id='heatmap-layer'
@@ -202,6 +209,12 @@ export default function LayerModal({
                       <div className='col-span-2'>
                         <input
                           onChange={(event) => {
+                            if (!isEditing)
+                              setLocalLayerConfig((prev) => ({
+                                ...prev,
+                                "steps.0.radius": "15",
+                                "steps.0.color": "#51bbd6",
+                              }));
                             setType(event.target.value);
                           }}
                           type='radio'
@@ -220,7 +233,7 @@ export default function LayerModal({
                         </label>
                       </div>
                     </div>
-
+                    {/* Properties */}
                     {Object.keys(layerForm).map((key) =>
                       key === "tableName" ? (
                         <div key={key} className='col-span-3'>
@@ -291,6 +304,125 @@ export default function LayerModal({
                           />
                         </div>
                       )
+                    )}
+                    {/* Steps */}
+                    {type === "cluster" && (
+                      <div className='relative border rounded-lg px-3 pt-6 pb-3 col-span-6 grid grid-cols-12 gap-y-6 gap-x-4'>
+                        <h6 className='absolute top-0 left-0 -mt-3 ml-4 bg-white px-3 text-sm font-medium text-gray-900'>
+                          Count Steps
+                        </h6>
+                        <div className='absolute top-0 right-0 -mt-3 mr-4 bg-white text-sm font-medium text-gray-900 flex rounded-md shadow-sm'>
+                          <button
+                            disabled={stepsLength === 1}
+                            className='rounded-l-md border -mr-px border-gray-300 bg-white hover:bg-gray-50 focus:z-10 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500'
+                            onClick={(event) => {
+                              event.preventDefault();
+                              setStepsLength(stepsLength - 1);
+                            }}
+                          >
+                            <MinusSmallIcon
+                              className='h-5 w-5 text-gray-700'
+                              aria-hidden='true'
+                            />
+                          </button>
+                          <button
+                            className='rounded-r-md border -ml-px border-gray-300 bg-white hover:bg-gray-50 focus:z-10 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500'
+                            onClick={(event) => {
+                              event.preventDefault();
+                              setStepsLength(stepsLength + 1);
+                            }}
+                          >
+                            <PlusSmallIcon
+                              className='h-5 w-5 text-gray-700'
+                              aria-hidden='true'
+                            />
+                          </button>
+                        </div>
+
+                        {Array.from({ length: stepsLength }).map((_, idx) => {
+                          return [
+                            { label: "Start", name: "start", type: "number" },
+                            { label: "End", name: "end", type: "number" },
+                            { label: "Color", name: "color", type: "color" },
+                            { label: "Radius", name: "radius", type: "number" },
+                          ].map(({ label, name, type }) =>
+                            name === "start" ? (
+                              <div className='col-span-3'>
+                                <label
+                                  htmlFor={`steps.${idx}.${name}`}
+                                  className='block text-sm font-medium text-gray-700'
+                                >
+                                  {label}
+                                </label>
+                                <input
+                                  value={starts[idx]}
+                                  type={type}
+                                  step='1'
+                                  name={`steps.${idx}.${name}`}
+                                  className={`mt-1 shadow-sm focus:ring-teal-500 focus:border-teal-500 block w-full disabled:bg-gray-100 ${
+                                    type === "color" ? "h-10 p-0 border-0" : ""
+                                  } text-sm border-gray-300 rounded-md`}
+                                  defaultValue={
+                                    localLayerConfig[`steps.${idx}.${name}`] ??
+                                    ""
+                                  }
+                                  disabled
+                                />
+                              </div>
+                            ) : name === "end" && idx === stepsLength - 1 ? (
+                              <div className='col-span-3'>
+                                <label
+                                  htmlFor={`steps.${idx}.${name}`}
+                                  className='block text-sm font-medium text-gray-700'
+                                >
+                                  {label}
+                                </label>
+                                <input
+                                  type='text'
+                                  name={`steps.${idx}.${name}`}
+                                  className={`mt-1 shadow-sm focus:ring-teal-500 focus:border-teal-500 block w-full disabled:bg-gray-100 ${
+                                    type === "color" ? "h-10 p-0 border-0" : ""
+                                  } text-sm border-gray-300 rounded-md`}
+                                  value='&infin;'
+                                  disabled
+                                />
+                              </div>
+                            ) : (
+                              <div className='col-span-3'>
+                                <label
+                                  htmlFor={`steps.${idx}.${name}`}
+                                  className='block text-sm font-medium text-gray-700'
+                                >
+                                  {label}
+                                </label>
+                                <input
+                                  onChange={(event) => {
+                                    if (name === "end") {
+                                      setStarts((prev) => {
+                                        const newStarts = [...prev];
+                                        newStarts[idx + 1] = event.target.value;
+                                        return newStarts;
+                                      });
+                                    }
+                                  }}
+                                  type={type}
+                                  step='1'
+                                  name={`steps.${idx}.${name}`}
+                                  className={`mt-1 shadow-sm focus:ring-teal-500 focus:border-teal-500 block w-full disabled:bg-gray-100 ${
+                                    type === "color" ? "h-10 p-0 border-0" : ""
+                                  } text-sm border-gray-300 rounded-md`}
+                                  defaultValue={
+                                    localLayerConfig[`steps.${idx}.${name}`] ??
+                                    ""
+                                  }
+                                  min='0'
+                                  required
+                                />
+                              </div>
+                            )
+                          );
+                        })}
+                      </div>
                     )}
                   </div>
                   {/* Buttons */}

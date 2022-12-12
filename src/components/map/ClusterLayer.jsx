@@ -1,7 +1,46 @@
 import { useEffect } from "preact/hooks";
 import { DBWorker } from "../../constants";
 
-function ClusterLayer({ map, layerName, tableName, longColumn, latColumn }) {
+const rest2Paint = (rest) => {
+  const colors = Object.keys(rest)
+    .filter((key) => key.includes(".color"))
+    .sort()
+    .map((key) => rest[key]);
+  const radiuses = Object.keys(rest)
+    .filter((key) => key.includes(".radius"))
+    .sort()
+    .map((key) => parseInt(rest[key]));
+  const ends = Object.keys(rest)
+    .filter((key) => key.includes(".end"))
+    .sort()
+    .map((key) => parseInt(rest[key]));
+  let circleColor = ["step", ["get", "point_count"]];
+  let circleRadius = ["step", ["get", "point_count"]];
+  if (colors.length === 1) {
+    circleColor = colors[0];
+    circleRadius = radiuses[0];
+  } else {
+    for (let index = 0; index < colors.length; index++) {
+      circleColor.push(colors[index]);
+      circleRadius.push(radiuses[index]);
+      if (ends[index]) {
+        circleColor.push(ends[index]);
+        circleRadius.push(ends[index]);
+      }
+    }
+  }
+
+  return { circleColor, circleRadius };
+};
+
+function ClusterLayer({
+  map,
+  layerName,
+  tableName,
+  longColumn,
+  latColumn,
+  ...rest
+}) {
   useEffect(() => {
     map.addSource(layerName, {
       type: "geojson",
@@ -11,22 +50,16 @@ function ClusterLayer({ map, layerName, tableName, longColumn, latColumn }) {
       },
       cluster: true,
     });
+
+    const { circleColor, circleRadius } = rest2Paint(rest);
     map.addLayer({
       id: layerName + "_circle",
       source: layerName,
       type: "circle",
       filter: ["has", "point_count"],
       paint: {
-        "circle-color": [
-          "step",
-          ["get", "point_count"],
-          "#51bbd6",
-          100,
-          "#f1f075",
-          750,
-          "#f28cb1",
-        ],
-        "circle-radius": ["step", ["get", "point_count"], 20, 100, 30, 750, 40],
+        "circle-color": circleColor,
+        "circle-radius": circleRadius,
       },
     });
     map.addLayer({
@@ -93,6 +126,12 @@ function ClusterLayer({ map, layerName, tableName, longColumn, latColumn }) {
 
     return () => {};
   }, [longColumn, latColumn, tableName]);
+
+  useEffect(() => {
+    const { circleColor, circleRadius } = rest2Paint(rest);
+    map.setPaintProperty(layerName + "_circle", "circle-color", circleColor);
+    map.setPaintProperty(layerName + "_circle", "circle-radius", circleRadius);
+  }, [rest]);
 
   return <></>;
 }
