@@ -3,7 +3,7 @@ import { Chart } from "chart.js";
 import { filterToString, filterToValues, setSnackContent } from "../../utils";
 import { DBWorker } from "../../constants";
 
-function ChartBox({ config, name, filter }) {
+function ChartBox({ config, tableName, filter }) {
   const elRef = useRef();
   const chartRef = useRef();
 
@@ -28,18 +28,26 @@ function ChartBox({ config, name, filter }) {
   }, []);
 
   useEffect(async () => {
-    const sql =
-      config.type === "bar"
-        ? `SELECT ${config.xColumn}, ${config.dataOperator[0]}(${
-            config.yColumn[0]
-          }) FROM '${name}' ${filterToString(filter)} GROUP BY ${
-            config.xColumn
-          } ORDER BY ${config.dataOperator[0]}(${config.yColumn[0]});`
-        : `SELECT ${config.xColumn}, ${config.yColumn.join(
-            ", "
-          )} FROM '${name}' ${filterToString(filter)} ORDER BY ${
-            config.xColumn
-          } LIMIT ${config.dataLimit};`;
+    let sql = "";
+    switch (config.type) {
+      case "bar":
+        sql = `SELECT ${config.xColumn}, ${config.dataOperator[0]}(${
+          config.yColumn[0]
+        }) FROM '${tableName}' ${filterToString(filter)} GROUP BY ${
+          config.xColumn
+        } ORDER BY ${config.dataOperator[0]}(${config.yColumn[0]});`;
+        break;
+      case "line":
+        sql = `SELECT ${config.xColumn}, ${config.yColumn.join(
+          ", "
+        )} FROM '${tableName}' ${filterToString(filter)} ORDER BY ${
+          config.xColumn
+        } LIMIT ${config.dataLimit};`;
+        break;
+      default:
+        break;
+    }
+
     const params = filterToValues(filter);
 
     const { results } = await DBWorker.pleaseDo({
@@ -69,7 +77,14 @@ function ChartBox({ config, name, filter }) {
       chartRef.current.data = data;
       chartRef.current.update();
     }
-  }, [config]);
+  }, [
+    config.xColumn,
+    config.dataOperator,
+    config.yColumn,
+    config.dataLimit,
+    config.borderColor,
+    config.backgroundColor,
+  ]);
 
   const colSpan = useMemo(() => {
     switch (config.span) {

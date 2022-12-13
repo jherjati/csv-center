@@ -14,7 +14,6 @@ import { Fragment } from "preact";
 import { useEffect, useState } from "preact/hooks";
 import { metricConfigs } from "../../contexts";
 import { getPropByString, setPropByString } from "../../utils";
-import { Ticks, CategoryScale } from "chart.js";
 import { chartForm } from "../../constants";
 
 export default function ConfigModal({ open, setOpen, tableName, columns }) {
@@ -38,16 +37,22 @@ export default function ConfigModal({ open, setOpen, tableName, columns }) {
     const form = new FormData(event.target);
     const data = Object.fromEntries(form.entries());
     const stats = [];
-    const charts = [...metricConfigs.value[tableName].charts];
-    Object.keys(charts).forEach(
-      (key) =>
-        (charts[key] = {
-          ...charts[key],
-          yColumn: charts[key].yColumn.slice(0, datasetLength),
-          borderColor: charts[key].borderColor.slice(0, datasetLength),
-          backgroundColor: charts[key].backgroundColor.slice(0, datasetLength),
-        })
-    );
+    const charts = metricConfigs.value[tableName].charts.map((chart) => ({
+      options: {
+        scales: {
+          x: {
+            title: {
+              display: true,
+            },
+          },
+        },
+        plugins: { ...chart.options.plugins },
+      },
+      dataLimit: chart.dataLimit,
+      yColumn: chart.yColumn.slice(0, datasetLength),
+      borderColor: chart.borderColor.slice(0, datasetLength),
+      backgroundColor: chart.backgroundColor.slice(0, datasetLength),
+    }));
 
     Object.keys(data).forEach((key) => {
       if (key.includes("stat")) {
@@ -55,35 +60,23 @@ export default function ConfigModal({ open, setOpen, tableName, columns }) {
       } else {
         const [_, idx, name] = key.split("_");
         setPropByString(charts[idx], name, data[key]);
-        // side effect below
         if (name.includes("annotation")) {
           setPropByString(
             charts[idx],
-            "options.plugins.annotation.annotations.box1.display",
+            "options.plugins.annotation.annotations.box.display",
             Boolean(data[key])
           );
         } else if (name.includes("xColumn")) {
           setPropByString(charts[idx], "options.scales.x.title", {
-            display: true,
             text: data[key],
           });
         } else if (name === "type") {
           switch (data[key]) {
             case "bar":
               charts[idx].options.scales.x.type = "category";
-              charts[idx].options.scales.x.offset = true;
-              charts[idx].options.scales.x.grid.offset = true;
-              charts[idx].options.scales.x.ticks.callback =
-                CategoryScale.prototype.getLabelForValue;
-              charts[idx].options.scales.y.beginAtZero = true;
               break;
             case "line":
               charts[idx].options.scales.x.type = "linear";
-              charts[idx].options.scales.x.offset = false;
-              charts[idx].options.scales.x.grid.offset = false;
-              charts[idx].options.scales.x.ticks.callback =
-                Ticks.formatters.numeric;
-              charts[idx].options.scales.y.beginAtZero = false;
               break;
             default:
               break;
