@@ -38,17 +38,26 @@ export default function ConfigModal({ open, setOpen, tableName, columns }) {
     const data = Object.fromEntries(form.entries());
     const stats = [];
     const charts = metricConfigs.value[tableName].charts.map((chart) => ({
-      options: {
-        scales: {
-          x: {
-            type: type === "line" ? "linear" : "category",
-            title: {
-              display: true,
+      options:
+        type === "pie"
+          ? {
+              plugins: {
+                legend: {
+                  position: "top",
+                },
+              },
+            }
+          : {
+              scales: {
+                x: {
+                  type: type === "line" ? "linear" : "category",
+                  title: {
+                    display: true,
+                  },
+                },
+              },
+              plugins: { ...chart.options.plugins },
             },
-          },
-        },
-        plugins: { ...chart.options.plugins },
-      },
       yColumn: chart.yColumn.slice(0, datasetLength),
       borderColor: chart.borderColor.slice(0, datasetLength),
       backgroundColor: chart.backgroundColor.slice(0, datasetLength),
@@ -259,19 +268,22 @@ export default function ConfigModal({ open, setOpen, tableName, columns }) {
                             Upcoming
                           </span>
                         </div>
-                        <div className='col-span-3 relative'>
+                        <div className='col-span-3'>
                           <input
-                            onChange={(event) => setType(event.target.value)}
+                            onChange={(event) => {
+                              setType(event.target.value);
+                              setDatasetLength(1);
+                            }}
                             type='radio'
                             id='pie-chart'
                             name={`chart_${chartIdx}_type`}
                             value='pie'
                             class='hidden peer'
-                            disabled
+                            checked={type === "pie"}
                           />
                           <label
                             for='pie-chart'
-                            class='inline-flex justify-center items-center space-x-3 p-2 w-full text-gray-700 bg-white rounded-lg border border-gray-200 peer-disabled:opacity-50'
+                            class='inline-flex justify-center items-center space-x-3 p-2 w-full text-gray-700 bg-white rounded-lg border border-gray-200 cursor-pointer  peer-checked:border-teal-600 peer-checked:text-teal-600 peer-checked:bg-gray-100 hover:text-gray-600 hover:bg-gray-100'
                           >
                             <AiOutlinePieChart className='h-8 w-8' />
                             <div>
@@ -283,9 +295,6 @@ export default function ConfigModal({ open, setOpen, tableName, columns }) {
                               </p>
                             </div>
                           </label>
-                          <span className='absolute top-0 right-0 -mr-2 -mt-4 py-1 px-3 text-xs flex justify-center items-center bg-teal-400 text-white rounded-xl shadow'>
-                            Upcoming
-                          </span>
                         </div>
                       </div>
 
@@ -307,6 +316,7 @@ export default function ConfigModal({ open, setOpen, tableName, columns }) {
                                   chart,
                                   input.name
                                 )}
+                                required
                               >
                                 {input.options(columns).map((opt) => (
                                   <option value={opt}>{opt}</option>
@@ -324,6 +334,7 @@ export default function ConfigModal({ open, setOpen, tableName, columns }) {
                               <input
                                 type={input.type}
                                 step={input.step}
+                                min='0'
                                 name={`chart_${chartIdx}_${input.name}`}
                                 className={`mt-1 shadow-sm focus:ring-teal-500 focus:border-teal-500 block w-full ${
                                   input.type === "color"
@@ -442,56 +453,58 @@ export default function ConfigModal({ open, setOpen, tableName, columns }) {
                         )}
                       </div>
 
-                      <div className='relative border rounded-lg px-3 pt-6 pb-3 col-span-12 grid grid-cols-12 gap-y-6 gap-x-4'>
-                        <h6 className='absolute top-0 left-0 -mt-3 ml-4 bg-white px-3 text-sm font-medium text-gray-900'>
-                          Annotation
-                        </h6>
-                        {chartForm[type]
-                          .filter((input) => input.section === "annotation")
-                          .map((input) =>
-                            input.type === "select" ? (
-                              <div className='sm:col-span-4'>
-                                <label
-                                  htmlFor={`chart_${chartIdx}_${input.name}`}
-                                  className='block text-sm font-medium text-gray-700'
-                                >
-                                  {input.label}
-                                </label>
-                                <select
-                                  name={`chart_${chartIdx}_${input.name}`}
-                                  className='mt-1 shadow-sm focus:ring-teal-500 focus:border-teal-500 block w-full sm:text-sm border-gray-300 rounded-md'
-                                  defaultValue={chart[input.name]}
-                                >
-                                  {input.options(columns).map((opt) => (
-                                    <option value={opt}>{opt}</option>
-                                  ))}
-                                </select>
-                              </div>
-                            ) : (
-                              <div className='sm:col-span-4'>
-                                <label
-                                  htmlFor={`chart_${chartIdx}_${input.name}`}
-                                  className='block text-sm font-medium text-gray-700'
-                                >
-                                  {input.label}
-                                </label>
-                                <input
-                                  type={input.type}
-                                  step={input.step}
-                                  name={`chart_${chartIdx}_${input.name}`}
-                                  className={`mt-1 shadow-sm focus:ring-teal-500 focus:border-teal-500 block w-full ${
-                                    input.type === "color"
-                                      ? "h-10 p-0 border-0"
-                                      : ""
-                                  } sm:text-sm border-gray-300 rounded-md`}
-                                  defaultValue={
-                                    getPropByString(chart, input.name) ?? ""
-                                  }
-                                />
-                              </div>
-                            )
-                          )}
-                      </div>
+                      {type !== "pie" && (
+                        <div className='relative border rounded-lg px-3 pt-6 pb-3 col-span-12 grid grid-cols-12 gap-y-6 gap-x-4'>
+                          <h6 className='absolute top-0 left-0 -mt-3 ml-4 bg-white px-3 text-sm font-medium text-gray-900'>
+                            Annotation
+                          </h6>
+                          {chartForm[type]
+                            .filter((input) => input.section === "annotation")
+                            .map((input) =>
+                              input.type === "select" ? (
+                                <div className='sm:col-span-4'>
+                                  <label
+                                    htmlFor={`chart_${chartIdx}_${input.name}`}
+                                    className='block text-sm font-medium text-gray-700'
+                                  >
+                                    {input.label}
+                                  </label>
+                                  <select
+                                    name={`chart_${chartIdx}_${input.name}`}
+                                    className='mt-1 shadow-sm focus:ring-teal-500 focus:border-teal-500 block w-full sm:text-sm border-gray-300 rounded-md'
+                                    defaultValue={chart[input.name]}
+                                  >
+                                    {input.options(columns).map((opt) => (
+                                      <option value={opt}>{opt}</option>
+                                    ))}
+                                  </select>
+                                </div>
+                              ) : (
+                                <div className='sm:col-span-4'>
+                                  <label
+                                    htmlFor={`chart_${chartIdx}_${input.name}`}
+                                    className='block text-sm font-medium text-gray-700'
+                                  >
+                                    {input.label}
+                                  </label>
+                                  <input
+                                    type={input.type}
+                                    step={input.step}
+                                    name={`chart_${chartIdx}_${input.name}`}
+                                    className={`mt-1 shadow-sm focus:ring-teal-500 focus:border-teal-500 block w-full ${
+                                      input.type === "color"
+                                        ? "h-10 p-0 border-0"
+                                        : ""
+                                    } sm:text-sm border-gray-300 rounded-md`}
+                                    defaultValue={
+                                      getPropByString(chart, input.name) ?? ""
+                                    }
+                                  />
+                                </div>
+                              )
+                            )}
+                        </div>
+                      )}
                     </div>
                   ))}
 

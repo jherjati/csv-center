@@ -229,6 +229,40 @@ export const chartForm = {
       section: "annotation",
     },
   ],
+  pie: [
+    {
+      name: "span",
+      label: "Chart Width",
+      type: "select",
+      options: () => [1, 2, 3, 4, 5, 6],
+    },
+    {
+      name: "xColumn",
+      label: "X Axis Column (Group By)",
+      type: "select",
+      options: (columns) =>
+        columns
+          .filter((col) => ["integer", "text"].includes(col.type))
+          .map((col) => col.name),
+    },
+    {
+      name: "dataOperator",
+      label: "Y Axis Operator",
+      type: "select",
+      options: () => ["count", "min", "max", "avg", "sum"],
+      section: "data",
+    },
+    {
+      name: "yColumn",
+      label: "Y Axis Column",
+      type: "select",
+      options: (columns) =>
+        columns
+          .filter((col) => ["integer", "real"].includes(col.type))
+          .map((col) => col.name),
+      section: "data",
+    },
+  ],
 };
 
 export const onBefoleUnload = (event) => {
@@ -265,3 +299,15 @@ export async function parseJsonFile(file) {
     fileReader.readAsText(file);
   });
 }
+
+export const randomColors = [
+  "#4dc9f6",
+  "#f67019",
+  "#f53794",
+  "#537bc4",
+  "#acc236",
+  "#166a8f",
+  "#00a950",
+  "#58595b",
+  "#8549ba",
+];

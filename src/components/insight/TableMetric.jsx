@@ -6,11 +6,13 @@ import {
   Chart,
   LineController,
   BarController,
+  PieController,
   CategoryScale,
   LinearScale,
   PointElement,
   LineElement,
   BarElement,
+  ArcElement,
   Tooltip,
   Legend,
 } from "chart.js";
@@ -28,11 +30,13 @@ import {
 Chart.register(
   LineController,
   BarController,
+  PieController,
   CategoryScale,
   LinearScale,
   PointElement,
   LineElement,
   BarElement,
+  ArcElement,
   Tooltip,
   Legend,
   annotationPlugin
