@@ -8,7 +8,7 @@ function Guide() {
       </div>
       <div className='w-full px-6 mt-4 flex'>
         <article className='prose bg-white rounded-lg p-6 shadow'>
-          <h3>User Guide (Alpha Release)</h3>
+          <h3>User Guide (Beta Release)</h3>
           <p>
             Hi there! Welcome to the CSV center. Our mission is to make working
             with CSV files a breeze. We use SQLite and web assembly to create an
@@ -115,10 +115,16 @@ function Guide() {
                   (usually label) could be either integer or text.
                 </p>
               </li>
+              <li>
+                <p>
+                  <strong>Pie</strong> chart, also good for aggregate data, x
+                  axis (usually label) could be either integer or text.
+                </p>
+              </li>
             </ul>
             <p>
-              <strong>Pie</strong> chart and othert type support will come in
-              the future. We are working on multi chart support now. In
+              <strong>Scatter</strong> plot and othert chart support will come
+              in the future. We are working on multi chart support now. In
               addition, you can also add annotation to your chart if needed.
             </p>
 
