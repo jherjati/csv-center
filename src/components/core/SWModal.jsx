@@ -60,8 +60,10 @@ export default function SWModal() {
               </Dialog.Title>
               <div className='mt-2'>
                 <p className='text-sm text-gray-500'>
-                  The latest version is here, with features that make your work
-                  even easier. You just need to refresh.
+                  The latest version is here, with features that will make your
+                  work even easier, including{" "}
+                  <strong className=' font-semibold'>Pie Chart</strong>! All you
+                  need to do is refresh.
                 </p>
               </div>
 
