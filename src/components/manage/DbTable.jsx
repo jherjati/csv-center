@@ -21,37 +21,14 @@ import {
 import { onBefoleUnload, DBWorker, rawWorker } from "../../constants";
 import { filterToString, filterToValues } from "../../utils";
 
-function DbTable({ name, isInFormats, children }) {
+function DbTable({ name, children }) {
   const [detailOpen, setDetailOpen] = useState(false);
   const [filterOpen, setFilterOpen] = useState(false);
   const [filter, setFilter] = useState([]);
   const [focusId, setFocusId] = useState(undefined);
   const [page, setPage] = useState(1);
-
   const { sortAsc, handleSortClick, sortString } = useSort();
-
-  // Column
-  const [columns, setColumns] = useState(
-    isInFormats ? formats.value[name] : []
-  );
-  useEffect(() => {
-    if (!isInFormats) {
-      DBWorker.pleaseDo({
-        id: "browse column",
-        action: "exec",
-        sql: `PRAGMA table_info('${name}')`,
-      }).then(({ results }) => {
-        setColumns(
-          results[0]?.values.map((val) => ({
-            name: val[1],
-            type: val[2].toLowerCase(),
-          }))
-        );
-      });
-    } else {
-      setColumns(formats.value[name]);
-    }
-  }, [name, isInFormats]);
+  const columns = formats.value[name];
 
   // Data
   const [data, setData] = useState([]);
