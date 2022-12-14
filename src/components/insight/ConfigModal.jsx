@@ -41,6 +41,7 @@ export default function ConfigModal({ open, setOpen, tableName, columns }) {
       options: {
         scales: {
           x: {
+            type: type === "line" ? "linear" : "category",
             title: {
               display: true,
             },
@@ -48,7 +49,6 @@ export default function ConfigModal({ open, setOpen, tableName, columns }) {
         },
         plugins: { ...chart.options.plugins },
       },
-      dataLimit: chart.dataLimit,
       yColumn: chart.yColumn.slice(0, datasetLength),
       borderColor: chart.borderColor.slice(0, datasetLength),
       backgroundColor: chart.backgroundColor.slice(0, datasetLength),
@@ -66,25 +66,9 @@ export default function ConfigModal({ open, setOpen, tableName, columns }) {
             "options.plugins.annotation.annotations.box.display",
             Boolean(data[key])
           );
-        } else if (name.includes("xColumn")) {
-          setPropByString(charts[idx], "options.scales.x.title", {
-            text: data[key],
-          });
-        } else if (name === "type") {
-          switch (data[key]) {
-            case "bar":
-              charts[idx].options.scales.x.type = "category";
-              break;
-            case "line":
-              charts[idx].options.scales.x.type = "linear";
-              break;
-            default:
-              break;
-          }
         }
       }
     });
-
     metricConfigs.value = {
       ...metricConfigs.value,
       [tableName]: { stats, charts },
@@ -319,7 +303,10 @@ export default function ConfigModal({ open, setOpen, tableName, columns }) {
                               <select
                                 name={`chart_${chartIdx}_${input.name}`}
                                 className='mt-1 shadow-sm focus:ring-teal-500 focus:border-teal-500 block w-full sm:text-sm border-gray-300 rounded-md'
-                                defaultValue={chart[input.name]}
+                                defaultValue={getPropByString(
+                                  chart,
+                                  input.name
+                                )}
                               >
                                 {input.options(columns).map((opt) => (
                                   <option value={opt}>{opt}</option>
@@ -346,6 +333,7 @@ export default function ConfigModal({ open, setOpen, tableName, columns }) {
                                 defaultValue={
                                   getPropByString(chart, input.name) ?? ""
                                 }
+                                required
                               />
                             </div>
                           )

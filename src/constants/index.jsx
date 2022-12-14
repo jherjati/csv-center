@@ -116,7 +116,7 @@ export const chartForm = {
       step: 25,
     },
     {
-      name: "xColumn",
+      name: "options.scales.x.title.text",
       label: "X Axis Column",
       type: "select",
       options: (columns) =>
@@ -173,7 +173,7 @@ export const chartForm = {
       options: () => [1, 2, 3, 4, 5, 6],
     },
     {
-      name: "xColumn",
+      name: "options.scales.x.title.text",
       label: "X Axis Column (Group By)",
       type: "select",
       options: (columns) =>

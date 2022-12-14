@@ -87,7 +87,6 @@ const TableMetric = forwardRef(({ name, children, handlePrint }, ref) => {
               },
               span: 6,
               dataLimit: 250,
-              xColumn: numberColumns[0]?.name,
               yColumn: [numberColumns[1]?.name],
               borderColor: ["#ffa500"],
               backgroundColor: ["#ee4b2b"],

@@ -4,11 +4,11 @@ import { filterToString, filterToValues, setSnackContent } from "../../utils";
 import { DBWorker } from "../../constants";
 
 function ChartBox({ config, tableName, filter }) {
-  const elRef = useRef();
-  const chartRef = useRef();
+  const elRef = useRef(),
+    chartRef = useRef();
 
   useEffect(() => {
-    if (!(config.xColumn && config.yColumn.length)) {
+    if (!(config.options.scales.x.title.text && config.yColumn.length)) {
       setSnackContent([
         "error",
         "Insufficient Data",
@@ -28,21 +28,24 @@ function ChartBox({ config, tableName, filter }) {
   }, []);
 
   useEffect(async () => {
-    let sql = "";
+    let xColumn = config.options.scales.x.title.text,
+      sql = "";
     switch (config.type) {
       case "bar":
-        sql = `SELECT ${config.xColumn}, ${config.dataOperator[0]}(${
+        sql = `SELECT ${xColumn}, ${config.dataOperator[0]}(${
           config.yColumn[0]
-        }) FROM '${tableName}' ${filterToString(filter)} GROUP BY ${
-          config.xColumn
-        } ORDER BY ${config.dataOperator[0]}(${config.yColumn[0]});`;
+        }) FROM '${tableName}' ${filterToString(
+          filter
+        )} GROUP BY ${xColumn} ORDER BY ${config.dataOperator[0]}(${
+          config.yColumn[0]
+        });`;
         break;
       case "line":
-        sql = `SELECT ${config.xColumn}, ${config.yColumn.join(
+        sql = `SELECT ${xColumn}, ${config.yColumn.join(
           ", "
-        )} FROM '${tableName}' ${filterToString(filter)} ORDER BY ${
-          config.xColumn
-        } LIMIT ${config.dataLimit};`;
+        )} FROM '${tableName}' ${filterToString(
+          filter
+        )} ORDER BY ${xColumn} LIMIT ${config.dataLimit};`;
         break;
       default:
         break;
@@ -62,23 +65,24 @@ function ChartBox({ config, tableName, filter }) {
       const data = {
         labels:
           config.type === "line" ? [] : result.values.map((value) => value[0]),
-        datasets: config.borderColor.map((col, colIdx) => ({
-          label: result.columns[colIdx + 1],
+        datasets: config.yColumn.map((_, yIdx) => ({
+          label: result.columns[yIdx + 1],
           normalized: true,
-          parsing: config.type !== "line",
-          borderColor: col,
-          backgroundColor: config.backgroundColor[colIdx],
+          parsing: !(config.type === "line"),
+          borderColor: config.borderColor[yIdx],
+          backgroundColor: config.backgroundColor[yIdx],
           data: result.values.map((value) => ({
             x: value[0],
-            y: value[colIdx + 1],
+            y: value[yIdx + 1],
           })),
         })),
       };
       chartRef.current.data = data;
+      chartRef.current.options.scales.x.title.text = xColumn;
       chartRef.current.update();
     }
   }, [
-    config.xColumn,
+    config.options.scales.x.title.text,
     config.dataOperator,
     config.yColumn,
     config.dataLimit,
