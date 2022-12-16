@@ -41,12 +41,13 @@ function DbTable({ name, isInFormats, children }) {
         action: "exec",
         sql: `PRAGMA table_info('${name}')`,
       }).then(({ results }) => {
-        setColumns(
-          results[0]?.values.map((val) => ({
-            name: val[1],
-            type: val[2].toLowerCase(),
-          }))
-        );
+        const columns = results[0]?.values.map((val) => ({
+          name: val[1],
+          type: val[2].toLowerCase(),
+          aliases: [val[1]],
+        }));
+        setColumns(columns);
+        formats.value = { ...formats.value, [name]: columns };
       });
     } else {
       setColumns(formats.value[name]);

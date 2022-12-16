@@ -1,3 +1,4 @@
+import { effect } from "@preact/signals";
 import { signal } from "@preact/signals";
 
 export const withHeader = signal(true);
@@ -6,6 +7,10 @@ export const formats = signal(
   localStorage.getItem("predefined_tables")
     ? JSON.parse(localStorage.getItem("predefined_tables"))
     : {}
+);
+
+effect(() =>
+  localStorage.setItem("predefined_tables", JSON.stringify(formats.value))
 );
 
 export const snackbar = signal({
