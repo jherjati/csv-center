@@ -48,6 +48,9 @@ function Insight() {
               columns={formats.value[dbTables[activeTable]]}
               ref={componentRef}
               handlePrint={handlePrint}
+              isInFormats={Object.keys(formats.value).includes(
+                dbTables[activeTable]
+              )}
             >
               <select
                 className='block w-56 rounded-md border-gray-300 py-2 pl-3 pr-10 focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 text-sm'
