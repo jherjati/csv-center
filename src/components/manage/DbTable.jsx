@@ -35,19 +35,20 @@ function DbTable({ name, children }) {
   useEffect(() => {
     if (columns.length) {
       const newDateIndeks = [];
+      const sql = `SELECT ${[{ name: "rowid" }, ...columns]
+        .map((el, idx) => {
+          if (el.type?.includes("date ")) {
+            newDateIndeks.push(idx);
+          }
+          return el.name;
+        })
+        .join(", ")} FROM '${name}' ${filterToString(
+        filter
+      )} ${sortString} LIMIT 10 OFFSET ${(page - 1) * 10}`;
       DBWorker.pleaseDo({
         id: "browse row",
         action: "exec",
-        sql: `SELECT ${[{ name: "rowid" }, ...columns]
-          .map((el, idx) => {
-            if (el.type?.includes("date ")) {
-              newDateIndeks.push(idx);
-            }
-            return el.name;
-          })
-          .join(", ")} FROM '${name}' ${filterToString(
-          filter
-        )} ${sortString} LIMIT 10 OFFSET ${(page - 1) * 10}`,
+        sql,
         params: filterToValues(filter),
       }).then((data) => {
         let toReturn = data.results[0];
