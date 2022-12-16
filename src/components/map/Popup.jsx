@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "preact/hooks";
 import maplibregl from "maplibre-gl";
 import { DBWorker } from "../../constants";
+import { isUrl } from "../../utils";
 
 const Popup = ({ configs, map }) => {
   const contentRef = useRef();
@@ -84,7 +85,17 @@ const Popup = ({ configs, map }) => {
                 <h5 className='capitalize font-medium mr-2'>
                   {key.split("_").join(" ")} :
                 </h5>
-                <p className='font-sm max-w-full break-words'>{item[key]}</p>
+                {isUrl(item[key]) ? (
+                  <a
+                    href={item[key]}
+                    target='_blank'
+                    className='font-sm max-w-full break-words text-indigo-600'
+                  >
+                    {item[key]}
+                  </a>
+                ) : (
+                  <p className='font-sm max-w-full break-words'>{item[key]}</p>
+                )}
               </div>
             ))}
           </div>

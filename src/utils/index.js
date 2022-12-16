@@ -148,3 +148,8 @@ export const instrospectDB = async () => {
   formats.value = newFormats;
   localStorage.setItem("predefined_tables", JSON.stringify(newFormats));
 };
+
+export const isUrl = (text) =>
+  /((?:(?:http|ftp|ws)s?|sftp):\/\/?)([^:/\s.#?]+\.[^:/\s#?]+|localhost)/gi.test(
+    text
+  );
