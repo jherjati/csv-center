@@ -43,7 +43,6 @@ export default function FormatModal({
       key !== focusFormat ? (newFormats[key] = formats.value[key]) : null
     );
     formats.value = newFormats;
-    localStorage.setItem("predefined_tables", JSON.stringify(newFormats));
   };
 
   const addColumn = (event) => {
@@ -100,7 +99,6 @@ export default function FormatModal({
           setTabName(tableName);
         }
         formats.value = newFormats;
-        localStorage.setItem("predefined_tables", JSON.stringify(newFormats));
         setOpen(false);
       }
     }

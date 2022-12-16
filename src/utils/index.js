@@ -146,7 +146,6 @@ export const instrospectDB = async () => {
     newFormats[newTables[idx]] = newFormat;
   });
   formats.value = newFormats;
-  localStorage.setItem("predefined_tables", JSON.stringify(newFormats));
 };
 
 export const isUrl = (text) =>

@@ -62,7 +62,6 @@ function FormatForm({ tabName, fields, file }) {
 
         const newFormats = { ...formats.value, [tableName]: newFormat };
         formats.value = newFormats;
-        localStorage.setItem("predefined_tables", JSON.stringify(newFormats));
 
         await DBWorker.pleaseDo({
           id: "create table",
