@@ -26,20 +26,19 @@ function ChartBox({ config, tableName, filter }) {
         config.type === "pie"
           ? config.xColumn
           : config.options.scales.x.title.text,
-      sql =
-        config.type === "line"
-          ? `SELECT ${xColumn}, ${config.yColumn.join(
-              ", "
-            )} FROM '${tableName}' ${filterToString(
-              filter
-            )} ORDER BY ${xColumn} LIMIT ${config.dataLimit};`
-          : `SELECT ${xColumn}, ${config.dataOperator[0]}(${
-              config.yColumn[0]
-            }) FROM '${tableName}' ${filterToString(
-              filter
-            )} GROUP BY ${xColumn} ORDER BY ${config.dataOperator[0]}(${
-              config.yColumn[0]
-            });`;
+      sql = ["line", "scatter"].includes(config.type)
+        ? `SELECT ${xColumn}, ${config.yColumn.join(
+            ", "
+          )} FROM '${tableName}' ${filterToString(
+            filter
+          )} ORDER BY ${xColumn} LIMIT ${config.dataLimit};`
+        : `SELECT ${xColumn}, ${config.dataOperator[0]}(${
+            config.yColumn[0]
+          }) FROM '${tableName}' ${filterToString(
+            filter
+          )} GROUP BY ${xColumn} ORDER BY ${config.dataOperator[0]}(${
+            config.yColumn[0]
+          });`;
 
     const params = filterToValues(filter);
 
@@ -53,11 +52,12 @@ function ChartBox({ config, tableName, filter }) {
     if (results?.length) {
       const result = results[0];
       const data = {
-        labels:
-          config.type === "line" ? [] : result.values.map((value) => value[0]),
+        labels: ["line", "scatter"].includes(config.type)
+          ? []
+          : result.values.map((value) => value[0]),
         datasets: config.yColumn.map((_, yIdx) => ({
           normalized: true,
-          parsing: !(config.type === "line"),
+          parsing: !["line", "scatter"].includes(config.type),
           label: result.columns[yIdx + 1],
           borderColor:
             config.type === "pie" ? randomColors : config.borderColor[yIdx],

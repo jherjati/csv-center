@@ -165,6 +165,69 @@ export const chartForm = {
       section: "annotation",
     },
   ],
+  scatter: [
+    {
+      name: "span",
+      label: "Chart Width",
+      type: "select",
+      options: () => [1, 2, 3, 4, 5, 6],
+    },
+    {
+      name: "dataLimit",
+      label: "First Data Limit",
+      type: "number",
+      step: 25,
+    },
+    {
+      name: "options.scales.x.title.text",
+      label: "X Axis Column",
+      type: "select",
+      options: (columns) =>
+        columns
+          .filter((col) => ["integer", "real"].includes(col.type))
+          .map((col) => col.name),
+    },
+    {
+      name: "yColumn",
+      label: "Y Axis Column",
+      type: "select",
+      options: (columns) =>
+        columns
+          .filter((col) => ["integer", "real"].includes(col.type))
+          .map((col) => col.name),
+      section: "data",
+    },
+    {
+      name: "borderColor",
+      label: "Border Color",
+      type: "color",
+      section: "data",
+    },
+    {
+      name: "backgroundColor",
+      label: "Background Color",
+      type: "color",
+      section: "data",
+    },
+    {
+      name: "options.plugins.annotation.annotations.box.yMin",
+      label: "Y Min",
+      type: "number",
+      section: "annotation",
+    },
+    {
+      name: "options.plugins.annotation.annotations.box.yMax",
+      label: "Y Max",
+      type: "number",
+      section: "annotation",
+    },
+    {
+      name: "options.plugins.annotation.annotations.box.label.content",
+      label: "Label",
+      type: "text",
+      section: "annotation",
+    },
+  ],
   bar: [
     {
       name: "span",

@@ -54,7 +54,9 @@ export default function ConfigModal({ open, setOpen, tableName, columns }) {
             : {
                 scales: {
                   x: {
-                    type: type[indeks] === "line" ? "linear" : "category",
+                    type: ["line", "scatter"].includes(type[indeks])
+                      ? "linear"
+                      : "category",
                     title: {
                       display: true,
                     },
@@ -111,12 +113,13 @@ export default function ConfigModal({ open, setOpen, tableName, columns }) {
       newVal[chartIdx] = event.target.value;
       return newVal;
     });
-    if (event.target.value !== "line")
-      setDatasetLength((prev) => {
-        const newVal = [...prev];
-        newVal[chartIdx] = 1;
-        return newVal;
-      });
+    setDatasetLength((prev) => {
+      const newVal = [...prev];
+      newVal[chartIdx] = ["line", "scatter"].includes(event.target.value)
+        ? charts[chartIdx].yColumn.length
+        : 1;
+      return newVal;
+    });
   };
 
   return (
@@ -285,7 +288,7 @@ export default function ConfigModal({ open, setOpen, tableName, columns }) {
                             </div>
                           </label>
                         </div>
-                        <div className='col-span-3 relative'>
+                        <div className='col-span-3'>
                           <input
                             onChange={(e) => onTypeChange(e, chartIdx)}
                             type='radio'
@@ -293,11 +296,11 @@ export default function ConfigModal({ open, setOpen, tableName, columns }) {
                             name={`chart_${chartIdx}_type`}
                             value='scatter'
                             class='hidden peer'
-                            disabled
+                            checked={type[chartIdx] === "scatter"}
                           />
                           <label
                             for={"scatter-chart" + chartIdx}
-                            class='inline-flex justify-center items-center space-x-3 p-2 w-full text-gray-700 bg-white rounded-lg border border-gray-200 peer-disabled:opacity-50'
+                            class='inline-flex justify-center items-center space-x-3 p-2 w-full text-gray-700 bg-white rounded-lg border border-gray-200 cursor-pointer  peer-checked:border-teal-600 peer-checked:text-teal-600 peer-checked:bg-gray-100 hover:text-gray-600 hover:bg-gray-100'
                           >
                             <AiOutlineDotChart className='h-8 w-8' />
                             <div>
@@ -307,9 +310,6 @@ export default function ConfigModal({ open, setOpen, tableName, columns }) {
                               <p class='w-full text-xs'>Good for point data</p>
                             </div>
                           </label>
-                          <span className='absolute top-0 right-0 -mr-2 -mt-4 py-1 px-3 text-xs flex justify-center items-center bg-teal-400 text-white rounded-xl shadow'>
-                            Upcoming
-                          </span>
                         </div>
                         <div className='col-span-3'>
                           <input
@@ -392,9 +392,11 @@ export default function ConfigModal({ open, setOpen, tableName, columns }) {
 
                       <div className='relative border rounded-lg px-3 pt-6 pb-3 col-span-12 grid grid-cols-12 gap-y-6 gap-x-4'>
                         <h6 className='absolute top-0 left-0 -mt-3 ml-4 bg-white px-3 text-sm font-medium text-gray-900'>
-                          {type[chartIdx] === "line" ? "Datasets" : "Dataset"}
+                          {["line", "scatter"].includes(type[chartIdx])
+                            ? "Datasets"
+                            : "Dataset"}
                         </h6>
-                        {type[chartIdx] === "line" && (
+                        {["line", "scatter"].includes(type[chartIdx]) && (
                           <div className='absolute top-0 right-0 -mt-3 mr-4 bg-white text-sm font-medium text-gray-900 flex rounded-md shadow-sm'>
                             <button
                               disabled={datasetLength[chartIdx] === 1}
@@ -439,7 +441,9 @@ export default function ConfigModal({ open, setOpen, tableName, columns }) {
                                 input.type === "select" ? (
                                   <div
                                     className={
-                                      type[chartIdx] === "line"
+                                      ["line", "scatter"].includes(
+                                        type[chartIdx]
+                                      )
                                         ? "col-span-4"
                                         : "col-span-3"
                                     }
@@ -468,7 +472,9 @@ export default function ConfigModal({ open, setOpen, tableName, columns }) {
                                 ) : (
                                   <div
                                     className={
-                                      type[chartIdx] === "line"
+                                      ["line", "scatter"].includes(
+                                        type[chartIdx]
+                                      )
                                         ? "col-span-4"
                                         : "col-span-3"
                                     }
