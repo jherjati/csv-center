@@ -99,6 +99,12 @@ export default function ConfigModal({ open, setOpen, tableName, columns }) {
     setCharts([...charts, { ...charts[charts.length - 1], id: Date.now() }]);
   };
 
+  const handleRemoveChart = (chartIdx) => {
+    setType((prev) => prev.filter((_, id) => id !== chartIdx));
+    setDatasetLength((prev) => prev.filter((_, id) => id !== chartIdx));
+    setCharts((prev) => prev.filter((_, id) => id !== chartIdx));
+  };
+
   const onTypeChange = (event, chartIdx) => {
     setType((prev) => {
       const newVal = [...prev];
@@ -216,6 +222,7 @@ export default function ConfigModal({ open, setOpen, tableName, columns }) {
                     setPage={setPage}
                     length={charts.length}
                     addChart={handleAddChart}
+                    removeChart={handleRemoveChart}
                   />
 
                   {charts.map((chart, chartIdx) => (

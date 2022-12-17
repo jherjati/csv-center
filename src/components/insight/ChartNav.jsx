@@ -1,6 +1,12 @@
 import { PlusCircleIcon, PlusIcon, TrashIcon } from "@heroicons/react/20/solid";
 
-export default function ChartNav({ page, setPage, length, addChart }) {
+export default function ChartNav({
+  page,
+  setPage,
+  length,
+  addChart,
+  removeChart,
+}) {
   return (
     <nav className='border-y my-3 border-gray-200 flex overflow-x-scroll'>
       {Array.from({ length }).map((_, i) => (
@@ -17,7 +23,16 @@ export default function ChartNav({ page, setPage, length, addChart }) {
           aria-current='page'
         >
           <p className=' whitespace-nowrap'>Chart {i + 1}</p>
-          {i ? <TrashIcon className='w-4 h-4 hover:text-red-600' /> : null}
+          {i ? (
+            <TrashIcon
+              onClick={(event) => {
+                event.preventDefault();
+                event.stopPropagation();
+                removeChart(i);
+              }}
+              className='w-4 h-4 hover:text-red-600'
+            />
+          ) : null}
         </button>
       ))}
       <button
