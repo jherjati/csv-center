@@ -1,6 +1,6 @@
 import { PlusCircleIcon, PlusIcon, TrashIcon } from "@heroicons/react/20/solid";
 
-export default function ChartNav({ page, setPage, length }) {
+export default function ChartNav({ page, setPage, length, addChart }) {
   return (
     <nav className='border-y my-3 border-gray-200 flex overflow-x-scroll'>
       {Array.from({ length }).map((_, i) => (
@@ -20,21 +20,16 @@ export default function ChartNav({ page, setPage, length }) {
           {i ? <TrashIcon className='w-4 h-4 hover:text-red-600' /> : null}
         </button>
       ))}
-      <AddButton />
+      <button
+        onClick={addChart}
+        type='button'
+        className={
+          "inline-flex items-center border-y-2 px-3 py-2 text-sm font-medium border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-900"
+        }
+        aria-current='page'
+      >
+        <PlusIcon className='w-4 h-4' />
+      </button>
     </nav>
-  );
-}
-
-function AddButton() {
-  return (
-    <button
-      type='button'
-      className={
-        "inline-flex items-center border-y-2 px-3 py-2 text-sm font-medium border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-900"
-      }
-      aria-current='page'
-    >
-      <PlusIcon className='w-4 h-4' />
-    </button>
   );
 }

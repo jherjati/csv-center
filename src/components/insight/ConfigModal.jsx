@@ -20,16 +20,18 @@ import ChartNav from "./ChartNav";
 export default function ConfigModal({ open, setOpen, tableName, columns }) {
   const [stats, setStats] = useState([]);
   const [charts, setCharts] = useState([]);
-  const [type, setType] = useState("line");
-  const [datasetLength, setDatasetLength] = useState(1);
+  const [type, setType] = useState(["line"]);
+  const [datasetLength, setDatasetLength] = useState([1]);
+  const [page, setPage] = useState(0);
 
   useEffect(() => {
     if (open) {
       const config = metricConfigs.value[tableName];
       setStats(config.stats);
+      setType(config.charts.map((el) => el.type));
+      setDatasetLength(config.charts.map((el) => el.yColumn.length));
       setCharts(config.charts);
-      setType(config.charts[0].type);
-      setDatasetLength(config.charts[0].yColumn.length);
+      setPage(0);
     }
   }, [open]);
 
@@ -38,31 +40,38 @@ export default function ConfigModal({ open, setOpen, tableName, columns }) {
     const form = new FormData(event.target);
     const data = Object.fromEntries(form.entries());
     const stats = [];
-    const charts = metricConfigs.value[tableName].charts.map((chart) => ({
-      options:
-        type === "pie"
-          ? {
-              plugins: {
-                legend: {
-                  position: "top",
-                },
-              },
-            }
-          : {
-              scales: {
-                x: {
-                  type: type === "line" ? "linear" : "category",
-                  title: {
-                    display: true,
+    const charts = metricConfigs.value[tableName].charts.map(
+      (chart, indeks) => {
+        return {
+          options:
+            type[indeks] === "pie"
+              ? {
+                  plugins: {
+                    legend: {
+                      position: "top",
+                    },
                   },
+                }
+              : {
+                  scales: {
+                    x: {
+                      type: type[indeks] === "line" ? "linear" : "category",
+                      title: {
+                        display: true,
+                      },
+                    },
+                  },
+                  plugins: { ...chart.options.plugins },
                 },
-              },
-              plugins: { ...chart.options.plugins },
-            },
-      yColumn: chart.yColumn.slice(0, datasetLength),
-      borderColor: chart.borderColor.slice(0, datasetLength),
-      backgroundColor: chart.backgroundColor.slice(0, datasetLength),
-    }));
+          yColumn: chart.yColumn.slice(0, datasetLength[indeks]),
+          borderColor: chart.borderColor.slice(0, datasetLength[indeks]),
+          backgroundColor: chart.backgroundColor.slice(
+            0,
+            datasetLength[indeks]
+          ),
+        };
+      }
+    );
 
     Object.keys(data).forEach((key) => {
       if (key.includes("stat")) {
@@ -86,7 +95,29 @@ export default function ConfigModal({ open, setOpen, tableName, columns }) {
     setOpen(false);
   };
 
-  const [page, setPage] = useState(0);
+  const handleAddChart = () => {
+    setType([...type, type[type.length - 1]]);
+    setDatasetLength([
+      ...datasetLength,
+      datasetLength[datasetLength.length - 1],
+    ]);
+    setCharts([...charts, { ...charts[charts.length - 1], id: Date.now() }]);
+  };
+
+  const onTypeChange = (event, chartIdx) => {
+    setType((prev) => {
+      const newVal = [...prev];
+      newVal[chartIdx] = event.target.value;
+      return newVal;
+    });
+    if (event.target.value !== "line")
+      setDatasetLength((prev) => {
+        const newVal = [...prev];
+        newVal[chartIdx] = 1;
+        return newVal;
+      });
+  };
+
   return (
     <Transition.Root show={open} as={Fragment}>
       <Dialog as='div' className='relative z-10' onClose={setOpen}>
@@ -185,26 +216,37 @@ export default function ConfigModal({ open, setOpen, tableName, columns }) {
                       The following config will be used as chart options
                     </p>
                   </div>
-                  <ChartNav page={page} setPage={setPage} length={3} />
+                  <ChartNav
+                    page={page}
+                    setPage={setPage}
+                    length={charts.length}
+                    addChart={handleAddChart}
+                  />
 
                   {charts.map((chart, chartIdx) => (
-                    <div className='grid gap-y-6 gap-x-4 grid-cols-12'>
+                    <div
+                      key={chart.id}
+                      className={
+                        "grid gap-y-6 gap-x-4 grid-cols-12 " +
+                        (chartIdx === page ? "" : "h-0 overflow-hidden")
+                      }
+                    >
                       <div className='col-span-12 grid grid-cols-12 gap-x-3 gap-y-1'>
                         <label className='col-span-12 block text-sm font-medium text-gray-700'>
                           Chart Type
                         </label>
                         <div className='col-span-3'>
                           <input
-                            onChange={(event) => setType(event.target.value)}
+                            onChange={(e) => onTypeChange(e, chartIdx)}
                             type='radio'
-                            id='line-chart'
+                            id={"line-chart" + chartIdx}
                             name={`chart_${chartIdx}_type`}
                             value='line'
                             class='hidden peer'
-                            checked={type === "line"}
+                            checked={type[chartIdx] === "line"}
                           />
                           <label
-                            for='line-chart'
+                            for={"line-chart" + chartIdx}
                             class='inline-flex justify-center items-center space-x-3 p-2 w-full text-gray-700 bg-white rounded-lg border border-gray-200 cursor-pointer  peer-checked:border-teal-600 peer-checked:text-teal-600 peer-checked:bg-gray-100 hover:text-gray-600 hover:bg-gray-100'
                           >
                             <AiOutlineLineChart className='h-8 w-8' />
@@ -218,19 +260,16 @@ export default function ConfigModal({ open, setOpen, tableName, columns }) {
                         </div>
                         <div className='col-span-3'>
                           <input
-                            onChange={(event) => {
-                              setType(event.target.value);
-                              setDatasetLength(1);
-                            }}
+                            onChange={(e) => onTypeChange(e, chartIdx)}
                             type='radio'
-                            id='bar-chart'
+                            id={"bar-chart" + chartIdx}
                             name={`chart_${chartIdx}_type`}
                             value='bar'
                             class='hidden peer'
-                            checked={type === "bar"}
+                            checked={type[chartIdx] === "bar"}
                           />
                           <label
-                            for='bar-chart'
+                            for={"bar-chart" + chartIdx}
                             class='inline-flex justify-center items-center space-x-3 p-2 w-full text-gray-700 bg-white rounded-lg border border-gray-200 cursor-pointer  peer-checked:border-teal-600 peer-checked:text-teal-600 peer-checked:bg-gray-100 hover:text-gray-600 hover:bg-gray-100'
                           >
                             <AiOutlineBarChart className='h-8 w-8' />
@@ -246,16 +285,16 @@ export default function ConfigModal({ open, setOpen, tableName, columns }) {
                         </div>
                         <div className='col-span-3 relative'>
                           <input
-                            onChange={(event) => setType(event.target.value)}
+                            onChange={(e) => onTypeChange(e, chartIdx)}
                             type='radio'
-                            id='scatter-chart'
+                            id={"scatter-chart" + chartIdx}
                             name={`chart_${chartIdx}_type`}
                             value='scatter'
                             class='hidden peer'
                             disabled
                           />
                           <label
-                            for='scatter-chart'
+                            for={"scatter-chart" + chartIdx}
                             class='inline-flex justify-center items-center space-x-3 p-2 w-full text-gray-700 bg-white rounded-lg border border-gray-200 peer-disabled:opacity-50'
                           >
                             <AiOutlineDotChart className='h-8 w-8' />
@@ -272,19 +311,16 @@ export default function ConfigModal({ open, setOpen, tableName, columns }) {
                         </div>
                         <div className='col-span-3'>
                           <input
-                            onChange={(event) => {
-                              setType(event.target.value);
-                              setDatasetLength(1);
-                            }}
+                            onChange={(e) => onTypeChange(e, chartIdx)}
                             type='radio'
-                            id='pie-chart'
+                            id={"pie-chart" + chartIdx}
                             name={`chart_${chartIdx}_type`}
                             value='pie'
                             class='hidden peer'
-                            checked={type === "pie"}
+                            checked={type[chartIdx] === "pie"}
                           />
                           <label
-                            for='pie-chart'
+                            for={"pie-chart" + chartIdx}
                             class='inline-flex justify-center items-center space-x-3 p-2 w-full text-gray-700 bg-white rounded-lg border border-gray-200 cursor-pointer  peer-checked:border-teal-600 peer-checked:text-teal-600 peer-checked:bg-gray-100 hover:text-gray-600 hover:bg-gray-100'
                           >
                             <AiOutlinePieChart className='h-8 w-8' />
@@ -300,7 +336,7 @@ export default function ConfigModal({ open, setOpen, tableName, columns }) {
                         </div>
                       </div>
 
-                      {chartForm[type]
+                      {chartForm[type[chartIdx]]
                         .filter((input) => !input.section)
                         .map((input) =>
                           input.type === "select" ? (
@@ -354,16 +390,20 @@ export default function ConfigModal({ open, setOpen, tableName, columns }) {
 
                       <div className='relative border rounded-lg px-3 pt-6 pb-3 col-span-12 grid grid-cols-12 gap-y-6 gap-x-4'>
                         <h6 className='absolute top-0 left-0 -mt-3 ml-4 bg-white px-3 text-sm font-medium text-gray-900'>
-                          {type === "line" ? "Datasets" : "Dataset"}
+                          {type[chartIdx] === "line" ? "Datasets" : "Dataset"}
                         </h6>
-                        {type === "line" && (
+                        {type[chartIdx] === "line" && (
                           <div className='absolute top-0 right-0 -mt-3 mr-4 bg-white text-sm font-medium text-gray-900 flex rounded-md shadow-sm'>
                             <button
-                              disabled={datasetLength === 1}
+                              disabled={datasetLength[chartIdx] === 1}
                               className='rounded-l-md border -mr-px border-gray-300 bg-white hover:bg-gray-50 focus:z-10 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500'
                               onClick={(event) => {
                                 event.preventDefault();
-                                setDatasetLength(datasetLength - 1);
+                                setDatasetLength(
+                                  datasetLength.map((el, idx) =>
+                                    idx === chartIdx ? el - 1 : el
+                                  )
+                                );
                               }}
                             >
                               <MinusSmallIcon
@@ -375,7 +415,11 @@ export default function ConfigModal({ open, setOpen, tableName, columns }) {
                               className='rounded-r-md border -ml-px border-gray-300 bg-white hover:bg-gray-50 focus:z-10 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500'
                               onClick={(event) => {
                                 event.preventDefault();
-                                setDatasetLength(datasetLength + 1);
+                                setDatasetLength(
+                                  datasetLength.map((el, idx) =>
+                                    idx === chartIdx ? el + 1 : el
+                                  )
+                                );
                               }}
                             >
                               <PlusSmallIcon
@@ -385,15 +429,15 @@ export default function ConfigModal({ open, setOpen, tableName, columns }) {
                             </button>
                           </div>
                         )}
-                        {Array.from({ length: datasetLength }).map(
+                        {Array.from({ length: datasetLength[chartIdx] }).map(
                           (_, dataIdx) =>
-                            chartForm[type]
+                            chartForm[type[chartIdx]]
                               .filter((input) => input.section === "data")
                               .map((input) =>
                                 input.type === "select" ? (
                                   <div
                                     className={
-                                      type === "line"
+                                      type[chartIdx] === "line"
                                         ? "col-span-4"
                                         : "col-span-3"
                                     }
@@ -422,7 +466,7 @@ export default function ConfigModal({ open, setOpen, tableName, columns }) {
                                 ) : (
                                   <div
                                     className={
-                                      type === "line"
+                                      type[chartIdx] === "line"
                                         ? "col-span-4"
                                         : "col-span-3"
                                     }
@@ -455,12 +499,12 @@ export default function ConfigModal({ open, setOpen, tableName, columns }) {
                         )}
                       </div>
 
-                      {type !== "pie" && (
+                      {type[chartIdx] !== "pie" && (
                         <div className='relative border rounded-lg px-3 pt-6 pb-3 col-span-12 grid grid-cols-12 gap-y-6 gap-x-4'>
                           <h6 className='absolute top-0 left-0 -mt-3 ml-4 bg-white px-3 text-sm font-medium text-gray-900'>
                             Annotation
                           </h6>
-                          {chartForm[type]
+                          {chartForm[type[chartIdx]]
                             .filter((input) => input.section === "annotation")
                             .map((input) =>
                               input.type === "select" ? (

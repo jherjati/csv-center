@@ -83,6 +83,7 @@ const TableMetric = forwardRef(
             stats: [numberColumns[0]?.name],
             charts: [
               {
+                id: Date.now(),
                 type: "line",
                 options: {
                   scales: {
