@@ -40,48 +40,43 @@ export default function ConfigModal({ open, setOpen, tableName, columns }) {
     const form = new FormData(event.target);
     const data = Object.fromEntries(form.entries());
     const stats = [];
-    const charts = metricConfigs.value[tableName].charts.map(
-      (chart, indeks) => {
-        return {
-          options:
-            type[indeks] === "pie"
-              ? {
-                  plugins: {
-                    legend: {
-                      position: "top",
-                    },
+    const funcCharts = charts.map((chart, indeks) => {
+      return {
+        options:
+          type[indeks] === "pie"
+            ? {
+                plugins: {
+                  legend: {
+                    position: "top",
                   },
-                }
-              : {
-                  scales: {
-                    x: {
-                      type: type[indeks] === "line" ? "linear" : "category",
-                      title: {
-                        display: true,
-                      },
-                    },
-                  },
-                  plugins: { ...chart.options.plugins },
                 },
-          yColumn: chart.yColumn.slice(0, datasetLength[indeks]),
-          borderColor: chart.borderColor.slice(0, datasetLength[indeks]),
-          backgroundColor: chart.backgroundColor.slice(
-            0,
-            datasetLength[indeks]
-          ),
-        };
-      }
-    );
+              }
+            : {
+                scales: {
+                  x: {
+                    type: type[indeks] === "line" ? "linear" : "category",
+                    title: {
+                      display: true,
+                    },
+                  },
+                },
+                plugins: { ...chart.options.plugins },
+              },
+        yColumn: chart.yColumn.slice(0, datasetLength[indeks]),
+        borderColor: chart.borderColor.slice(0, datasetLength[indeks]),
+        backgroundColor: chart.backgroundColor.slice(0, datasetLength[indeks]),
+      };
+    });
 
     Object.keys(data).forEach((key) => {
       if (key.includes("stat")) {
         stats[key.split("_")[1]] = data[key];
       } else {
         const [_, idx, name] = key.split("_");
-        setPropByString(charts[idx], name, data[key]);
+        setPropByString(funcCharts[idx], name, data[key]);
         if (name.includes("annotation")) {
           setPropByString(
-            charts[idx],
+            funcCharts[idx],
             "options.plugins.annotation.annotations.box.display",
             Boolean(data[key])
           );
@@ -90,7 +85,7 @@ export default function ConfigModal({ open, setOpen, tableName, columns }) {
     });
     metricConfigs.value = {
       ...metricConfigs.value,
-      [tableName]: { stats, charts },
+      [tableName]: { stats, charts: funcCharts },
     };
     setOpen(false);
   };
