@@ -15,6 +15,7 @@ import { useEffect, useState } from "preact/hooks";
 import { metricConfigs } from "../../contexts";
 import { getPropByString, setPropByString } from "../../utils";
 import { chartForm } from "../../constants";
+import ChartNav from "./ChartNav";
 
 export default function ConfigModal({ open, setOpen, tableName, columns }) {
   const [stats, setStats] = useState([]);
@@ -85,6 +86,7 @@ export default function ConfigModal({ open, setOpen, tableName, columns }) {
     setOpen(false);
   };
 
+  const [page, setPage] = useState(0);
   return (
     <Transition.Root show={open} as={Fragment}>
       <Dialog as='div' className='relative z-10' onClose={setOpen}>
@@ -182,8 +184,8 @@ export default function ConfigModal({ open, setOpen, tableName, columns }) {
                     <p className='mt-1 max-w-2xl text-sm text-gray-500'>
                       The following config will be used as chart options
                     </p>
-                    <hr className='my-3' />
                   </div>
+                  <ChartNav page={page} setPage={setPage} length={3} />
 
                   {charts.map((chart, chartIdx) => (
                     <div className='grid gap-y-6 gap-x-4 grid-cols-12'>
