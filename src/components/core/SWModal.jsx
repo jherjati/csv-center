@@ -62,8 +62,8 @@ export default function SWModal() {
                 <p className='text-sm text-gray-500'>
                   The latest version is here, with features that will make your
                   work even easier, including{" "}
-                  <strong className=' font-semibold'>Pie Chart</strong>! All you
-                  need to do is refresh.
+                  <strong className=' font-semibold'>multichart support</strong>
+                  ! All you need to do is refresh.
                 </p>
               </div>
 

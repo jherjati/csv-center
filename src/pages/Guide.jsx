@@ -4,7 +4,9 @@ function Guide() {
   return (
     <main className='py-6'>
       <div className='mx-auto max-w-7xl px-8'>
-        <h1 className='text-2xl font-semibold text-gray-900'>Guide</h1>
+        <h1 className='text-2xl font-semibold text-gray-900'>
+          Guide 'n Feedback
+        </h1>
       </div>
       <div className='w-full px-6 mt-4 flex'>
         <article className='prose bg-white rounded-lg p-6 shadow'>
@@ -16,11 +18,11 @@ function Guide() {
             priority. CSV center is built as a progressive web app and is
             designed to be an offline-first app, so you don't need to worry
             about an internet connection after your first visit. Currently, only
-            the <strong>map page</strong>, <strong>bug report</strong> , and{" "}
-            <strong>feature request</strong> require an internet connection. All
-            other features, such as importing, managing, and pulling insights,
-            are fully offline, as well as the ability to write custom SQL
-            commands. We hope you enjoy using CSV center!
+            the <strong>map page</strong> and <strong>user feedback</strong>{" "}
+            require an internet connection. All other features, such as
+            importing, managing, and pulling insights, are fully offline, as
+            well as the ability to write custom SQL commands. We hope you enjoy
+            using CSV center!
           </p>
           <ol>
             <li>
@@ -90,8 +92,29 @@ function Guide() {
               necessary configurations. You will see your data will be displayed
               as points on the map. As usual, you can do BREAD operation to your
               layer configuration, we try our best to optimize the visualisation
-              process.
+              process.Currently we accommodate these layer types :{" "}
             </p>
+            <ul>
+              <li>
+                <p>
+                  <strong>Circle</strong> layer, standard representation of
+                  point data.
+                </p>
+              </li>
+              <li>
+                <p>
+                  <strong>Heatmap</strong> layer, shows magnitude of a
+                  phenomenon as color in two dimensions.
+                </p>
+              </li>
+              <li>
+                <p>
+                  <strong>Cluster</strong> layer, visual aggregation of point
+                  features. The point features are clustered to simplify the
+                  data's visualization.
+                </p>
+              </li>
+            </ul>
 
             <li>Pulling Insight</li>
 
@@ -117,15 +140,22 @@ function Guide() {
               </li>
               <li>
                 <p>
+                  <strong>Scatter</strong> plot, using Cartesian coordinates to
+                  display values for typically two variables for a set of data.
+                </p>
+              </li>
+              <li>
+                <p>
                   <strong>Pie</strong> chart, also good for aggregate data, x
                   axis (usually label) could be either integer or text.
                 </p>
               </li>
             </ul>
             <p>
-              <strong>Scatter</strong> plot and othert chart support will come
-              in the future. We are working on multi chart support now. In
-              addition, you can also add annotation to your chart if needed.
+              Drawing multi chart is also supported. So you can combine many
+              chart type in one printed paper. Don't forget to adjust the chart
+              width. In addition, you can also add annotation to your chart if
+              needed.
             </p>
 
             <li>Comparing</li>

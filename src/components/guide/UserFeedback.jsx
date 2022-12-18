@@ -63,8 +63,81 @@ export default function UserFeedback() {
   return (
     <form
       onSubmit={handleSubmit}
-      className='relative w-full h-fit ml-6 bg-white rounded-lg overflow-hidden border border-gray-300 shadow-sm focus-within:border-indigo-500 focus-within:ring-1 focus-within:ring-indigo-500'
+      className='w-full h-fit ml-6 bg-white rounded-lg overflow-hidden border border-gray-300 shadow-sm focus-within:border-indigo-500 focus-within:ring-1 focus-within:ring-indigo-500'
     >
+      <div className='flex justify-between items-center px-3 py-2 border-b'>
+        <h3 className='text-xl'>User Feedback</h3>
+        <div className='z-10 inline-flex flex-nowrap justify-end space-x-2'>
+          <input
+            type='text'
+            className='hidden'
+            name='tags'
+            value={JSON.stringify([labelled.value])}
+          />
+          <Listbox
+            as='div'
+            value={labelled}
+            onChange={setLabelled}
+            className='flex-shrink-0'
+          >
+            {({ open }) => (
+              <>
+                <Listbox.Label className='sr-only'> Add a label </Listbox.Label>
+                <div className='relative'>
+                  <Listbox.Button className='relative inline-flex items-center whitespace-nowrap rounded-full bg-gray-50 py-2 text-sm font-medium text-gray-500 hover:bg-gray-100 px-3'>
+                    <TagIcon
+                      className={classNames(
+                        labelled.value === null
+                          ? "text-gray-300"
+                          : "text-gray-500",
+                        "h-5 w-5 flex-shrink-0 -ml-1"
+                      )}
+                      aria-hidden='true'
+                    />
+                    <span
+                      className={classNames(
+                        labelled.value === null ? "" : "text-gray-900",
+                        "truncate ml-2 block"
+                      )}
+                    >
+                      {labelled.value === null ? "Label" : labelled.name}
+                    </span>
+                  </Listbox.Button>
+
+                  <Transition
+                    show={open}
+                    as={Fragment}
+                    leave='transition ease-in duration-100'
+                    leaveFrom='opacity-100'
+                    leaveTo='opacity-0'
+                  >
+                    <Listbox.Options className='absolute right-0 z-10 mt-1 max-h-56 w-52 overflow-auto rounded-lg bg-white py-3 shadow ring-1 ring-black ring-opacity-5 focus:outline-none text-sm'>
+                      {labels.map((label) => (
+                        <Listbox.Option
+                          key={label.value}
+                          className={({ active }) =>
+                            classNames(
+                              active ? "bg-gray-100" : "bg-white",
+                              "relative cursor-pointer select-none py-2 px-3"
+                            )
+                          }
+                          value={label}
+                        >
+                          <div className='flex items-center'>
+                            <span className='block truncate font-medium'>
+                              {label.name}
+                            </span>
+                          </div>
+                        </Listbox.Option>
+                      ))}
+                    </Listbox.Options>
+                  </Transition>
+                </div>
+              </>
+            )}
+          </Listbox>
+        </div>
+      </div>
       <section>
         <label htmlFor='title' className='sr-only'>
           Title
@@ -80,7 +153,7 @@ export default function UserFeedback() {
           Description
         </label>
         <textarea
-          rows={9}
+          rows={10}
           name='description'
           id='description'
           className='block w-full resize-none border-0 py-0 placeholder-gray-500 focus:ring-0 text-sm'
@@ -88,77 +161,6 @@ export default function UserFeedback() {
           defaultValue={""}
         />
       </section>
-
-      <div className='absolute z-10 right-0 top-0 flex flex-nowrap justify-end space-x-2 py-2 px-3'>
-        <input
-          type='text'
-          className='hidden'
-          name='tags'
-          value={JSON.stringify([labelled.value])}
-        />
-        <Listbox
-          as='div'
-          value={labelled}
-          onChange={setLabelled}
-          className='flex-shrink-0'
-        >
-          {({ open }) => (
-            <>
-              <Listbox.Label className='sr-only'> Add a label </Listbox.Label>
-              <div className='relative'>
-                <Listbox.Button className='relative inline-flex items-center whitespace-nowrap rounded-full bg-gray-50 py-2 text-sm font-medium text-gray-500 hover:bg-gray-100 px-3'>
-                  <TagIcon
-                    className={classNames(
-                      labelled.value === null
-                        ? "text-gray-300"
-                        : "text-gray-500",
-                      "h-5 w-5 flex-shrink-0 -ml-1"
-                    )}
-                    aria-hidden='true'
-                  />
-                  <span
-                    className={classNames(
-                      labelled.value === null ? "" : "text-gray-900",
-                      "truncate ml-2 block"
-                    )}
-                  >
-                    {labelled.value === null ? "Label" : labelled.name}
-                  </span>
-                </Listbox.Button>
-
-                <Transition
-                  show={open}
-                  as={Fragment}
-                  leave='transition ease-in duration-100'
-                  leaveFrom='opacity-100'
-                  leaveTo='opacity-0'
-                >
-                  <Listbox.Options className='absolute right-0 z-10 mt-1 max-h-56 w-52 overflow-auto rounded-lg bg-white py-3 shadow ring-1 ring-black ring-opacity-5 focus:outline-none text-sm'>
-                    {labels.map((label) => (
-                      <Listbox.Option
-                        key={label.value}
-                        className={({ active }) =>
-                          classNames(
-                            active ? "bg-gray-100" : "bg-white",
-                            "relative cursor-default select-none py-2 px-3"
-                          )
-                        }
-                        value={label}
-                      >
-                        <div className='flex items-center'>
-                          <span className='block truncate font-medium'>
-                            {label.name}
-                          </span>
-                        </div>
-                      </Listbox.Option>
-                    ))}
-                  </Listbox.Options>
-                </Transition>
-              </div>
-            </>
-          )}
-        </Listbox>
-      </div>
 
       <div className='flex items-center justify-between space-x-3 border-t border-gray-200 py-2 px-3'>
         <div className='flex'>
