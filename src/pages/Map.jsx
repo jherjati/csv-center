@@ -36,8 +36,8 @@ function Map() {
         container: mapContainer.current,
         style:
           "https://api.maptiler.com/maps/streets/style.json?key=get_your_own_OpIi9ZULNHzrESv6T2vL",
-        center: [107.5, -6.8],
-        zoom: 8.5,
+        center: [-122.4194, 37.7749],
+        zoom: 10,
       });
       const map = mapRef.current;
 
