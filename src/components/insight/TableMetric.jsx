@@ -72,6 +72,14 @@ const TableMetric = forwardRef(
     }, [name, isInFormats]);
 
     const [filter, setFilter] = useState([]);
+    useEffect(() => {
+      setFilter(
+        metricConfigs.value[name] ? metricConfigs.value[name].filter : []
+      );
+    }, []);
+    useEffect(() => {
+      if (metricConfigs.value[name]) metricConfigs.value[name].filter = filter;
+    }, [filter]);
 
     // Fill Config Placeholder
     useEffect(() => {
@@ -124,6 +132,7 @@ const TableMetric = forwardRef(
                 backgroundColor: ["#ee4b2b"],
               },
             ],
+            filter: [],
           },
         };
       }

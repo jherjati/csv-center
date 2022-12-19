@@ -38,7 +38,7 @@ export default function FilterModal({
       setSnackContent([
         "error",
         "An Error Occured",
-        "Download has crashed due to an issue in the table configuration",
+        "Filter couldn't be applied due to some restriction",
       ]);
     }
   };
