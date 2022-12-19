@@ -1,8 +1,5 @@
 import { classNames } from "../../utils";
-import {
-  AdjustmentsHorizontalIcon,
-  TableCellsIcon,
-} from "@heroicons/react/20/solid";
+import { TableCellsIcon } from "@heroicons/react/20/solid";
 import { PencilSquareIcon } from "@heroicons/react/24/outline";
 
 import { formats } from "../../contexts";
@@ -28,10 +25,7 @@ export default function FormatTabs({
           )}
           aria-current={"Dynamic" === tabName ? "page" : undefined}
         >
-          <AdjustmentsHorizontalIcon
-            className='-ml-0.5 mr-2 h-5 w-5'
-            aria-hidden='true'
-          />
+          <TableCellsIcon className='-ml-0.5 mr-2 h-5 w-5' aria-hidden='true' />
           <p>New</p>
         </button>
         {Object.keys(formats.value).map((tab) => (
@@ -47,10 +41,6 @@ export default function FormatTabs({
             )}
             aria-current={tab === tabName ? "page" : undefined}
           >
-            <TableCellsIcon
-              className='-ml-0.5 mr-2 h-5 w-5'
-              aria-hidden='true'
-            />
             <p className='grow text-left'>{tab}</p>
             <PencilSquareIcon
               className='h-5 w-5 ml-3'
