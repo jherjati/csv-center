@@ -2,9 +2,8 @@ import { useLocation } from "wouter-preact";
 import { parse } from "papaparse";
 import { parse as dateParse } from "date-fns";
 import { useState, useMemo } from "preact/hooks";
-import { ArrowPathIcon } from "@heroicons/react/20/solid";
-
-import { formats, withHeader } from "../../contexts";
+import { ArrowPathIcon, XCircleIcon } from "@heroicons/react/20/solid";
+import { formats, ignoredFields, withHeader } from "../../contexts";
 import { types, DBWorker } from "../../constants";
 import {
   dbNameEscaper,
@@ -74,8 +73,10 @@ function FormatForm({ tabName, fields, file }) {
 
         stepFunction = (row, parser) => {
           Object.keys(row.data).forEach((key) => {
-            if (row.data[key].includes(",") && realKeys.includes(key)) {
-              row.data[key] = realTransformer(row.data[key]);
+            if (realKeys.includes(key)) {
+              // if (row.data[key].includes(","))
+              //   row.data[key] = realTransformer(row.data[key]);
+              row.data[key] = parseFloat(row.data[key]);
             } else if (dateKeys.map((k) => k.key).includes(key)) {
               row.data[key] =
                 dateParse(
@@ -129,8 +130,10 @@ function FormatForm({ tabName, fields, file }) {
 
         stepFunction = (row, parser) => {
           Object.keys(row.data).forEach((key) => {
-            if (row.data[key].includes(",") && realKeys.includes(key)) {
-              row.data[key] = realTransformer(row.data[key]);
+            if (realKeys.includes(key)) {
+              // if (row.data[key].includes(","))
+              //   row.data[key] = realTransformer(row.data[key]);
+              row.data[key] = parseFloat(row.data[key]);
             } else if (dateKeys.map((k) => k.key).includes(key)) {
               row.data[key] =
                 dateParse(
@@ -201,27 +204,37 @@ function FormatForm({ tabName, fields, file }) {
     <form onSubmit={handleImport}>
       <section className='grid grid-cols-2 gap-4'>
         {tabName === "Dynamic"
-          ? fields.map((col, id) => (
-              <div key={id}>
-                <label
-                  htmlFor={col + "_mapping"}
-                  className='block text-sm font-medium text-gray-700'
-                >
-                  {col ?? ""}
-                </label>
-                <select
-                  name={col}
-                  id={col + "_mapping"}
-                  className='mt-2 w-full shadow-sm focus:ring-teal-500 focus:border-teal-500 block text-sm border-gray-300 rounded-md'
-                >
-                  {types.map(({ label }) => (
-                    <option key={label} value={label}>
-                      {label}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            ))
+          ? fields
+              .filter((col) => !ignoredFields.value.includes(col))
+              .map((col, id) => (
+                <div key={id}>
+                  <div className='w-full flex items-center justify-between'>
+                    <label
+                      htmlFor={col + "_mapping"}
+                      className='block text-sm font-medium text-gray-700'
+                    >
+                      {col ?? ""}
+                    </label>
+                    <XCircleIcon
+                      className='h-4 w-4 text-gray-300 hover:text-gray-700 cursor-pointer'
+                      onClick={() => {
+                        ignoredFields.value = [...ignoredFields.value, col];
+                      }}
+                    />
+                  </div>
+                  <select
+                    name={col}
+                    id={col + "_mapping"}
+                    className='mt-2 w-full shadow-sm focus:ring-teal-500 focus:border-teal-500 block text-sm border-gray-300 rounded-md'
+                  >
+                    {types.map(({ label }) => (
+                      <option key={label} value={label}>
+                        {label}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              ))
           : columns.map((col, id) => {
               const candidates = col.aliases
                 .concat([col.name])

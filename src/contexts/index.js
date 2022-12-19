@@ -53,3 +53,5 @@ PRAGMA table_info('table_name');
 export const layerConfigs = signal([]);
 
 export const isSampleData = signal(false);
+
+export const ignoredFields = signal([]);

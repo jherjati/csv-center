@@ -2,7 +2,7 @@ import { parse } from "papaparse";
 import { useEffect, useMemo, useState } from "preact/hooks";
 
 import Toggle from "./Toggle";
-import { withHeader } from "../../contexts";
+import { ignoredFields, withHeader } from "../../contexts";
 import { setSnackContent } from "../../utils";
 
 export default function PreviewTable({ fields, setFields, file }) {
@@ -56,24 +56,28 @@ export default function PreviewTable({ fields, setFields, file }) {
           <table className='min-w-full divide-y divide-gray-300'>
             <thead>
               <tr>
-                {fields.map((el) => (
-                  <th
-                    scope='col'
-                    className='py-3.5 px-3 text-right text-sm font-semibold text-gray-900 table-cell max-w-sm overflow-hidden whitespace-nowrap overflow-ellipsis'
-                  >
-                    {el}
-                  </th>
-                ))}
+                {fields
+                  .filter((col) => !ignoredFields.value.includes(col))
+                  .map((el) => (
+                    <th
+                      scope='col'
+                      className='py-3.5 px-3 text-right text-sm font-semibold text-gray-900 table-cell max-w-sm overflow-hidden whitespace-nowrap overflow-ellipsis'
+                    >
+                      {el}
+                    </th>
+                  ))}
               </tr>
             </thead>
             <tbody>
               {rows.map((row, idx) => (
                 <tr key={idx} className='border-b border-gray-200'>
-                  {fields.map((el) => (
-                    <td className='py-4 px-3 text-right text-sm text-gray-500 table-cell max-w-sm overflow-hidden whitespace-nowrap overflow-ellipsis'>
-                      {row[el]}
-                    </td>
-                  ))}
+                  {fields
+                    .filter((col) => !ignoredFields.value.includes(col))
+                    .map((el) => (
+                      <td className='py-4 px-3 text-right text-sm text-gray-500 table-cell max-w-sm overflow-hidden whitespace-nowrap overflow-ellipsis'>
+                        {row[el]}
+                      </td>
+                    ))}
                 </tr>
               ))}
             </tbody>

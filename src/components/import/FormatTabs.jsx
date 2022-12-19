@@ -32,7 +32,7 @@ export default function FormatTabs({
             className='-ml-0.5 mr-2 h-5 w-5'
             aria-hidden='true'
           />
-          <p>Dynamic</p>
+          <p>New</p>
         </button>
         {Object.keys(formats.value).map((tab) => (
           <button
