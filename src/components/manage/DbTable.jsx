@@ -221,7 +221,7 @@ function DbTable({ name, isInFormats, children }) {
                   <th
                     key={col}
                     scope='col'
-                    className='px-3 py-3.5 text-left text-sm font-semibold text-gray-900 first:pl-6 last:pr-6'
+                    className='px-3 py-3.5 text-left text-sm font-semibold text-gray-900 first:pl-6 last:pr-6 max-w-sm overflow-hidden whitespace-nowrap overflow-ellipsis'
                   >
                     <span className='flex w-full justify-between items-center space-x-2'>
                       <h4 className='line-clamp-2 inline'>{col}</h4>
@@ -267,7 +267,7 @@ function DbTable({ name, isInFormats, children }) {
                   {row.map((col, idx) => (
                     <td
                       key={idx}
-                      className='whitespace-nowrap px-3 py-4 text-sm text-gray-500 first:pl-6 last:pr-6'
+                      className='whitespace-nowrap px-3 py-4 text-sm text-gray-500 first:pl-6 last:pr-6 max-w-sm overflow-hidden overflow-ellipsis'
                     >
                       <p className='line-clamp-2'>{col}</p>
                     </td>

@@ -74,9 +74,7 @@ function FormatForm({ tabName, fields, file }) {
         stepFunction = (row, parser) => {
           Object.keys(row.data).forEach((key) => {
             if (realKeys.includes(key)) {
-              // if (row.data[key].includes(","))
-              //   row.data[key] = realTransformer(row.data[key]);
-              row.data[key] = parseFloat(row.data[key]);
+              row.data[key] = parseFloat(row.data[key].replace(/[^\d.-]/g, ""));
             } else if (dateKeys.map((k) => k.key).includes(key)) {
               row.data[key] =
                 dateParse(
@@ -131,9 +129,7 @@ function FormatForm({ tabName, fields, file }) {
         stepFunction = (row, parser) => {
           Object.keys(row.data).forEach((key) => {
             if (realKeys.includes(key)) {
-              // if (row.data[key].includes(","))
-              //   row.data[key] = realTransformer(row.data[key]);
-              row.data[key] = parseFloat(row.data[key]);
+              row.data[key] = parseFloat(row.data[key].replace(/[^\d.-]/g, ""));
             } else if (dateKeys.map((k) => k.key).includes(key)) {
               row.data[key] =
                 dateParse(
