@@ -79,7 +79,10 @@ const Popup = ({ configs, map }) => {
             Loading...
           </div>
         ) : (
-          <div className='w-full items-center p-2' style={{ minWidth: 270 }}>
+          <div
+            className='w-full items-center p-2 max-h-96 overflow-y-scroll'
+            style={{ minWidth: 270 }}
+          >
             {Object.keys(item).map((key) => (
               <div className='flex text-gray-900 flex-wrap'>
                 <h5 className='capitalize font-medium mr-2'>
