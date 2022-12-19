@@ -59,7 +59,7 @@ export default function PreviewTable({ fields, setFields, file }) {
                 {fields.map((el) => (
                   <th
                     scope='col'
-                    className='py-3.5 px-3 text-right text-sm font-semibold text-gray-900 table-cell'
+                    className='py-3.5 px-3 text-right text-sm font-semibold text-gray-900 table-cell max-w-sm overflow-hidden whitespace-nowrap overflow-ellipsis'
                   >
                     {el}
                   </th>
@@ -70,7 +70,7 @@ export default function PreviewTable({ fields, setFields, file }) {
               {rows.map((row, idx) => (
                 <tr key={idx} className='border-b border-gray-200'>
                   {fields.map((el) => (
-                    <td className='py-4 px-3 text-right text-sm text-gray-500 table-cell'>
+                    <td className='py-4 px-3 text-right text-sm text-gray-500 table-cell max-w-sm overflow-hidden whitespace-nowrap overflow-ellipsis'>
                       {row[el]}
                     </td>
                   ))}
