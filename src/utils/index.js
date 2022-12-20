@@ -137,7 +137,7 @@ export const instrospectDB = async () => {
       newFormat = newFormat.map((col) => {
         const oldCol = oldFormat.find((c) => c.name === col.name);
         if (oldCol) {
-          col.alises = oldCol.aliases;
+          col.aliases = oldCol.aliases;
           col.type = oldCol.type;
         }
         return col;
