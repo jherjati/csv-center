@@ -1,0 +1,476 @@
+{
+  "Airbnb_listing": {
+    "stats": ["price"],
+    "charts": [
+      {
+        "options": {
+          "scales": {
+            "x": {
+              "axis": "x",
+              "type": "linear",
+              "title": {
+                "display": true,
+                "text": "host_id",
+                "padding": {
+                  "top": 4,
+                  "bottom": 4
+                },
+                "color": "#666"
+              },
+              "ticks": {
+                "minRotation": 0,
+                "maxRotation": 50,
+                "mirror": false,
+                "textStrokeWidth": 0,
+                "textStrokeColor": "",
+                "padding": 3,
+                "display": true,
+                "autoSkip": true,
+                "autoSkipPadding": 3,
+                "labelOffset": 0,
+                "minor": {},
+                "major": {},
+                "align": "center",
+                "crossAlign": "near",
+                "showLabelBackdrop": false,
+                "backdropColor": "rgba(255, 255, 255, 0.75)",
+                "backdropPadding": 2,
+                "color": "#666"
+              },
+              "display": true,
+              "offset": false,
+              "reverse": false,
+              "beginAtZero": false,
+              "bounds": "ticks",
+              "grace": 0,
+              "grid": {
+                "display": true,
+                "lineWidth": 1,
+                "drawBorder": true,
+                "drawOnChartArea": true,
+                "drawTicks": true,
+                "tickLength": 8,
+                "offset": false,
+                "borderDash": [],
+                "borderDashOffset": 0,
+                "borderWidth": 1,
+                "color": "rgba(0,0,0,0.1)",
+                "borderColor": "rgba(0,0,0,0.1)"
+              },
+              "id": "x",
+              "position": "bottom"
+            },
+            "y": {
+              "axis": "y",
+              "type": "linear",
+              "ticks": {
+                "minRotation": 0,
+                "maxRotation": 50,
+                "mirror": false,
+                "textStrokeWidth": 0,
+                "textStrokeColor": "",
+                "padding": 3,
+                "display": true,
+                "autoSkip": true,
+                "autoSkipPadding": 3,
+                "labelOffset": 0,
+                "minor": {},
+                "major": {},
+                "align": "center",
+                "crossAlign": "near",
+                "showLabelBackdrop": false,
+                "backdropColor": "rgba(255, 255, 255, 0.75)",
+                "backdropPadding": 2,
+                "color": "#666"
+              },
+              "display": true,
+              "offset": false,
+              "reverse": false,
+              "beginAtZero": false,
+              "bounds": "ticks",
+              "grace": 0,
+              "grid": {
+                "display": true,
+                "lineWidth": 1,
+                "drawBorder": true,
+                "drawOnChartArea": true,
+                "drawTicks": true,
+                "tickLength": 8,
+                "offset": false,
+                "borderDash": [],
+                "borderDashOffset": 0,
+                "borderWidth": 1,
+                "color": "rgba(0,0,0,0.1)",
+                "borderColor": "rgba(0,0,0,0.1)"
+              },
+              "title": {
+                "display": false,
+                "text": "",
+                "padding": {
+                  "top": 4,
+                  "bottom": 4
+                },
+                "color": "#666"
+              },
+              "id": "y",
+              "position": "left"
+            }
+          },
+          "plugins": {
+            "annotation": {
+              "annotations": {
+                "box": {
+                  "display": false,
+                  "type": "box",
+                  "backgroundColor": "rgba(255, 99, 132, 0.25)",
+                  "label": {
+                    "drawTime": "afterDraw",
+                    "display": true,
+                    "position": {
+                      "x": "start",
+                      "y": "center"
+                    },
+                    "backgroundColor": "transparent",
+                    "callout": {
+                      "display": false
+                    },
+                    "content": ""
+                  },
+                  "id": "box",
+                  "yMin": "",
+                  "yMax": ""
+                }
+              }
+            }
+          }
+        },
+        "yColumn": ["latitude"],
+        "borderColor": ["#ffa500"],
+        "backgroundColor": ["#ee4b2b"],
+        "type": "line",
+        "span": "3",
+        "dataLimit": "250"
+      },
+      {
+        "options": {
+          "scales": {
+            "x": {
+              "axis": "x",
+              "type": "category",
+              "title": {
+                "display": true,
+                "text": "zipcode",
+                "padding": {
+                  "top": 4,
+                  "bottom": 4
+                },
+                "color": "#666"
+              },
+              "offset": true,
+              "grid": {
+                "offset": true,
+                "display": true,
+                "lineWidth": 1,
+                "drawBorder": true,
+                "drawOnChartArea": true,
+                "drawTicks": true,
+                "tickLength": 8,
+                "borderDash": [],
+                "borderDashOffset": 0,
+                "borderWidth": 1,
+                "color": "rgba(0,0,0,0.1)",
+                "borderColor": "rgba(0,0,0,0.1)"
+              },
+              "ticks": {
+                "minRotation": 0,
+                "maxRotation": 50,
+                "mirror": false,
+                "textStrokeWidth": 0,
+                "textStrokeColor": "",
+                "padding": 3,
+                "display": true,
+                "autoSkip": true,
+                "autoSkipPadding": 3,
+                "labelOffset": 0,
+                "minor": {},
+                "major": {},
+                "align": "center",
+                "crossAlign": "near",
+                "showLabelBackdrop": false,
+                "backdropColor": "rgba(255, 255, 255, 0.75)",
+                "backdropPadding": 2,
+                "color": "#666"
+              },
+              "display": true,
+              "reverse": false,
+              "beginAtZero": false,
+              "bounds": "ticks",
+              "grace": 0,
+              "id": "x",
+              "position": "bottom"
+            },
+            "y": {
+              "axis": "y",
+              "type": "linear",
+              "beginAtZero": true,
+              "ticks": {
+                "minRotation": 0,
+                "maxRotation": 50,
+                "mirror": false,
+                "textStrokeWidth": 0,
+                "textStrokeColor": "",
+                "padding": 3,
+                "display": true,
+                "autoSkip": true,
+                "autoSkipPadding": 3,
+                "labelOffset": 0,
+                "minor": {},
+                "major": {},
+                "align": "center",
+                "crossAlign": "near",
+                "showLabelBackdrop": false,
+                "backdropColor": "rgba(255, 255, 255, 0.75)",
+                "backdropPadding": 2,
+                "color": "#666"
+              },
+              "display": true,
+              "offset": false,
+              "reverse": false,
+              "bounds": "ticks",
+              "grace": 0,
+              "grid": {
+                "display": true,
+                "lineWidth": 1,
+                "drawBorder": true,
+                "drawOnChartArea": true,
+                "drawTicks": true,
+                "tickLength": 8,
+                "offset": false,
+                "borderDash": [],
+                "borderDashOffset": 0,
+                "borderWidth": 1,
+                "color": "rgba(0,0,0,0.1)",
+                "borderColor": "rgba(0,0,0,0.1)"
+              },
+              "title": {
+                "display": false,
+                "text": "",
+                "padding": {
+                  "top": 4,
+                  "bottom": 4
+                },
+                "color": "#666"
+              },
+              "id": "y",
+              "position": "left"
+            }
+          },
+          "plugins": {
+            "annotation": {
+              "annotations": {
+                "box": {
+                  "display": false,
+                  "type": "box",
+                  "backgroundColor": "rgba(255, 99, 132, 0.25)",
+                  "label": {
+                    "drawTime": "afterDraw",
+                    "display": true,
+                    "position": {
+                      "x": "start",
+                      "y": "center"
+                    },
+                    "backgroundColor": "transparent",
+                    "callout": {
+                      "display": false
+                    },
+                    "content": ""
+                  },
+                  "id": "box",
+                  "yMin": "",
+                  "yMax": ""
+                }
+              }
+            }
+          }
+        },
+        "yColumn": ["weekly_price"],
+        "borderColor": ["#ffa500"],
+        "backgroundColor": ["#ee4b2b"],
+        "type": "bar",
+        "span": "3",
+        "dataOperator": {
+          "0": "avg"
+        }
+      },
+      {
+        "options": {
+          "scales": {
+            "x": {
+              "axis": "x",
+              "type": "linear",
+              "title": {
+                "display": true,
+                "text": "host_id",
+                "padding": {
+                  "top": 4,
+                  "bottom": 4
+                },
+                "color": "#666"
+              },
+              "ticks": {
+                "minRotation": 0,
+                "maxRotation": 50,
+                "mirror": false,
+                "textStrokeWidth": 0,
+                "textStrokeColor": "",
+                "padding": 3,
+                "display": true,
+                "autoSkip": true,
+                "autoSkipPadding": 3,
+                "labelOffset": 0,
+                "minor": {},
+                "major": {},
+                "align": "center",
+                "crossAlign": "near",
+                "showLabelBackdrop": false,
+                "backdropColor": "rgba(255, 255, 255, 0.75)",
+                "backdropPadding": 2,
+                "color": "#666"
+              },
+              "display": true,
+              "offset": false,
+              "reverse": false,
+              "beginAtZero": false,
+              "bounds": "ticks",
+              "grace": 0,
+              "grid": {
+                "display": true,
+                "lineWidth": 1,
+                "drawBorder": true,
+                "drawOnChartArea": true,
+                "drawTicks": true,
+                "tickLength": 8,
+                "offset": false,
+                "borderDash": [],
+                "borderDashOffset": 0,
+                "borderWidth": 1,
+                "color": "rgba(0,0,0,0.1)",
+                "borderColor": "rgba(0,0,0,0.1)"
+              },
+              "id": "x",
+              "position": "bottom"
+            },
+            "y": {
+              "axis": "y",
+              "type": "linear",
+              "ticks": {
+                "minRotation": 0,
+                "maxRotation": 50,
+                "mirror": false,
+                "textStrokeWidth": 0,
+                "textStrokeColor": "",
+                "padding": 3,
+                "display": true,
+                "autoSkip": true,
+                "autoSkipPadding": 3,
+                "labelOffset": 0,
+                "minor": {},
+                "major": {},
+                "align": "center",
+                "crossAlign": "near",
+                "showLabelBackdrop": false,
+                "backdropColor": "rgba(255, 255, 255, 0.75)",
+                "backdropPadding": 2,
+                "color": "#666"
+              },
+              "display": true,
+              "offset": false,
+              "reverse": false,
+              "beginAtZero": false,
+              "bounds": "ticks",
+              "grace": 0,
+              "grid": {
+                "display": true,
+                "lineWidth": 1,
+                "drawBorder": true,
+                "drawOnChartArea": true,
+                "drawTicks": true,
+                "tickLength": 8,
+                "offset": false,
+                "borderDash": [],
+                "borderDashOffset": 0,
+                "borderWidth": 1,
+                "color": "rgba(0,0,0,0.1)",
+                "borderColor": "rgba(0,0,0,0.1)"
+              },
+              "title": {
+                "display": false,
+                "text": "",
+                "padding": {
+                  "top": 4,
+                  "bottom": 4
+                },
+                "color": "#666"
+              },
+              "id": "y",
+              "position": "left"
+            }
+          },
+          "plugins": {
+            "annotation": {
+              "annotations": {
+                "box": {
+                  "display": false,
+                  "type": "box",
+                  "backgroundColor": "rgba(255, 99, 132, 0.25)",
+                  "label": {
+                    "drawTime": "afterDraw",
+                    "display": true,
+                    "position": {
+                      "x": "start",
+                      "y": "center"
+                    },
+                    "backgroundColor": "transparent",
+                    "callout": {
+                      "display": false
+                    },
+                    "content": ""
+                  },
+                  "id": "box",
+                  "yMin": "",
+                  "yMax": ""
+                }
+              }
+            }
+          }
+        },
+        "yColumn": ["number_of_reviews"],
+        "borderColor": ["#ffa500"],
+        "backgroundColor": ["#ee4b2b"],
+        "type": "scatter",
+        "span": "4",
+        "dataLimit": "250"
+      },
+      {
+        "options": {
+          "plugins": {
+            "legend": {
+              "position": "top"
+            }
+          },
+          "scales": {}
+        },
+        "yColumn": ["beds"],
+        "borderColor": ["#ffa500"],
+        "backgroundColor": ["#ee4b2b"],
+        "type": "pie",
+        "span": "2",
+        "xColumn": "room_type",
+        "dataOperator": {
+          "0": "avg"
+        }
+      }
+    ],
+    "filter": [["price", ">", "0"]]
+  }
+}

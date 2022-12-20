@@ -1,0 +1,20 @@
+[
+  {
+    "type": "cluster",
+    "layerName": "Airbnb",
+    "tableName": "Airbnb_listing",
+    "longColumn": "longitude",
+    "latColumn": "latitude",
+    "steps.0.end": "100",
+    "steps.0.color": "#ebf28c",
+    "steps.0.radius": "13",
+    "steps.1.end": "200",
+    "steps.1.color": "#b2f462",
+    "steps.1.radius": "16",
+    "steps.2.end": "300",
+    "steps.2.color": "#6df532",
+    "steps.2.radius": "19",
+    "steps.3.color": "#02ed1e",
+    "steps.3.radius": "22"
+  }
+]

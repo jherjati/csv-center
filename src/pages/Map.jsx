@@ -9,10 +9,11 @@ import { useTables } from "../hooks";
 import EmptyDb from "../components/core/EmptyDb";
 import CircleLayer from "../components/map/CircleLayer";
 import Popup from "../components/map/Popup";
-import SampleLoader from "../components/core/SampleLoader";
 import { layerConfigs } from "../contexts";
 import HeatmapLayer from "../components/map/HeatmapLayer";
 import ClusterLayer from "../components/map/ClusterLayer";
+import { lazy, Suspense } from "preact/compat";
+const SampleLoader = lazy(() => import("../components/core/SampleLoader"));
 
 function Map() {
   const { dbTables } = useTables();
@@ -76,7 +77,9 @@ function Map() {
         </div>
         <div className='mx-auto max-w-7xl px-8'>
           <EmptyDb />
-          <SampleLoader />
+          <Suspense fallback={<></>}>
+            <SampleLoader />
+          </Suspense>
         </div>
       </main>
     ) : (
