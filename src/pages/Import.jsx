@@ -5,7 +5,7 @@ import TableFormat from "../components/import/TableFormat";
 import PageError from "../components/core/PageError";
 import Dropzone from "../components/import/Dropzone";
 import { setSnackContent } from "../utils";
-
+import { ignoredFields } from "../contexts";
 import { formats } from "../contexts";
 import DBLoader from "../components/import/DBLoader";
 
@@ -16,6 +16,7 @@ function Import() {
   // Auto detect format candidate
   const [tabName, setTabName] = useState("Dynamic");
   useEffect(() => {
+    ignoredFields.value = [];
     if (file) {
       const tableName = file.name.split(".")[0];
       if (Object.keys(formats.value).includes(tableName)) setTabName(tableName);
