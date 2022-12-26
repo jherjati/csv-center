@@ -21,7 +21,7 @@ import {
 import { onBefoleUnload } from "../../constants";
 import { filterToString, filterToValues } from "../../utils";
 
-function DbTable({ name, isInFormats, children }) {
+function DbTable({ tableName, isInFormats, children }) {
   const [detailOpen, setDetailOpen] = useState(false);
   const [filterOpen, setFilterOpen] = useState(false);
   const [filter, setFilter] = useState([]);
@@ -32,27 +32,29 @@ function DbTable({ name, isInFormats, children }) {
 
   // Column
   const [columns, setColumns] = useState(
-    isInFormats ? formats.value[name] : []
+    isInFormats ? formats.value[tableName] : []
   );
   useEffect(() => {
     if (!isInFormats) {
-      DBWorker.value.pleaseDo({
-        id: "browse column",
-        action: "exec",
-        sql: `PRAGMA table_info('${name}')`,
-      }).then(({ results }) => {
-        const columns = results[0]?.values.map((val) => ({
-          name: val[1],
-          type: val[2].toLowerCase(),
-          aliases: [val[1]],
-        }));
-        setColumns(columns);
-        formats.value = { ...formats.value, [name]: columns };
-      });
+      DBWorker.value
+        .pleaseDo({
+          id: "browse column",
+          action: "exec",
+          sql: `PRAGMA table_info('${tableName}')`,
+        })
+        .then(({ results }) => {
+          const columns = results[0]?.values.map((val) => ({
+            name: val[1],
+            type: val[2].toLowerCase(),
+            aliases: [val[1]],
+          }));
+          setColumns(columns);
+          formats.value = { ...formats.value, [tableName]: columns };
+        });
     } else {
-      setColumns(formats.value[name]);
+      setColumns(formats.value[tableName]);
     }
-  }, [name, isInFormats]);
+  }, [tableName, isInFormats]);
 
   // Data
   const [data, setData] = useState([]);
@@ -66,55 +68,59 @@ function DbTable({ name, isInFormats, children }) {
           }
           return el.name;
         })
-        .join(", ")} FROM '${name}' ${filterToString(
+        .join(", ")} FROM '${tableName}' ${filterToString(
         filter
       )} ${sortString} LIMIT 10 OFFSET ${(page - 1) * 10}`;
-      DBWorker.value.pleaseDo({
-        id: "browse row",
-        action: "exec",
-        sql,
-        params: filterToValues(filter),
-      }).then((data) => {
-        let toReturn = data.results[0];
-        toReturn.columns[0] = "rowid";
-        if (toReturn && newDateIndeks.length) {
-          toReturn.values = toReturn.values.map((row) => {
-            let newRow = [...row];
-            newDateIndeks.forEach((indeks) => {
-              newRow[indeks] = dateFormat(
-                new Date(newRow[indeks] * 1000),
-                /\[(.*?)\]/.exec(
-                  columns.find((col) => col.name === toReturn.columns[indeks])
-                    .type
-                )[1]
-              );
+      DBWorker.value
+        .pleaseDo({
+          id: "browse row",
+          action: "exec",
+          sql,
+          params: filterToValues(filter),
+        })
+        .then((data) => {
+          let toReturn = data.results[0];
+          toReturn.columns[0] = "rowid";
+          if (toReturn && newDateIndeks.length) {
+            toReturn.values = toReturn.values.map((row) => {
+              let newRow = [...row];
+              newDateIndeks.forEach((indeks) => {
+                newRow[indeks] = dateFormat(
+                  new Date(newRow[indeks] * 1000),
+                  /\[(.*?)\]/.exec(
+                    columns.find((col) => col.name === toReturn.columns[indeks])
+                      .type
+                  )[1]
+                );
+              });
+              return newRow;
             });
-            return newRow;
-          });
-        }
-        setData(toReturn);
-      });
+          }
+          setData(toReturn);
+        });
     }
-  }, [name, sortString, page, detailOpen, filter, columns]);
+  }, [tableName, sortString, page, detailOpen, filter, columns]);
 
   // Count
   const [count, setCount] = useState(0);
   useEffect(() => {
-    DBWorker.value.pleaseDo({
-      id: "count row",
-      action: "exec",
-      sql: `SELECT COUNT(*) FROM '${name}' ${filterToString(filter)}`,
-      params: filterToValues(filter),
-    }).then((data) => {
-      setCount(data.results[0]?.values[0]);
-    });
-  }, [name, filter, detailOpen]);
+    DBWorker.value
+      .pleaseDo({
+        id: "count row",
+        action: "exec",
+        sql: `SELECT COUNT(*) FROM '${tableName}' ${filterToString(filter)}`,
+        params: filterToValues(filter),
+      })
+      .then((data) => {
+        setCount(data.results[0]?.values[0]);
+      });
+  }, [tableName, filter, detailOpen]);
 
   // Export
   const handleExport = useCallback(() => {
     window.removeEventListener("beforeunload", onBefoleUnload);
 
-    const fileStream = streamSaver.createWriteStream(name + ".csv");
+    const fileStream = streamSaver.createWriteStream(tableName + ".csv");
     const encoder = new TextEncoder();
 
     const writerRef = fileStream.getWriter();
@@ -153,10 +159,10 @@ function DbTable({ name, isInFormats, children }) {
     rawWorker.value.postMessage({
       id: "export table",
       action: "each",
-      sql: `SELECT * FROM '${name}' ${filterToString(filter)}`,
+      sql: `SELECT * FROM '${tableName}' ${filterToString(filter)}`,
       params: filterToValues(filter),
     });
-  }, [name, filter]);
+  }, [tableName, filter]);
 
   return (
     <section className='my-6 w-full rounded-lg overflow-hidden shadow '>
@@ -166,23 +172,25 @@ function DbTable({ name, isInFormats, children }) {
           <button
             className='px-3 py-2 inline-flex items-center rounded-md border border-gray-300 bg-white text-sm font-medium leading-5 text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2'
             onClick={() => {
-              DBWorker.value.pleaseDo({
-                id: "save session",
-                action: "export",
-              }).then((buffer) => {
-                const arraybuff = buffer;
-                const blob = new Blob([arraybuff]);
-                const a = document.createElement("a");
-                document.body.appendChild(a);
-                a.href = window.URL.createObjectURL(blob);
-                a.download = "sql.db";
-                a.onclick = function () {
-                  setTimeout(function () {
-                    window.URL.revokeObjectURL(a.href);
-                  }, 1500);
-                };
-                a.click();
-              });
+              DBWorker.value
+                .pleaseDo({
+                  id: "save session",
+                  action: "export",
+                })
+                .then((buffer) => {
+                  const arraybuff = buffer;
+                  const blob = new Blob([arraybuff]);
+                  const a = document.createElement("a");
+                  document.body.appendChild(a);
+                  a.href = window.URL.createObjectURL(blob);
+                  a.download = "sql.db";
+                  a.onclick = function () {
+                    setTimeout(function () {
+                      window.URL.revokeObjectURL(a.href);
+                    }, 1500);
+                  };
+                  a.click();
+                });
             }}
           >
             <InboxIcon
@@ -286,7 +294,7 @@ function DbTable({ name, isInFormats, children }) {
       <DetailModal
         open={detailOpen}
         setOpen={setDetailOpen}
-        tableName={name}
+        tableName={tableName}
         focusId={focusId}
         columns={columns}
       />
@@ -294,7 +302,7 @@ function DbTable({ name, isInFormats, children }) {
         <FilterModal
           open={filterOpen}
           setOpen={setFilterOpen}
-          tableName={name}
+          tableName={tableName}
           filter={filter}
           setFilter={setFilter}
           columns={columns}

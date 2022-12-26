@@ -58,7 +58,7 @@ function Manage() {
           {dbTables && (
             <DbTable
               key={activeTable}
-              name={dbTables[activeTable]}
+              tableName={dbTables[activeTable]}
               isInFormats={Object.keys(formats.value).includes(
                 dbTables[activeTable]
               )}
