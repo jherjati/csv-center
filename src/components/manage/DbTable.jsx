@@ -21,21 +21,18 @@ import {
 import { onBefoleUnload } from "../../constants";
 import { filterToString, filterToValues } from "../../utils";
 
-function DbTable({ tableName, isInFormats, children }) {
+function DbTable({ tableName, children }) {
   const [detailOpen, setDetailOpen] = useState(false);
   const [filterOpen, setFilterOpen] = useState(false);
   const [filter, setFilter] = useState([]);
   const [focusId, setFocusId] = useState(undefined);
   const [page, setPage] = useState(1);
-
   const { sortAsc, handleSortClick, sortString } = useSort();
 
   // Column
-  const [columns, setColumns] = useState(
-    isInFormats ? formats.value[tableName] : []
-  );
+  const [columns, setColumns] = useState(formats.value[tableName] ?? []);
   useEffect(() => {
-    if (!isInFormats) {
+    if (!formats.value[tableName])
       DBWorker.value
         .pleaseDo({
           id: "browse column",
@@ -51,10 +48,7 @@ function DbTable({ tableName, isInFormats, children }) {
           setColumns(columns);
           formats.value = { ...formats.value, [tableName]: columns };
         });
-    } else {
-      setColumns(formats.value[tableName]);
-    }
-  }, [tableName, isInFormats]);
+  }, [tableName, formats.value]);
 
   // Data
   const [data, setData] = useState([]);
@@ -117,7 +111,7 @@ function DbTable({ tableName, isInFormats, children }) {
   }, [tableName, filter, detailOpen]);
 
   // Export
-  const handleExport = useCallback(() => {
+  const handleExport = useCallback((tableName, filter) => {
     window.removeEventListener("beforeunload", onBefoleUnload);
 
     const fileStream = streamSaver.createWriteStream(tableName + ".csv");
@@ -129,30 +123,32 @@ function DbTable({ tableName, isInFormats, children }) {
     );
 
     rawWorker.value.onmessage = ({ data }) => {
-      if (!data.finished) {
-        writerRef.write(
-          encoder.encode(
-            unparse(
-              [
-                columns.map(({ name, type }) => {
-                  if (type.includes("date ")) {
-                    return dateFormat(
-                      new Date(data.row[name] * 1000),
-                      /\[(.*?)\]/.exec(type)[1]
-                    );
-                  }
-                  return data.row[name];
-                }),
-              ],
-              {
-                delimiter: ";",
-              }
-            ) + "\r\n"
-          )
-        );
-      } else {
-        writerRef.close();
-        window.addEventListener("beforeunload", onBefoleUnload);
+      if (data.id === "export table") {
+        if (!data.finished) {
+          writerRef.write(
+            encoder.encode(
+              unparse(
+                [
+                  columns.map(({ name, type }) => {
+                    if (type.includes("date ")) {
+                      return dateFormat(
+                        new Date(data.row[name] * 1000),
+                        /\[(.*?)\]/.exec(type)[1]
+                      );
+                    }
+                    return data.row[name];
+                  }),
+                ],
+                {
+                  delimiter: ";",
+                }
+              ) + "\r\n"
+            )
+          );
+        } else {
+          writerRef.close();
+          window.addEventListener("beforeunload", onBefoleUnload);
+        }
       }
     };
 
@@ -162,7 +158,7 @@ function DbTable({ tableName, isInFormats, children }) {
       sql: `SELECT * FROM '${tableName}' ${filterToString(filter)}`,
       params: filterToValues(filter),
     });
-  }, [tableName, filter]);
+  }, []);
 
   return (
     <section className='my-6 w-full rounded-lg overflow-hidden shadow '>
@@ -214,7 +210,7 @@ function DbTable({ tableName, isInFormats, children }) {
               setFocusId(undefined);
               setDetailOpen(true);
             },
-            handleExport,
+            () => handleExport(tableName, filter),
           ]}
         />
       </div>
