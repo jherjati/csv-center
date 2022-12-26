@@ -38,7 +38,7 @@ export default function App() {
         }
       })
       .catch(console.error);
-  }, [Object.keys(formats.value)]);
+  }, [formats.value]);
 
   return (
     <>
@@ -46,73 +46,61 @@ export default function App() {
         <Sidebar />
 
         <div className='flex flex-1 flex-col pl-56 h-full'>
-          <Switch className='flex-1'>
-            <Route path='/'>
-              <Suspense fallback={<></>}>
-                <PageHOC>
+          <PageHOC>
+            <Switch className='flex-1'>
+              <Route path='/'>
+                <Suspense fallback={<></>}>
                   <Import />
-                </PageHOC>
-              </Suspense>
-            </Route>
-            <Route path='/manage'>
-              <Suspense fallback={<></>}>
-                {!dbTables || !dbTables.length ? (
-                  <Empty />
-                ) : (
-                  <PageHOC>
+                </Suspense>
+              </Route>
+              <Route path='/manage'>
+                <Suspense fallback={<></>}>
+                  {!dbTables || !dbTables.length ? (
+                    <Empty />
+                  ) : (
                     <Manage dbTables={dbTables} />
-                  </PageHOC>
-                )}
-              </Suspense>
-            </Route>
-            <Route path='/map'>
-              <Suspense fallback={<></>}>
-                {!dbTables || !dbTables.length ? (
-                  <Empty />
-                ) : (
-                  <PageHOC>
+                  )}
+                </Suspense>
+              </Route>
+              <Route path='/map'>
+                <Suspense fallback={<></>}>
+                  {!dbTables || !dbTables.length ? (
+                    <Empty />
+                  ) : (
                     <Map dbTables={dbTables} />
-                  </PageHOC>
-                )}
-              </Suspense>
-            </Route>
-            <Route path='/insight'>
-              <Suspense fallback={<></>}>
-                {!dbTables || !dbTables.length ? (
-                  <Empty />
-                ) : (
-                  <PageHOC>
+                  )}
+                </Suspense>
+              </Route>
+              <Route path='/insight'>
+                <Suspense fallback={<></>}>
+                  {!dbTables || !dbTables.length ? (
+                    <Empty />
+                  ) : (
                     <Insight dbTables={dbTables} />
-                  </PageHOC>
-                )}
-              </Suspense>
-            </Route>
-            <Route path='/compare'>
-              <Suspense fallback={<></>}>
-                {!dbTables || !dbTables.length ? (
-                  <Empty />
-                ) : (
-                  <PageHOC>
+                  )}
+                </Suspense>
+              </Route>
+              <Route path='/compare'>
+                <Suspense fallback={<></>}>
+                  {!dbTables || !dbTables.length ? (
+                    <Empty />
+                  ) : (
                     <Compare dbTables={dbTables} />
-                  </PageHOC>
-                )}
-              </Suspense>
-            </Route>
-            <Route path='/command'>
-              <Suspense fallback={<></>}>
-                <PageHOC>
+                  )}
+                </Suspense>
+              </Route>
+              <Route path='/command'>
+                <Suspense fallback={<></>}>
                   <Command />
-                </PageHOC>
-              </Suspense>
-            </Route>
-            <Route path='/guide'>
-              <Suspense fallback={<></>}>
-                <PageHOC>
+                </Suspense>
+              </Route>
+              <Route path='/guide'>
+                <Suspense fallback={<></>}>
                   <Guide />
-                </PageHOC>
-              </Suspense>
-            </Route>
-          </Switch>
+                </Suspense>
+              </Route>
+            </Switch>
+          </PageHOC>
         </div>
         <SWModal />
         <SnackBar />
