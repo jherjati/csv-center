@@ -48,14 +48,16 @@ function DbTable({ tableName, children }) {
           setColumns(columns);
           formats.value = { ...formats.value, [tableName]: columns };
         });
+    else setColumns(formats.value[tableName]);
   }, [tableName, formats.value]);
 
   // Data
   const [data, setData] = useState([]);
   useEffect(() => {
-    if (columns.length) {
+    if (formats.value[tableName].length) {
+      const funcColumns = formats.value[tableName];
       const newDateIndeks = [];
-      const sql = `SELECT ${[{ name: "rowid" }, ...columns]
+      const sql = `SELECT ${[{ name: "rowid" }, ...funcColumns]
         .map((el, idx) => {
           if (el.type?.includes("date ")) {
             newDateIndeks.push(idx);
@@ -73,6 +75,7 @@ function DbTable({ tableName, children }) {
           params: filterToValues(filter),
         })
         .then((data) => {
+          if (data.error) throw Error(data.error);
           let toReturn = data.results[0];
           toReturn.columns[0] = "rowid";
           if (toReturn && newDateIndeks.length) {
@@ -82,8 +85,9 @@ function DbTable({ tableName, children }) {
                 newRow[indeks] = dateFormat(
                   new Date(newRow[indeks] * 1000),
                   /\[(.*?)\]/.exec(
-                    columns.find((col) => col.name === toReturn.columns[indeks])
-                      .type
+                    funcColumns.find(
+                      (col) => col.name === toReturn.columns[indeks]
+                    ).type
                   )[1]
                 );
               });
@@ -91,9 +95,10 @@ function DbTable({ tableName, children }) {
             });
           }
           setData(toReturn);
-        });
+        })
+        .catch((error) => console.error(error));
     }
-  }, [tableName, sortString, page, detailOpen, filter, columns]);
+  }, [tableName, sortString, page, detailOpen, filter]);
 
   // Count
   const [count, setCount] = useState(0);
