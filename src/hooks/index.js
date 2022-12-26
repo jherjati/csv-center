@@ -1,5 +1,6 @@
 import { useCallback, useState, useMemo, useEffect } from "preact/hooks";
-import { onBefoleUnload, DBWorker } from "../constants";
+import { onBefoleUnload } from "../constants";
+import { DBWorker } from "../contexts";
 
 export const useSort = () => {
   const [sortAsc, setSortAsc] = useState({});
@@ -33,11 +34,11 @@ export const useSort = () => {
 export const useInitDB = () => {
   useEffect(() => {
     window.addEventListener("beforeunload", onBefoleUnload);
-    DBWorker.pleaseDo({
+    DBWorker.value.pleaseDo({
       action: "open",
     }).catch(console.error);
     return () => {
-      DBWorker.pleaseDo({ action: "close" });
+      DBWorker.value.pleaseDo({ action: "close" });
     };
   }, []);
 };
@@ -45,7 +46,7 @@ export const useInitDB = () => {
 export const useTables = () => {
   const [dbTables, setDbTables] = useState();
   useEffect(() => {
-    DBWorker.pleaseDo({
+    DBWorker.value.pleaseDo({
       id: "browse table",
       action: "exec",
       sql: `SELECT name FROM sqlite_schema WHERE type ='table' AND name NOT LIKE 'sqlite_%';`,

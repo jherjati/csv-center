@@ -1,10 +1,9 @@
 import { useCallback, useRef, useState } from "preact/hooks";
 import { EditorView, basicSetup } from "codemirror";
 import { sql } from "@codemirror/lang-sql";
-import { DBWorker } from "../constants";
 import { ArrowPathIcon, BoltSlashIcon } from "@heroicons/react/20/solid";
 import { setSnackContent } from "../utils";
-import { commandText } from "../contexts";
+import { commandText, DBWorker } from "../contexts";
 
 function Command() {
   const editor = useRef();
@@ -24,19 +23,21 @@ function Command() {
     setIsLoading(true);
     const sql = editor.current.state.doc.toString();
     commandText.value = sql;
-    DBWorker.pleaseDo({
-      id: "execute command",
-      action: "exec",
-      sql,
-    }).then((data) => {
-      if (data.id === "execute command") {
-        if (data.error) {
-          setSnackContent(["error", "An Error Occured", data.error]);
+    DBWorker.value
+      .pleaseDo({
+        id: "execute command",
+        action: "exec",
+        sql,
+      })
+      .then((data) => {
+        if (data.id === "execute command") {
+          if (data.error) {
+            setSnackContent(["error", "An Error Occured", data.error]);
+          }
+          setResults(data.results);
         }
-        setResults(data.results);
-      }
-      setIsLoading(false);
-    });
+        setIsLoading(false);
+      });
   };
 
   const onClear = () => {

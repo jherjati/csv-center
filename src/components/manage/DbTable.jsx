@@ -3,7 +3,7 @@ import streamSaver from "streamsaver";
 import { unparse } from "papaparse";
 import { format as dateFormat } from "date-fns";
 
-import { formats } from "../../contexts";
+import { DBWorker, formats, rawWorker } from "../../contexts";
 import { useSort } from "../../hooks";
 import Actions from "../core/Actions";
 import Pagination from "./Pagination";
@@ -18,7 +18,7 @@ import {
   DocumentArrowUpIcon,
   InboxIcon,
 } from "@heroicons/react/20/solid";
-import { onBefoleUnload, DBWorker, rawWorker } from "../../constants";
+import { onBefoleUnload } from "../../constants";
 import { filterToString, filterToValues } from "../../utils";
 
 function DbTable({ name, isInFormats, children }) {
@@ -36,7 +36,7 @@ function DbTable({ name, isInFormats, children }) {
   );
   useEffect(() => {
     if (!isInFormats) {
-      DBWorker.pleaseDo({
+      DBWorker.value.pleaseDo({
         id: "browse column",
         action: "exec",
         sql: `PRAGMA table_info('${name}')`,
@@ -69,7 +69,7 @@ function DbTable({ name, isInFormats, children }) {
         .join(", ")} FROM '${name}' ${filterToString(
         filter
       )} ${sortString} LIMIT 10 OFFSET ${(page - 1) * 10}`;
-      DBWorker.pleaseDo({
+      DBWorker.value.pleaseDo({
         id: "browse row",
         action: "exec",
         sql,
@@ -100,7 +100,7 @@ function DbTable({ name, isInFormats, children }) {
   // Count
   const [count, setCount] = useState(0);
   useEffect(() => {
-    DBWorker.pleaseDo({
+    DBWorker.value.pleaseDo({
       id: "count row",
       action: "exec",
       sql: `SELECT COUNT(*) FROM '${name}' ${filterToString(filter)}`,
@@ -122,7 +122,7 @@ function DbTable({ name, isInFormats, children }) {
       encoder.encode(columns.map((col) => col.name).join(";") + "\r\n")
     );
 
-    rawWorker.onmessage = ({ data }) => {
+    rawWorker.value.onmessage = ({ data }) => {
       if (!data.finished) {
         writerRef.write(
           encoder.encode(
@@ -150,7 +150,7 @@ function DbTable({ name, isInFormats, children }) {
       }
     };
 
-    rawWorker.postMessage({
+    rawWorker.value.postMessage({
       id: "export table",
       action: "each",
       sql: `SELECT * FROM '${name}' ${filterToString(filter)}`,
@@ -166,7 +166,7 @@ function DbTable({ name, isInFormats, children }) {
           <button
             className='px-3 py-2 inline-flex items-center rounded-md border border-gray-300 bg-white text-sm font-medium leading-5 text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2'
             onClick={() => {
-              DBWorker.pleaseDo({
+              DBWorker.value.pleaseDo({
                 id: "save session",
                 action: "export",
               }).then((buffer) => {

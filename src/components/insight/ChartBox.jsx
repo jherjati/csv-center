@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useRef } from "preact/hooks";
 import { Chart } from "chart.js";
 import { filterToString, filterToValues, setSnackContent } from "../../utils";
-import { DBWorker, randomColors } from "../../constants";
+import { randomColors } from "../../constants";
+import { DBWorker } from "../../contexts";
 
 function ChartBox({ config, tableName, filter }) {
   const elRef = useRef(),
@@ -42,7 +43,7 @@ function ChartBox({ config, tableName, filter }) {
 
     const params = filterToValues(filter);
 
-    const { results } = await DBWorker.pleaseDo({
+    const { results } = await DBWorker.value.pleaseDo({
       id: "get chart data",
       action: "exec",
       params,

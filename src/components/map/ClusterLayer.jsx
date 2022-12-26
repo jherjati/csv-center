@@ -1,5 +1,5 @@
 import { useEffect } from "preact/hooks";
-import { DBWorker } from "../../constants";
+import { DBWorker } from "../../contexts";
 
 const rest2Paint = (rest) => {
   const colors = Object.keys(rest)
@@ -107,7 +107,7 @@ function ClusterLayer({
   }, []);
 
   useEffect(() => {
-    DBWorker.pleaseDo({
+    DBWorker.value.pleaseDo({
       action: "exec",
       sql: `SELECT ${longColumn}, ${latColumn}, rowid FROM '${tableName}';`,
     }).then(({ results }) => {

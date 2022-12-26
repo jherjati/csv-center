@@ -1,9 +1,9 @@
 import { useCallback, useState } from "preact/hooks";
 import { useLocation } from "wouter-preact";
-import { DBWorker } from "../../constants";
 import { instrospectDB } from "../../utils";
 import { transfer } from "comlink";
 import { ArrowPathIcon, InboxArrowDownIcon } from "@heroicons/react/20/solid";
+import { DBWorker } from "../../contexts";
 
 function DBLoader() {
   const [_, setLocation] = useLocation();
@@ -13,7 +13,7 @@ function DBLoader() {
     const reader = new FileReader();
     reader.onload = async function () {
       try {
-        await DBWorker.pleaseDo(
+        await DBWorker.value.pleaseDo(
           {
             id: "load_session",
             action: "open",

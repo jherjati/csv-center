@@ -1,5 +1,5 @@
 import { useEffect } from "preact/hooks";
-import { DBWorker } from "../../constants";
+import { DBWorker } from "../../contexts";
 
 function HeatmapLayer({
   map,
@@ -41,7 +41,7 @@ function HeatmapLayer({
   }, []);
 
   useEffect(() => {
-    DBWorker.pleaseDo({
+    DBWorker.value.pleaseDo({
       action: "exec",
       sql: `SELECT ${longColumn}, ${latColumn}, rowid FROM '${tableName}';`,
     }).then(({ results }) => {

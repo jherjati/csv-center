@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "preact/hooks";
 import maplibregl from "maplibre-gl";
-import { DBWorker } from "../../constants";
 import { isUrl } from "../../utils";
+import { DBWorker } from "../../contexts";
 
 const Popup = ({ configs, map }) => {
   const contentRef = useRef();
@@ -55,7 +55,7 @@ const Popup = ({ configs, map }) => {
   useEffect(() => {
     if (feature.tableName && feature.id) {
       setIsLoading(true);
-      DBWorker.pleaseDo({
+      DBWorker.value.pleaseDo({
         action: "exec",
         sql: `SELECT * from '${feature.tableName}' WHERE rowid = ${feature.id}`,
       }).then(({ results }) => {

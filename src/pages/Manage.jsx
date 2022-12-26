@@ -2,21 +2,21 @@ import { useEffect, useErrorBoundary, useState } from "preact/hooks";
 import PageError from "../components/core/PageError";
 import DbTable from "../components/manage/DbTable";
 import EmptyDb from "../components/core/EmptyDb";
-import { formats } from "../contexts";
+import { DBWorker, formats } from "../contexts";
 import { setSnackContent } from "../utils";
 import SampleLoader from "../components/core/SampleLoader";
-import { DBWorker } from "../constants";
 
 function Manage() {
   const [dbTables, setDbTables] = useState();
   const [activeTable, setActiveTable] = useState(0);
 
   useEffect(() => {
-    DBWorker.pleaseDo({
-      id: "browse table",
-      action: "exec",
-      sql: `SELECT name FROM sqlite_schema WHERE type ='table' AND name NOT LIKE 'sqlite_%';`,
-    })
+    DBWorker.value
+      .pleaseDo({
+        id: "browse table",
+        action: "exec",
+        sql: `SELECT name FROM sqlite_schema WHERE type ='table' AND name NOT LIKE 'sqlite_%';`,
+      })
       .then(({ results }) => {
         if (results) {
           const newTables = results[0]?.values?.map((el) => el[0]);

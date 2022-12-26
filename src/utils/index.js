@@ -1,5 +1,5 @@
-import { DBWorker, types } from "../constants";
-import { formats, snackbar } from "../contexts";
+import { types } from "../constants";
+import { DBWorker, formats, snackbar } from "../contexts";
 
 export function paginate(page, maxPage) {
   if (maxPage <= 7) {
@@ -110,13 +110,13 @@ export const formatDynamic = (data, withHeader) =>
     .join(", ");
 
 export const instrospectDB = async () => {
-  const { results } = await DBWorker.pleaseDo({
+  const { results } = await DBWorker.value.pleaseDo({
     id: "browse table",
     action: "exec",
     sql: `SELECT name FROM sqlite_schema WHERE type ='table' AND name NOT LIKE 'sqlite_%';`,
   });
   const newTables = results[0]?.values?.map((el) => el[0]);
-  const data = await DBWorker.pleaseDo({
+  const data = await DBWorker.value.pleaseDo({
     id: "browse column",
     action: "exec",
     sql: newTables.map((name) => `PRAGMA table_info('${name}')`).join(";"),

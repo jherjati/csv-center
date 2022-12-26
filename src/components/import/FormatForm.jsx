@@ -3,13 +3,12 @@ import { parse } from "papaparse";
 import { parse as dateParse } from "date-fns";
 import { useState, useMemo } from "preact/hooks";
 import { ArrowPathIcon, XCircleIcon } from "@heroicons/react/20/solid";
-import { formats, ignoredFields, withHeader } from "../../contexts";
-import { types, DBWorker } from "../../constants";
+import { DBWorker, formats, ignoredFields, withHeader } from "../../contexts";
+import { types } from "../../constants";
 import {
   dbNameEscaper,
   formatColumns,
   formatDynamic,
-  realTransformer,
   setSnackContent,
   symbolReplacer,
 } from "../../utils";
@@ -62,7 +61,7 @@ function FormatForm({ tabName, fields, file }) {
         const newFormats = { ...formats.value, [tableName]: newFormat };
         formats.value = newFormats;
 
-        await DBWorker.pleaseDo({
+        await DBWorker.value.pleaseDo({
           id: "create table",
           action: "exec",
           sql: `CREATE TABLE IF NOT EXISTS '${tableName}'( ${formatDynamic(
@@ -91,7 +90,7 @@ function FormatForm({ tabName, fields, file }) {
           `;
 
           parser.pause();
-          DBWorker.pleaseDo({
+          DBWorker.value.pleaseDo({
             id: "insert row",
             action: "exec",
             sql: statement,
@@ -118,7 +117,7 @@ function FormatForm({ tabName, fields, file }) {
           }
         });
 
-        await DBWorker.pleaseDo({
+        await DBWorker.value.pleaseDo({
           id: "create table",
           action: "exec",
           sql: `CREATE TABLE IF NOT EXISTS '${tableName}'( ${formatColumns(
@@ -146,7 +145,7 @@ function FormatForm({ tabName, fields, file }) {
             `;
 
           parser.pause();
-          DBWorker.pleaseDo({
+          DBWorker.value.pleaseDo({
             id: "insert row",
             action: "exec",
             sql: statement,
@@ -169,7 +168,7 @@ function FormatForm({ tabName, fields, file }) {
           ]);
         },
         complete: function () {
-          DBWorker.pleaseDo({
+          DBWorker.value.pleaseDo({
             id: "check complete",
             action: "exec",
             sql: `PRAGMA main.quick_check('${tableName}')`,

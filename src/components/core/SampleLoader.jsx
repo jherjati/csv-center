@@ -1,8 +1,12 @@
 import { ArrowPathIcon, InboxArrowDownIcon } from "@heroicons/react/20/solid";
 import { transfer } from "comlink";
 import { useCallback, useState } from "preact/hooks";
-import { DBWorker } from "../../constants";
-import { isSampleData, layerConfigs, metricConfigs } from "../../contexts";
+import {
+  DBWorker,
+  isSampleData,
+  layerConfigs,
+  metricConfigs,
+} from "../../contexts";
 import { instrospectDB } from "../../utils";
 import map from "../../sample/map.json";
 import insight from "../../sample/insight.json";
@@ -15,7 +19,7 @@ function SampleLoader() {
       let res = await fetch("/sample.db");
       res = await res.arrayBuffer();
       res = new Uint8Array(res);
-      await DBWorker.pleaseDo(
+      await DBWorker.value.pleaseDo(
         {
           id: "load_session",
           action: "open",

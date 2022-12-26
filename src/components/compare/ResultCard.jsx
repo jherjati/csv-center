@@ -8,8 +8,8 @@ import {
   Tooltip,
   Legend,
 } from "chart.js";
-import { DBWorker } from "../../constants";
 import { setPropByString } from "../../utils";
+import { DBWorker } from "../../contexts";
 Chart.register(
   LineController,
   LinearScale,
@@ -92,8 +92,9 @@ function ResultCard({ chartConfig, dataConfigs }) {
       )
       .join(" ; ");
     const params = [];
-    DBWorker.pleaseDo({ id: "compare", action: "exec", params, sql }).then(
-      (data) => {
+    DBWorker.value
+      .pleaseDo({ id: "compare", action: "exec", params, sql })
+      .then((data) => {
         if (data.results?.length) {
           const datasets = data.results.map(({ columns, values }, idx) => ({
             label: `${dataConfigs[idx].tableName} (${columns[1]})`,
@@ -109,8 +110,7 @@ function ResultCard({ chartConfig, dataConfigs }) {
           );
           chartRef.current.update();
         }
-      }
-    );
+      });
   }, [chartConfig, dataConfigs]);
 
   return (

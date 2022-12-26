@@ -2,9 +2,10 @@ import { Dialog, Transition } from "@headlessui/react";
 import { Fragment } from "preact";
 import { useCallback, useEffect } from "preact/hooks";
 import { TrashIcon } from "@heroicons/react/20/solid";
-import { types, DBWorker } from "../../constants";
+import { types } from "../../constants";
 import { parse } from "date-fns";
 import { format as dateFormat } from "date-fns";
+import { DBWorker } from "../../contexts";
 
 export default function DetailModal({
   open,
@@ -15,7 +16,7 @@ export default function DetailModal({
 }) {
   useEffect(() => {
     if (open && focusId) {
-      DBWorker.pleaseDo({
+      DBWorker.value.pleaseDo({
         id: "read row",
         action: "exec",
         sql: `SELECT * FROM '${tableName}' WHERE rowid = ? LIMIT 1`,
@@ -51,7 +52,7 @@ export default function DetailModal({
             .map(() => "?")
             .join(", ")} );
         `;
-      await DBWorker.pleaseDo({
+      await DBWorker.value.pleaseDo({
         id: "mutate row",
         action: "exec",
         sql: statement,
@@ -114,7 +115,7 @@ export default function DetailModal({
                       <button
                         onClick={(event) => {
                           event.preventDefault();
-                          DBWorker.pleaseDo({
+                          DBWorker.value.pleaseDo({
                             id: "delete row",
                             action: "exec",
                             sql: `DELETE FROM '${tableName}' WHERE rowid = ${focusId}`,

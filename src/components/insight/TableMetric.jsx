@@ -1,5 +1,5 @@
 import { useEffect, useState } from "preact/hooks";
-import { formats, metricConfigs } from "../../contexts";
+import { DBWorker, formats, metricConfigs } from "../../contexts";
 import Actions from "../core/Actions";
 import StatsBox from "./StatsBox";
 import {
@@ -27,7 +27,6 @@ import {
   FunnelIcon,
   PrinterIcon,
 } from "@heroicons/react/20/solid";
-import { DBWorker } from "../../constants";
 
 Chart.register(
   LineController,
@@ -53,7 +52,7 @@ const TableMetric = forwardRef(
     );
     useEffect(() => {
       if (!isInFormats) {
-        DBWorker.pleaseDo({
+        DBWorker.value.pleaseDo({
           id: "browse column",
           action: "exec",
           sql: `PRAGMA table_info('${name}')`,

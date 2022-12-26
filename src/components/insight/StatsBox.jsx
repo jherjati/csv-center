@@ -1,6 +1,6 @@
 import { ArrowDownIcon, ArrowUpIcon } from "@heroicons/react/20/solid";
 import { useEffect, useMemo, useState } from "preact/hooks";
-import { DBWorker } from "../../constants";
+import { DBWorker } from "../../contexts";
 import { classNames, filterToString, filterToValues } from "../../utils";
 
 export default function StatsBox({ column, tableName, filter }) {
@@ -12,14 +12,16 @@ export default function StatsBox({ column, tableName, filter }) {
     )};`;
     const params = filterToValues(filter);
 
-    DBWorker.pleaseDo({
-      id: "get metric",
-      action: "exec",
-      sql,
-      params,
-    }).then(({ results }) => {
-      setValues(results[0].values[0]);
-    });
+    DBWorker.value
+      .pleaseDo({
+        id: "get metric",
+        action: "exec",
+        sql,
+        params,
+      })
+      .then(({ results }) => {
+        setValues(results[0].values[0]);
+      });
   }, [column, filter]);
 
   const stats = useMemo(

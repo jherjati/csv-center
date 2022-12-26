@@ -6,10 +6,6 @@ import {
   ListBulletIcon,
   PresentationChartBarIcon,
 } from "@heroicons/react/24/outline";
-import { wrap } from "comlink";
-
-export const rawWorker = new Worker("/sql/db-worker.js");
-export const DBWorker = wrap(rawWorker);
 
 export const navigation = [
   { name: "Import", href: "/", icon: ArrowDownOnSquareIcon },

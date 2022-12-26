@@ -1,5 +1,8 @@
-import { effect } from "@preact/signals";
-import { signal } from "@preact/signals";
+import { effect, signal, computed } from "@preact/signals";
+import { wrap } from "comlink";
+
+export const rawWorker = signal(new Worker("/sql/db-worker.js"));
+export const DBWorker = computed(() => wrap(rawWorker.value));
 
 export const withHeader = signal(true);
 
