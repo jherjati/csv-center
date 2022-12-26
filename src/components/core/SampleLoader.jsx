@@ -1,12 +1,7 @@
 import { ArrowPathIcon, InboxArrowDownIcon } from "@heroicons/react/20/solid";
 import { transfer } from "comlink";
 import { useCallback, useState } from "preact/hooks";
-import {
-  DBWorker,
-  isSampleData,
-  layerConfigs,
-  metricConfigs,
-} from "../../contexts";
+import { DBWorker, layerConfigs, metricConfigs } from "../../contexts";
 import { instrospectDB } from "../../utils";
 import map from "../../sample/map.json";
 import insight from "../../sample/insight.json";
@@ -30,7 +25,6 @@ function SampleLoader() {
       await instrospectDB();
       layerConfigs.value = map;
       metricConfigs.value = insight;
-      isSampleData.value = true;
     } catch (error) {
       console.error(error);
     } finally {

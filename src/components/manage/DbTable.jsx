@@ -96,7 +96,7 @@ function DbTable({ tableName, children }) {
           }
           setData(toReturn);
         })
-        .catch((error) => console.error(error));
+        .catch(console.error);
     }
   }, [tableName, sortString, page, detailOpen, filter]);
 
