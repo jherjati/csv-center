@@ -19,7 +19,7 @@ function Insight({ dbTables }) {
       <div className='mx-auto max-w-7xl px-8'>
         <TableMetric
           key={activeTable}
-          name={dbTables[activeTable]}
+          tableName={dbTables[activeTable]}
           columns={formats.value[dbTables[activeTable]]}
           ref={componentRef}
           handlePrint={handlePrint}

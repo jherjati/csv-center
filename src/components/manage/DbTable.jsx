@@ -305,7 +305,7 @@ function DbTable({ tableName, children }) {
       {columns.length ? (
         <FilterModal
           open={filterOpen}
-          setOpen={setFilterOpen}
+          closeModal={() => setFilterOpen(false)}
           tableName={tableName}
           filter={filter}
           setFilter={setFilter}

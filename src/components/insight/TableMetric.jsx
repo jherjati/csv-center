@@ -45,50 +45,46 @@ Chart.register(
 );
 
 const TableMetric = forwardRef(
-  ({ name, children, handlePrint, isInFormats }, ref) => {
+  ({ tableName, children, handlePrint, isInFormats }, ref) => {
     // Column
     const [columns, setColumns] = useState(
-      isInFormats ? formats.value[name] : []
+      isInFormats ? formats.value[tableName] : []
     );
     useEffect(() => {
       if (!isInFormats) {
-        DBWorker.value.pleaseDo({
-          id: "browse column",
-          action: "exec",
-          sql: `PRAGMA table_info('${name}')`,
-        }).then(({ results }) => {
-          const columns = results[0]?.values.map((val) => ({
-            name: val[1],
-            type: val[2].toLowerCase(),
-            aliases: [val[1]],
-          }));
-          setColumns(columns);
-          formats.value = { ...formats.value, [name]: columns };
-        });
+        DBWorker.value
+          .pleaseDo({
+            id: "browse column",
+            action: "exec",
+            sql: `PRAGMA table_info('${tableName}')`,
+          })
+          .then(({ results }) => {
+            const columns = results[0]?.values.map((val) => ({
+              name: val[1],
+              type: val[2].toLowerCase(),
+              aliases: [val[1]],
+            }));
+            setColumns(columns);
+            formats.value = { ...formats.value, [tableName]: columns };
+          });
       } else {
-        setColumns(formats.value[name]);
+        setColumns(formats.value[tableName]);
       }
-    }, [name, isInFormats]);
+    }, [tableName, isInFormats]);
 
-    const [filter, setFilter] = useState([]);
-    useEffect(() => {
-      setFilter(
-        metricConfigs.value[name] ? metricConfigs.value[name].filter : []
-      );
-    }, []);
-    useEffect(() => {
-      if (metricConfigs.value[name]) metricConfigs.value[name].filter = filter;
-    }, [filter]);
+    const filter = metricConfigs.value[tableName]
+      ? metricConfigs.value[tableName].filter
+      : [];
 
     // Fill Config Placeholder
     useEffect(() => {
-      if (columns.length && !metricConfigs.value[name]) {
+      if (columns.length && !metricConfigs.value[tableName]) {
         const numberColumns = columns.filter((col) =>
           ["integer", "real"].includes(col.type)
         );
         metricConfigs.value = {
           ...metricConfigs.value,
-          [name]: {
+          [tableName]: {
             stats: [numberColumns[0]?.name],
             charts: [
               {
@@ -137,8 +133,7 @@ const TableMetric = forwardRef(
       }
     }, [columns]);
 
-    const [filterOpen, setFilterOpen] = useState(false);
-    const [configOpen, setConfigOpen] = useState(false);
+    const [modalType, setModalType] = useState();
 
     return (
       <section className='bg-white overflow-hidden shadow rounded-lg my-6 pb-6'>
@@ -149,22 +144,22 @@ const TableMetric = forwardRef(
             icons={[FunnelIcon, Cog8ToothIcon, PrinterIcon]}
             labels={["Filter", "Config", "Print"]}
             handlers={[
-              () => setFilterOpen(true),
-              () => setConfigOpen(true),
+              () => setModalType("filter"),
+              () => setModalType("config"),
               handlePrint,
             ]}
           />
         </div>
         <div ref={ref} className='border-y border-gray-200'>
-          {metricConfigs.value[name]?.stats.map((col) => (
-            <StatsBox column={col} tableName={name} filter={filter} />
+          {metricConfigs.value[tableName]?.stats.map((col) => (
+            <StatsBox column={col} tableName={tableName} filter={filter} />
           ))}
           <div className='w-full grid grid-cols-6'>
-            {metricConfigs.value[name]?.charts.map((config, idx) => (
+            {metricConfigs.value[tableName]?.charts.map((config, idx) => (
               <ChartBox
                 key={config.type + idx}
                 config={config}
-                tableName={name}
+                tableName={tableName}
                 filter={filter}
               />
             ))}
@@ -173,17 +168,25 @@ const TableMetric = forwardRef(
         {columns.length ? (
           <>
             <FilterModal
-              open={filterOpen}
-              setOpen={setFilterOpen}
-              tableName={name}
+              open={modalType === "filter"}
+              closeModal={setModalType}
+              tableName={tableName}
               filter={filter}
-              setFilter={setFilter}
+              setFilter={(cb) =>
+                (metricConfigs.value = {
+                  ...metricConfigs.value,
+                  [tableName]: {
+                    ...metricConfigs.value[tableName],
+                    filter: cb(filter),
+                  },
+                })
+              }
               columns={columns}
             />
             <ConfigModal
-              open={configOpen}
-              setOpen={setConfigOpen}
-              tableName={name}
+              open={modalType === "config"}
+              closeModal={setModalType}
+              tableName={tableName}
               columns={columns}
             />
           </>

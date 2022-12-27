@@ -8,7 +8,7 @@ import { setSnackContent } from "../../utils";
 
 export default function FilterModal({
   open,
-  setOpen,
+  closeModal,
   tableName,
   filter,
   setFilter,
@@ -45,7 +45,7 @@ export default function FilterModal({
 
   return (
     <Transition.Root show={open} as={Fragment}>
-      <Dialog as='div' className='relative z-10' onClose={setOpen}>
+      <Dialog as='div' className='relative z-10' onClose={closeModal}>
         <Transition.Child
           as={Fragment}
           enter='ease-out duration-300'
@@ -77,7 +77,7 @@ export default function FilterModal({
                   <button
                     onClick={(event) => {
                       event.preventDefault();
-                      setOpen(false);
+                      closeModal();
                     }}
                     className='inline-flex items-center rounded-md border border-gray-300 bg-white p-1 text-xs font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2'
                   >

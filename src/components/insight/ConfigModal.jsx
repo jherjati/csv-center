@@ -17,7 +17,7 @@ import { getPropByString, setPropByString } from "../../utils";
 import { chartForm } from "../../constants";
 import ChartNav from "./ChartNav";
 
-export default function ConfigModal({ open, setOpen, tableName, columns }) {
+export default function ConfigModal({ open, closeModal, tableName, columns }) {
   const [stats, setStats] = useState([]);
   const [charts, setCharts] = useState([]);
   const [type, setType] = useState(["line"]);
@@ -87,9 +87,13 @@ export default function ConfigModal({ open, setOpen, tableName, columns }) {
     });
     metricConfigs.value = {
       ...metricConfigs.value,
-      [tableName]: { stats, charts: funcCharts },
+      [tableName]: {
+        ...metricConfigs.value[tableName],
+        stats,
+        charts: funcCharts,
+      },
     };
-    setOpen(false);
+    closeModal();
   };
 
   const handleAddChart = () => {
@@ -124,7 +128,7 @@ export default function ConfigModal({ open, setOpen, tableName, columns }) {
 
   return (
     <Transition.Root show={open} as={Fragment}>
-      <Dialog as='div' className='relative z-10' onClose={setOpen}>
+      <Dialog as='div' className='relative z-10' onClose={closeModal}>
         <Transition.Child
           as={Fragment}
           enter='ease-out duration-300'
@@ -154,7 +158,7 @@ export default function ConfigModal({ open, setOpen, tableName, columns }) {
                   onSubmit={handleSubmit}
                   onReset={(event) => {
                     event.preventDefault();
-                    setOpen(false);
+                    closeModal();
                   }}
                 >
                   <div className='flex justify-between items-center mb-6'>
