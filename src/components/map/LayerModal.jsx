@@ -36,9 +36,8 @@ const configForm = {
 
 export default function LayerModal({
   open,
-  setOpen,
+  closeModal,
   dbTables,
-  isEditing,
   layerConfig,
 }) {
   const [type, setType] = useState("circle");
@@ -59,7 +58,7 @@ export default function LayerModal({
 
   useEffect(() => {
     if (open) {
-      if (isEditing) {
+      if (layerConfig) {
         setLocalLayerConfig(layerConfig);
         setType(layerConfig.type);
         const ends = Object.keys(layerConfig)
@@ -89,7 +88,7 @@ export default function LayerModal({
       const form = new FormData(event.target);
       const data = Object.fromEntries(form.entries());
       const newConfigs = ((prev) => {
-        if (isEditing) {
+        if (layerConfig) {
           const newConfigs = [...prev];
           const oldIdx = newConfigs.findIndex(
             (conf) => conf.layerName === layerConfig.layerName
@@ -101,7 +100,7 @@ export default function LayerModal({
         }
       })(layerConfigs.value);
       layerConfigs.value = newConfigs;
-      setOpen(false);
+      closeModal();
     },
     [layerConfig, type]
   );
@@ -115,7 +114,7 @@ export default function LayerModal({
 
   return (
     <Transition.Root show={open} as={Fragment}>
-      <Dialog as='div' className='relative z-10' onClose={setOpen}>
+      <Dialog as='div' className='relative z-10' onClose={closeModal}>
         <Transition.Child
           as={Fragment}
           enter='ease-out duration-300'
@@ -145,13 +144,11 @@ export default function LayerModal({
                   onSubmit={handleSubmit}
                   onReset={(event) => {
                     event.preventDefault();
-                    setOpen(false);
+                    closeModal();
                   }}
                 >
                   <h4 className='text-lg leading-6 font-medium text-gray-900 capitalize'>
-                    {isEditing && layerConfig
-                      ? layerConfig.layerName
-                      : "New Layer"}
+                    {layerConfig?.layerName ?? "New Layer"}
                   </h4>
                   {/* Inputs */}
                   <div className='mt-6 grid gap-y-6 gap-x-4 grid-cols-6 max-h-[36rem] overflow-scroll'>
@@ -181,7 +178,7 @@ export default function LayerModal({
                       <div className='col-span-2'>
                         <input
                           onChange={(event) => {
-                            if (!isEditing)
+                            if (!layerConfig)
                               setLocalLayerConfig((prev) => ({
                                 ...prev,
                                 heatmapIntensity: 1,
@@ -209,7 +206,7 @@ export default function LayerModal({
                       <div className='col-span-2'>
                         <input
                           onChange={(event) => {
-                            if (!isEditing)
+                            if (!layerConfig)
                               setLocalLayerConfig((prev) => ({
                                 ...prev,
                                 "steps.0.radius": "15",

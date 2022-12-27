@@ -47,9 +47,6 @@ function Map({ dbTables }) {
   }, [dbTables]);
 
   const [open, setOpen] = useState(false);
-  useEffect(() => {
-    if (!open) setFocusLayer(null);
-  }, [open]);
 
   return (
     <>
@@ -60,15 +57,14 @@ function Map({ dbTables }) {
       <LayerModal
         key={focusLayer}
         open={open}
-        setOpen={setOpen}
+        closeModal={() => {
+          setOpen(false);
+          setFocusLayer(null);
+        }}
         dbTables={dbTables}
-        isEditing={Boolean(focusLayer)}
         layerConfig={layerConfigs.value.find(
           (conf) => conf.layerName === focusLayer
         )}
-        setLayerConfigs={(newConf) => {
-          layerConfigs.value = newConf;
-        }}
       />
       <main className='relative w-full h-full' ref={mapContainer}>
         {mapLoad ? (
