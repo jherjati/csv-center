@@ -115,6 +115,29 @@ function DbTable({ tableName, children }) {
       });
   }, [tableName, filter, detailOpen]);
 
+  // Save
+  const handleSave = useCallback(() => {
+    DBWorker.value
+      .pleaseDo({
+        id: "save session",
+        action: "export",
+      })
+      .then((buffer) => {
+        const arraybuff = buffer;
+        const blob = new Blob([arraybuff]);
+        const a = document.createElement("a");
+        document.body.appendChild(a);
+        a.href = window.URL.createObjectURL(blob);
+        a.download = "sql.db";
+        a.onclick = function () {
+          setTimeout(function () {
+            window.URL.revokeObjectURL(a.href);
+          }, 1500);
+        };
+        a.click();
+      });
+  }, []);
+
   // Export
   const handleExport = useCallback((tableName, filter) => {
     window.removeEventListener("beforeunload", onBefoleUnload);
@@ -172,27 +195,7 @@ function DbTable({ tableName, children }) {
           {children}
           <button
             className='px-3 py-2 inline-flex items-center rounded-md border border-gray-300 bg-white text-sm font-medium leading-5 text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2'
-            onClick={() => {
-              DBWorker.value
-                .pleaseDo({
-                  id: "save session",
-                  action: "export",
-                })
-                .then((buffer) => {
-                  const arraybuff = buffer;
-                  const blob = new Blob([arraybuff]);
-                  const a = document.createElement("a");
-                  document.body.appendChild(a);
-                  a.href = window.URL.createObjectURL(blob);
-                  a.download = "sql.db";
-                  a.onclick = function () {
-                    setTimeout(function () {
-                      window.URL.revokeObjectURL(a.href);
-                    }, 1500);
-                  };
-                  a.click();
-                });
-            }}
+            onClick={handleSave}
           >
             <InboxIcon
               className='mr-2 h-5 w-5 text-gray-400'
