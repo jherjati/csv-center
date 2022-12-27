@@ -1,6 +1,4 @@
-import { useCallback, useState, useMemo, useEffect } from "preact/hooks";
-import { onBefoleUnload } from "../constants";
-import { DBWorker } from "../contexts";
+import { useCallback, useState, useMemo } from "preact/hooks";
 
 export const useSort = () => {
   const [sortAsc, setSortAsc] = useState({});
@@ -29,34 +27,4 @@ export const useSort = () => {
   }, [sortAsc]);
 
   return { sortAsc, handleSortClick, sortString };
-};
-
-export const useInitDB = () => {
-  useEffect(() => {
-    window.addEventListener("beforeunload", onBefoleUnload);
-    DBWorker.value.pleaseDo({
-      action: "open",
-    }).catch(console.error);
-    return () => {
-      DBWorker.value.pleaseDo({ action: "close" });
-    };
-  }, []);
-};
-
-export const useTables = () => {
-  const [dbTables, setDbTables] = useState();
-  useEffect(() => {
-    DBWorker.value.pleaseDo({
-      id: "browse table",
-      action: "exec",
-      sql: `SELECT name FROM sqlite_schema WHERE type ='table' AND name NOT LIKE 'sqlite_%';`,
-    })
-      .then((data) => {
-        if (data.results)
-          setDbTables(data.results[0]?.values?.map((el) => el[0]));
-      })
-      .catch(console.error);
-  }, []);
-
-  return { dbTables };
 };

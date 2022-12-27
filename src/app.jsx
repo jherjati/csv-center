@@ -11,16 +11,26 @@ const Guide = lazy(() => import("./pages/Guide"));
 const Empty = lazy(() => import("./pages/Empty"));
 
 import Mobile from "./pages/Mobile";
+import PageHOC from "./components/core/PageHOC";
 import SWModal from "./components/core/SWModal";
 import SnackBar from "./components/core/Snackbar";
 import Sidebar from "./components/layout/Sidebar";
 
-import { useInitDB } from "./hooks";
+import { onBefoleUnload } from "./constants";
 import { DBWorker, formats } from "./contexts";
-import PageHOC from "./components/core/PageHOC";
 
 export default function App() {
-  useInitDB();
+  useEffect(() => {
+    window.addEventListener("beforeunload", onBefoleUnload);
+    DBWorker.value
+      .pleaseDo({
+        action: "open",
+      })
+      .catch(console.error);
+    return () => {
+      DBWorker.value.pleaseDo({ action: "close" });
+    };
+  }, []);
 
   const [dbTables, setDbTables] = useState();
   useEffect(() => {
