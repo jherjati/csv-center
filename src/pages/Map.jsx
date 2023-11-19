@@ -20,7 +20,7 @@ function Map({ dbTables }) {
       mapRef.current = new maplibregl.Map({
         container: mapContainer.current,
         style:
-          "https://api.maptiler.com/maps/streets/style.json?key=get_your_own_OpIi9ZULNHzrESv6T2vL",
+          "https://api.maptiler.com/maps/streets/style.json?key=2ZOGY2YypAQQM0ZwijVA",
         center: [-122.4194, 37.7749],
         zoom: 10,
       });
